@@ -9,12 +9,12 @@ def get_profile(request):
 
 # Send Buy book request
 @api_view(['GET'])
-def buy_your_book_request(request):
+def send_buy_book_request(request):
     return Response({"data": "Buy Book Request"})
 
 # Exchange book request
 @api_view(['GET'])
-def exchange_your_book_request(request):
+def send_exchange_book_request(request):
     return Response({"data": "Exchange book request"})
 
 # Accept request to exchange
@@ -26,6 +26,11 @@ def accept_exchange_request_from_buyer(request):
 @api_view(['POST'])
 def sell_book_to_others(request):
     return Response({"data": "Sell book request"})
+
+# Accept request to sell
+@api_view(['POST'])
+def accept_sell_request_from_buyer(request):
+    return Response({"data": "Accept sell request"})
 
 # Buy request from other buyer
 @api_view(['GET'])
