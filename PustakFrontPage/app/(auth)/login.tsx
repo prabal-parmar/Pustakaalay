@@ -165,13 +165,48 @@ export default function LoginScreen() {
             <ChevronRight size={20} color="#fff" />
           </Pressable>
 
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>New here?</Text>
-            <Pressable>
-              <TouchableOpacity onPressOut={() => router.navigate("/register")}>
-                <Text style={styles.footerLink}>Let's Register</Text>
-              </TouchableOpacity>
-            </Pressable>
+          <View style={{ marginTop: 22, alignItems: "center" }}>
+            <Text
+              style={{
+                fontSize: 12,
+                fontWeight: "700",
+                color: "#6B705C",
+                marginBottom: 10,
+              }}
+            >
+              New here?
+            </Text>
+
+            <View style={{ flexDirection: "row", justifyContent: "center" }}>
+              <Pressable
+                onPress={() => router.push("/registerSeller")}
+                style={{ marginRight: 14 }}
+              >
+                <Text
+                  style={{
+                    fontSize: 12,
+                    fontWeight: "800",
+                    color: "#1A1A1A",
+                    textDecorationLine: "underline",
+                  }}
+                >
+                  Register as Collector
+                </Text>
+              </Pressable>
+
+              <Pressable onPress={() => router.push("/registerBuyer")}>
+                <Text
+                  style={{
+                    fontSize: 12,
+                    fontWeight: "800",
+                    color: "#1A1A1A",
+                    textDecorationLine: "underline",
+                  }}
+                >
+                  Register as Reader
+                </Text>
+              </Pressable>
+            </View>
           </View>
         </Animated.View>
       </ScrollView>
