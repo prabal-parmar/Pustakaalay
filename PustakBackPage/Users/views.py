@@ -4,6 +4,7 @@ from rest_framework.decorators import api_view
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
+from .models import BuyerModel, SellerModel, CustomUser
 # Create your views here.
 
 @api_view(['POST'])
@@ -50,8 +51,64 @@ def login_seller(request):
 
 @api_view(['POST'])
 def register_buyer(request):
-    return Response({"data": "Register Buyer"})
+    username = request.data.get("username")
+    
+    check_username = CustomUser.objects.filter(username=username).values().first()
+    print(check_username)
+    if check_username is not None:
+        return Response({"message": "Username already taken"}, status=status.HTTP_306_RESERVED)
+    
+    email = request.data.get("email")
+    check_email = BuyerModel.objects.filter(email=email).first()
+    if check_email is not None:
+        return Response({"message": "Email already registered"}, status=status.HTTP_306_RESERVED)
+
+    first_name = request.data.get("first_name")
+    last_name = request.data.get("last_name")
+    password = request.data.get("password")
+    age = int(request.data.get("age"))
+    gender = request.data.get("gender")
+    contact_number = request.data.get("contact_number")
+
+    user = CustomUser.objects.create(username=username, 
+                                      password=password, 
+                                      first_name=first_name,
+                                      last_name=last_name,
+                                      role="buyer")
+    
+    buyer = BuyerModel.objects.create(user=user, 
+                                      email=email, 
+                                      age=age, 
+                                      contact_number=contact_number,
+                                      gender=gender)
+
+    return Response({"message": "Buyer registered successfully!"}, status=status.HTTP_201_CREATED)
 
 @api_view(['POST'])
 def register_seller(request):
-    return Response({"data": "Register Seller"})
+    username = request.data.get("username")
+    check_username = CustomUser.objects.filter(username=username).first()
+    if check_username is not None:
+        return Response({"message": "Username already taken"}, status=status.HTTP_306_RESERVED)
+    
+    email = request.data.get("email")
+    check_email = BuyerModel.objects.filter(email=email).first()
+    if check_email is not None:
+        return Response({"message": "Email already registered"}, status=status.HTTP_306_RESERVED)
+    
+    password = request.data.get("password")
+    first_name = request.data.get("first_name")
+    last_name = request.data.get("last_name")
+    sellertype = request.data.get("sellertype")
+
+    user = CustomUser.objects.create(username=username, 
+                                      password=password, 
+                                      first_name=first_name,
+                                      last_name=last_name,
+                                      role="seller")
+    
+    seller = SellerModel.objects.create(user=user, 
+                                      email=email,
+                                      sellertype=sellertype)
+    
+    return Response({"message": "Seller registered successfully!"}, status=status.HTTP_201_CREATED)

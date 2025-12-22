@@ -12,9 +12,17 @@ class CustomUser(AbstractUser):
         return f"{self.username} -> ({self.role})"
     
 class BuyerModel(models.Model):
+
+    GENDER_OPTION = (
+        ('male', 'Male'),
+        ('female', 'Female'),
+        ('other', 'Other')
+    )
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='buyer_profile')
     contact_number = models.CharField(max_length=10)
     email = models.EmailField("email address", unique=True)
+    age = models.IntegerField()
+    gender = models.CharField(max_length=10, choices=GENDER_OPTION)
 
     def __str__(self):
         return self.user.username
