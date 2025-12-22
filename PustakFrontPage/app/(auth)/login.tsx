@@ -45,6 +45,17 @@ export default function LoginScreen() {
     ]).start();
   }, []);
 
+  const loginUser = async () => {
+    setRole("Collector")
+    if(role == "Collector"){
+      router.navigate('/(seller)/mybook')
+    }
+    else{
+      router.navigate('/(buyer)/explore')
+    }
+    return null;
+  }
+
   return (
     <SafeAreaView style={styles.safe}>
       <LinearGradient
@@ -160,7 +171,7 @@ export default function LoginScreen() {
             <Text style={styles.recoverText}>Forgot Password?</Text>
           </Pressable>
 
-          <Pressable style={styles.cta}>
+          <Pressable style={styles.cta} onPress={loginUser}>
             <Text style={styles.ctaText}>Login</Text>
             <ChevronRight size={20} color="#fff" />
           </Pressable>

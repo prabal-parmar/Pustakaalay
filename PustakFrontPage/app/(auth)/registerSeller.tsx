@@ -196,7 +196,7 @@ export default function SellerRegisterScreen() {
             <Text style={styles.submitText}>
               {isSubmitting
                 ? "CREATING ACCOUNT..."
-                : "REGISTER AS COLLECTOR"}
+                : "CREATE ACCOUNT"}
             </Text>
             {!isSubmitting && (
               <ChevronRight size={20} color="#fff" />

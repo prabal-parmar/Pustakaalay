@@ -1,10 +1,10 @@
 import React from 'react'
 import { Text } from 'react-native'
 
-const home = () => {
+const ebook = () => {
   return (
-    <Text>Home Page</Text>
+    <Text>E-Books</Text>
   )
 }
 
-export default home
+export default ebook
