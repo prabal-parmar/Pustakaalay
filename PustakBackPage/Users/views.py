@@ -1,10 +1,11 @@
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, logout
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
 from .models import BuyerModel, SellerModel, CustomUser
+from Seller.models import SellerProfile
 # Create your views here.
 
 @api_view(['POST'])
@@ -111,4 +112,10 @@ def register_seller(request):
                                       email=email,
                                       sellertype=sellertype)
     
+    SellerProfile.objects.create(seller=seller)
     return Response({"message": "Seller registered successfully!"}, status=status.HTTP_201_CREATED)
+
+@api_view(['POST'])
+def logout_user(request):
+    logout(request)
+    return Response({"message": "Logout Successfully"}, status=status.HTTP_200_OK)
