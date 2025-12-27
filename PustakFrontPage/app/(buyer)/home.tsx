@@ -1,70 +1,45 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
-  SafeAreaView,
-  ScrollView,
-  Pressable,
   TextInput,
-  Modal,
+  TouchableOpacity,
+  ScrollView,
+  SafeAreaView,
+  StatusBar,
+  Dimensions,
 } from "react-native";
 import {
   Search,
   Bell,
   User,
   BookOpen,
+  Flame,
   Star,
-  Clock,
+  ChevronRight,
   TrendingUp,
   Heart,
-  ArrowRight,
+  Book,
+  Plus,
+  ArrowUpRight,
   Tag,
   MapPin,
   ScanLine,
-  X,
+  Clock,
+  Sparkles,
 } from "lucide-react-native";
 import { styles } from "@/components/styles/buyerStyles/homeStyles";
 
-interface ReadingBook {
-  id: number;
-  title: string;
-  author: string;
-  progress: number;
-  lastRead: string;
-  description: string;
-  color: string;
-}
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
-interface TrendingBook {
-  id: number;
-  title: string;
-  author: string;
-  rating: number;
-  reads: string;
-  genre: string;
-  description: string;
-}
-
-interface MarketBook {
-  id: number;
-  title: string;
-  author: string;
-  type: "Buy" | "Exchange";
-  price: string;
-  distance: string;
-  condition: string;
-}
-
-type Book = ReadingBook | TrendingBook;
-
-
-const Home: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState<string>("");
-  const [notifOpen, setNotifOpen] = useState<boolean>(false);
+const guidelineBaseWidth = 375;
+const scale = (size: number) => (SCREEN_WIDTH / guidelineBaseWidth) * size;
+export default function App() {
+  const [searchTerm, setSearchTerm] = useState("");
   const [wishlist, setWishlist] = useState<number[]>([101]);
-  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
-  const [user, setUser] = useState({name: "Prabal Parmar"})
-  const readingNow: ReadingBook[] = [
+  const [user, setUser] = useState({ name: "Prabal Parmar" });
+
+  const readingNow = [
     {
       id: 1,
       title: "The Midnight Library",
@@ -72,21 +47,16 @@ const Home: React.FC = () => {
       progress: 65,
       color: "#5c1616",
       lastRead: "2h ago",
-      description:
-        "Between life and death there is a library, and within that library, the shelves go on forever.",
     },
   ];
 
-  const trending: TrendingBook[] = [
+  const trending = [
     {
       id: 101,
       title: "Project Hail Mary",
       author: "Andy Weir",
       rating: 4.9,
       reads: "12.4k",
-      genre: "Sci-Fi",
-      description:
-        "Ryland Grace is the sole survivor on a desperate, last-chance mission.",
     },
     {
       id: 102,
@@ -94,13 +64,10 @@ const Home: React.FC = () => {
       author: "Madeline Miller",
       rating: 4.8,
       reads: "8.1k",
-      genre: "Mythology",
-      description:
-        "In the house of Helios, god of the sun, a daughter is born.",
     },
   ];
 
-  const recommended: MarketBook[] = [
+  const recommended = [
     {
       id: 201,
       title: "Sapiens: A Brief History",
@@ -121,178 +88,250 @@ const Home: React.FC = () => {
     },
   ];
 
-  const toggleWishlist = (id: number): void => {
+  const toggleWishlist = (id: number) => {
     setWishlist((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
     );
   };
 
-  const filteredTrending = useMemo(
-    () =>
-      trending.filter(
-        (b) =>
-          b.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          b.author.toLowerCase().includes(searchTerm.toLowerCase())
-      ),
-    [searchTerm]
-  );
-
-  const filteredRecommended = useMemo(
-    () =>
-      recommended.filter(
-        (b) =>
-          b.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          b.author.toLowerCase().includes(searchTerm.toLowerCase())
-      ),
-    [searchTerm]
-  );
-
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" />
+
+      <View style={styles.bgBlob1} />
+      <View style={styles.bgBlob2} />
+
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <View style={styles.headerRow}>
-            <View style={styles.profile}>
+          <View style={styles.topRow}>
+            <View style={styles.profileContainer}>
               <View style={styles.avatar}>
-                <User size={26} color="#5c1616" />
+                <User size={scale(28)} color="#5c1616" strokeWidth={2.5} />
+                <View style={styles.onlineDot} />
               </View>
-              <View>
-                <Text style={styles.greeting}>Good Morning</Text>
-                <Text style={styles.name}>{user.name}</Text>
+              <View style={styles.welcomeText}>
+                <Text style={styles.subLabel}>GOOD MORNING</Text>
+                <Text style={styles.userName}>{user.name}</Text>
               </View>
             </View>
-
-            <Pressable onPress={() => setNotifOpen(!notifOpen)}>
-              <Bell size={22} color="#5c1616" />
-            </Pressable>
+            <TouchableOpacity style={styles.iconButton}>
+              <Bell size={scale(20)} color="#5c1616" />
+              <View style={styles.notifDot} />
+            </TouchableOpacity>
           </View>
 
-          <View style={styles.searchBox}>
-            <Search size={18} color="#999" />
+          <View style={styles.searchBar}>
+            <Search size={scale(18)} color="#A5A58D" strokeWidth={3} />
             <TextInput
+              placeholder="Search library, authors..."
+              placeholderTextColor="#A5A58D"
+              style={styles.searchInput}
               value={searchTerm}
               onChangeText={setSearchTerm}
-              placeholder="Titles, authors, or scans..."
-              style={styles.input}
             />
-            <ScanLine size={18} color="#aaa" />
+            <ScanLine size={scale(18)} color="#A5A58D" />
           </View>
         </View>
 
-        <Text style={styles.sectionTitle}>Continue Reading</Text>
-
-        {readingNow.map((book) => (
-          <Pressable
-            key={book.id}
-            style={styles.readingCard}
-            onPress={() => setSelectedBook(book)}
-          >
-            <BookOpen size={40} color={book.color} />
-            <View style={{ flex: 1 }}>
-              <Text style={styles.bookTitle}>{book.title}</Text>
-              <Text style={styles.author}>by {book.author}</Text>
-
-              <View style={styles.progressRow}>
-                <Clock size={12} color="#999" />
-                <Text style={styles.smallText}>{book.lastRead}</Text>
-              </View>
-
-              <View style={styles.progressBar}>
-                <View
-                  style={[
-                    styles.progressFill,
-                    { width: `${book.progress}%` },
-                  ]}
-                />
-              </View>
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <View style={styles.titleGroup}>
+              <View style={styles.titleAccent} />
+              <Text style={styles.sectionTitle}>CONTINUE READING</Text>
             </View>
-            <ArrowRight size={20} color="#5c1616" />
-          </Pressable>
-        ))}
+            <TouchableOpacity>
+              <Text style={styles.viewAll}>View All</Text>
+            </TouchableOpacity>
+          </View>
 
-        <Text style={styles.sectionTitle}>Viral Picks</Text>
-
-        <View style={styles.grid}>
-          {filteredTrending.map((book) => (
-            <Pressable
-              key={book.id}
-              style={styles.trendingCard}
-              onPress={() => setSelectedBook(book)}
-            >
-              <Pressable
-                style={styles.heart}
-                onPress={() => toggleWishlist(book.id)}
-              >
-                <Heart
-                  size={16}
-                  color={wishlist.includes(book.id) ? "#5c1616" : "#999"}
-                  fill={wishlist.includes(book.id) ? "#5c1616" : "none"}
+          {readingNow.map((book) => (
+            <TouchableOpacity key={book.id} style={styles.readingCard}>
+              <View style={styles.bookIconBox}>
+                <BookOpen
+                  size={scale(32)}
+                  color={book.color}
+                  strokeWidth={1.5}
                 />
-              </Pressable>
-
-              <BookOpen size={38} color="#FBBF24" />
-              <Text style={styles.bookTitle}>{book.title}</Text>
-              <Text style={styles.author}>{book.author}</Text>
-
-              <View style={styles.ratingRow}>
-                <Star size={14} color="#FBBF24" />
-                <Text>{book.rating}</Text>
-                <TrendingUp size={14} color="#B07D05" />
-                <Text>{book.reads}</Text>
               </View>
-            </Pressable>
+              <View style={styles.readingInfo}>
+                <View style={styles.cardHeader}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.bookTitle} numberOfLines={1}>
+                      {book.title}
+                    </Text>
+                    <Text style={styles.authorName}>by {book.author}</Text>
+                  </View>
+                  <View style={styles.chevronBox}>
+                    <ChevronRight
+                      size={scale(18)}
+                      color="#5c1616"
+                      strokeWidth={3}
+                    />
+                  </View>
+                </View>
+                <View style={styles.progressContainer}>
+                  <View style={styles.progressLabelRow}>
+                    <Text style={styles.progressText}>
+                      {book.progress}% COMPLETED
+                    </Text>
+                    <View style={styles.timeRow}>
+                      <Clock size={scale(10)} color="#A5A58D" />
+                      <Text style={styles.timeText}>{book.lastRead}</Text>
+                    </View>
+                  </View>
+                  <View style={styles.progressBarBg}>
+                    <View
+                      style={[
+                        styles.progressBarFill,
+                        { width: `${book.progress}%` },
+                      ]}
+                    />
+                  </View>
+                </View>
+              </View>
+            </TouchableOpacity>
           ))}
         </View>
 
-        <Text style={styles.sectionTitle}>Marketplace</Text>
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <View style={styles.titleGroup}>
+              <View
+                style={[styles.titleAccent, { backgroundColor: "#FBBF24" }]}
+              />
+              <Text style={styles.sectionTitle}>VIRAL PICKS</Text>
+            </View>
+            <View style={styles.hotBadge}>
+              <Flame size={scale(12)} color="#5c1616" fill="#5c1616" />
+              <Text style={styles.hotText}>HOT</Text>
+            </View>
+          </View>
 
-        {filteredRecommended.map((book) => (
-          <View key={book.id} style={styles.marketCard}>
-            <BookOpen size={28} color="#666" />
-            <View style={{ flex: 1 }}>
-              <Text style={styles.bookTitle}>{book.title}</Text>
-              <Text style={styles.author}>{book.author}</Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.horizontalScroll}
+          >
+            {trending.map((book) => (
+              <View key={book.id} style={styles.trendingCard}>
+                <View style={styles.bookCover}>
+                  <Book
+                    size={scale(48)}
+                    color="#FBBF24"
+                    style={{ opacity: 0.3 }}
+                  />
+                  <View style={styles.eBookBadge}>
+                    <Text style={styles.eBookText}>E-BOOK</Text>
+                  </View>
+                  <TouchableOpacity
+                    style={styles.heartIcon}
+                    onPress={() => toggleWishlist(book.id)}
+                  >
+                    <Heart
+                      size={scale(16)}
+                      color="#5c1616"
+                      fill={
+                        wishlist.includes(book.id) ? "#5c1616" : "transparent"
+                      }
+                    />
+                  </TouchableOpacity>
+                </View>
+                <Text style={styles.trendingTitle} numberOfLines={1}>
+                  {book.title}
+                </Text>
+                <Text style={styles.authorName}>{book.author}</Text>
+                <View style={styles.statsRow}>
+                  <View style={styles.statItem}>
+                    <Star size={scale(10)} color="#FBBF24" fill="#FBBF24" />
+                    <Text style={styles.statText}>{book.rating}</Text>
+                  </View>
+                  <View style={styles.statItem}>
+                    <TrendingUp size={scale(10)} color="#A5A58D" />
+                    <Text style={styles.statText}>{book.reads}</Text>
+                  </View>
+                </View>
+              </View>
+            ))}
+          </ScrollView>
+        </View>
 
-              <View style={styles.marketRow}>
-                <MapPin size={12} color="#999" />
-                <Text style={styles.smallText}>{book.distance}</Text>
-                <Tag size={12} color="#999" />
-                <Text style={styles.smallText}>{book.condition}</Text>
+        <View style={styles.marketplace}>
+          <View style={styles.sectionHeader}>
+            <View style={styles.titleGroup}>
+              <View
+                style={[styles.titleAccent, { backgroundColor: "#B07D05" }]}
+              />
+              <Text style={styles.sectionTitle}>LOCAL EXCHANGE</Text>
+            </View>
+          </View>
+
+          {recommended.map((book) => (
+            <TouchableOpacity key={book.id} style={styles.exchangeCard}>
+              <View style={styles.exchangeIconBox}>
+                <BookOpen size={scale(24)} color="#6B705C" />
+                <View
+                  style={[
+                    styles.typeTag,
+                    {
+                      backgroundColor:
+                        book.type === "Exchange" ? "#5c1616" : "#B07D05",
+                    },
+                  ]}
+                >
+                  <Text style={styles.typeTagText}>{book.type[0]}</Text>
+                </View>
+              </View>
+              <View style={styles.exchangeInfo}>
+                <View style={styles.cardHeader}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.bookTitle}>{book.title}</Text>
+                    <Text style={styles.authorName}>by {book.author}</Text>
+                  </View>
+                  <Text
+                    style={[
+                      styles.priceTag,
+                      {
+                        color: book.type === "Exchange" ? "#5c1616" : "#1A1A1A",
+                      },
+                    ]}
+                  >
+                    {book.price}
+                  </Text>
+                </View>
+                <View style={styles.exchangeFooter}>
+                  <View style={styles.tagGroup}>
+                    <View style={styles.iconTag}>
+                      <MapPin size={scale(10)} color="#6B705C" />
+                      <Text style={styles.tagText}>{book.distance}</Text>
+                    </View>
+                    <View style={styles.iconTag}>
+                      <Tag size={scale(10)} color="#6B705C" />
+                      <Text style={styles.tagText}>{book.condition}</Text>
+                    </View>
+                  </View>
+                  <ArrowUpRight size={scale(14)} color="#A5A58D" />
+                </View>
+              </View>
+            </TouchableOpacity>
+          ))}
+
+          <TouchableOpacity style={styles.ctaBanner}>
+            <View style={styles.ctaSparkle}>
+              <Sparkles size={scale(80)} color="#FBBF24" opacity={0.1} />
+            </View>
+            <Text style={styles.ctaTitle}>Listing books?</Text>
+            <Text style={styles.ctaSub}>
+              Sell or trade your books in less than 30 seconds.
+            </Text>
+            <View style={styles.ctaButton}>
+              <Text style={styles.ctaButtonText}>POST NOW</Text>
+              <View style={styles.plusBox}>
+                <Plus size={scale(20)} color="#FFF" strokeWidth={3} />
               </View>
             </View>
-            <Text style={styles.price}>{book.price}</Text>
-          </View>
-        ))}
-      </ScrollView>
-
-      <Modal visible={!!selectedBook} transparent animationType="slide">
-        <View style={styles.modalBackdrop}>
-          <View style={styles.modal}>
-            <Pressable
-              style={styles.close}
-              onPress={() => setSelectedBook(null)}
-            >
-              <X size={22} />
-            </Pressable>
-
-            <BookOpen size={60} color="#FBBF24" />
-            <Text style={styles.modalTitle}>{selectedBook?.title}</Text>
-            <Text style={styles.modalAuthor}>
-              by {selectedBook?.author}
-            </Text>
-            <Text style={styles.modalDesc}>
-              {selectedBook?.description}
-            </Text>
-
-            <Pressable style={styles.startBtn}>
-              <Text style={styles.startText}>Start Reading</Text>
-              <ArrowRight size={20} color="#fff" />
-            </Pressable>
-          </View>
+          </TouchableOpacity>
         </View>
-      </Modal>
+      </ScrollView>
     </SafeAreaView>
   );
-};
-
-export default Home;
+}

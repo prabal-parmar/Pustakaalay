@@ -1,302 +1,413 @@
 import { Dimensions, StyleSheet } from "react-native";
 
-const CARD_SHADOW = {
-  shadowColor: "#000",
-  shadowOffset: { width: 0, height: 6 },
-  shadowOpacity: 0.08,
-  shadowRadius: 12,
-  elevation: 8,
-};
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
-const { width } = Dimensions.get("window");
+const guidelineBaseWidth = 375;
+const scale = (size: number) => (SCREEN_WIDTH / guidelineBaseWidth) * size;
+
+const moderateScale = (size: number, factor = 0.5) =>
+  size + (scale(size) - size) * factor;
+
+const GRID_PADDING = scale(24);
 
 export const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: "#FFFDF0",
+  container: { flex: 1, backgroundColor: "#FFFDF0" },
+  bgBlob1: {
+    position: "absolute",
+    width: scale(400),
+    height: scale(400),
+    borderRadius: scale(200),
+    backgroundColor: "#FFE8A3",
+    top: scale(-100),
+    right: scale(-100),
+    opacity: 0.3,
+  },
+  bgBlob2: {
+    position: "absolute",
+    width: scale(300),
+    height: scale(300),
+    borderRadius: scale(150),
+    backgroundColor: "#FFF1C1",
+    bottom: scale(100),
+    left: scale(-100),
+    opacity: 0.2,
   },
 
-  header: {
-    padding: 20,
-    backgroundColor: "#FFFDF0",
-
-    borderBottomWidth: 1,
-    borderBottomColor: "#EFE8DA",
-
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 4,
-  },
-
-  headerRow: {
+  header: { padding: GRID_PADDING, paddingTop: scale(30) },
+  topRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: scale(24),
   },
-
-  profile: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-
+  profileContainer: { flexDirection: "row", alignItems: "center", flex: 1 },
   avatar: {
-    width: 52,
-    height: 52,
+    width: scale(56),
+    height: scale(56),
     backgroundColor: "#FBBF24",
-    borderRadius: 16,
+    borderRadius: scale(18),
     justifyContent: "center",
     alignItems: "center",
-
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    elevation: 6,
+    borderWidth: 2,
+    borderColor: "#FFF",
+  },
+  onlineDot: {
+    position: "absolute",
+    top: scale(-2),
+    right: scale(-2),
+    width: scale(12),
+    height: scale(12),
+    backgroundColor: "#22c55e",
+    borderRadius: scale(6),
+    borderWidth: 2,
+    borderColor: "#FFF",
+  },
+  welcomeText: { marginLeft: scale(12), flex: 1 },
+  subLabel: {
+    fontSize: moderateScale(10),
+    fontWeight: "900",
+    color: "#6B705C",
+    letterSpacing: 2,
+  },
+  userName: {
+    fontSize: moderateScale(22),
+    fontWeight: "900",
+    color: "#1A1A1A",
+  },
+  iconButton: {
+    width: scale(44),
+    height: scale(44),
+    backgroundColor: "#FFF",
+    borderRadius: scale(16),
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#E5E0D5",
+  },
+  notifDot: {
+    position: "absolute",
+    top: scale(10),
+    right: scale(10),
+    width: scale(8),
+    height: scale(8),
+    backgroundColor: "#5c1616",
+    borderRadius: scale(4),
+    borderWidth: 2,
+    borderColor: "#FFF",
   },
 
-  greeting: { fontSize: 10, color: "#777" },
-  name: { fontSize: 20, fontWeight: "900" },
-
-  searchBox: {
-    marginTop: 16,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 20,
+  searchBar: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 14,
-
+    backgroundColor: "#FFF",
+    borderRadius: scale(22),
+    paddingHorizontal: scale(16),
+    height: scale(56),
     borderWidth: 1,
-    borderColor: "#EEE8DC",
-
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 6,
+    borderColor: "#E5E0D5",
+  },
+  searchInput: {
+    flex: 1,
+    marginLeft: scale(12),
+    fontWeight: "700",
+    color: "#1A1A1A",
+    height: "100%",
   },
 
-  input: { flex: 1, padding: 10 },
-
+  section: { paddingHorizontal: GRID_PADDING, marginBottom: scale(32) },
+  sectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-end",
+    marginBottom: scale(16),
+  },
+  titleGroup: { flexDirection: "row", alignItems: "center", flex: 1 },
+  titleAccent: {
+    width: scale(6),
+    height: scale(20),
+    backgroundColor: "#5c1616",
+    borderRadius: scale(3),
+    marginRight: scale(10),
+  },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: moderateScale(18),
     fontWeight: "900",
-    margin: 20,
+    color: "#1A1A1A",
+  },
+  viewAll: {
+    fontSize: moderateScale(10),
+    fontWeight: "900",
+    color: "#5c1616",
+    letterSpacing: 1,
   },
 
   readingCard: {
-    backgroundColor: "#FFFFFF",
-    marginHorizontal: 20,
-    padding: 20,
-    borderRadius: 24,
+    backgroundColor: "#FFF",
+    borderRadius: scale(32),
+    padding: scale(16),
     flexDirection: "row",
-    alignItems: "center",
-    gap: 14,
-
     borderWidth: 1,
-    borderColor: "#F0EDE6",
-
-    ...CARD_SHADOW,
-  },
-
-  bookTitle: { fontSize: 16, fontWeight: "900" },
-  author: { fontSize: 12, color: "#777" },
-
-  progressRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    marginTop: 6,
-  },
-
-  progressBar: {
-    height: 6,
-    backgroundColor: "#EFE8DA",
-    borderRadius: 6,
-    marginTop: 6,
-  },
-
-  progressFill: {
-    height: "100%",
-    backgroundColor: "#FBBF24",
-    borderRadius: 6,
-  },
-
-  grid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-  },
-
-  trendingCard: {
-    width: width / 2 - 30,
-    backgroundColor: "#FFFFFF",
-    padding: 16,
-    borderRadius: 28,
-    marginBottom: 20,
-
-    borderWidth: 1,
-    borderColor: "#F0EDE6",
-
+    borderColor: "#F3EEE0",
+    elevation: 2,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.06,
-    shadowRadius: 10,
-    elevation: 6,
-  },
-
-  heart: {
-    position: "absolute",
-    top: 12,
-    right: 12,
-  },
-
-  ratingRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    marginTop: 10,
-  },
-
-  marketCard: {
-    backgroundColor: "#FFFFFF",
-    marginHorizontal: 20,
-    marginBottom: 14,
-    padding: 16,
-    borderRadius: 22,
-    flexDirection: "row",
-    gap: 12,
-    alignItems: "center",
-
-    borderWidth: 1,
-    borderColor: "#EEE8DC",
-
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 5,
+    shadowRadius: 10,
   },
-
-  marketRow: {
-    flexDirection: "row",
+  bookIconBox: {
+    width: scale(64),
+    height: scale(80),
+    backgroundColor: "#FDFDFB",
+    borderRadius: scale(16),
+    justifyContent: "center",
     alignItems: "center",
-    gap: 8,
-    marginTop: 6,
+    borderWidth: 1,
+    borderColor: "#F4F1EA",
+  },
+  readingInfo: { flex: 1, marginLeft: scale(16) },
+  cardHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+  bookTitle: {
+    fontSize: moderateScale(16),
+    fontWeight: "900",
+    color: "#1A1A1A",
+  },
+  authorName: {
+    fontSize: moderateScale(12),
+    fontWeight: "700",
+    color: "#6B705C",
+    marginTop: scale(2),
+  },
+  chevronBox: {
+    width: scale(32),
+    height: scale(32),
+    backgroundColor: "#FBBF24",
+    borderRadius: scale(10),
+    justifyContent: "center",
+    alignItems: "center",
   },
 
-  price: {
+  progressContainer: { marginTop: scale(12) },
+  progressLabelRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: scale(6),
+  },
+  progressText: {
+    fontSize: moderateScale(9),
     fontWeight: "900",
     color: "#5c1616",
   },
-
-  cta: {
-    margin: 20,
-    backgroundColor: "#1A1A1A",
-    borderRadius: 32,
-    padding: 24,
-    alignItems: "center",
-
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-    elevation: 14,
-  },
-
-  ctaTitle: {
-    color: "#fff",
-    fontSize: 20,
+  timeRow: { flexDirection: "row", alignItems: "center" },
+  timeText: {
+    fontSize: moderateScale(9),
     fontWeight: "900",
-    marginVertical: 12,
-    textAlign: "center",
+    color: "#A5A58D",
+    marginLeft: scale(4),
+  },
+  progressBarBg: {
+    width: "100%",
+    height: scale(6),
+    backgroundColor: "#F4F1EA",
+    borderRadius: scale(3),
+  },
+  progressBarFill: {
+    height: "100%",
+    backgroundColor: "#5c1616",
+    borderRadius: scale(3),
   },
 
-  ctaButton: {
-    backgroundColor: "#FBBF24",
+  hotBadge: {
     flexDirection: "row",
-    gap: 10,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 24,
     alignItems: "center",
-
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 6,
+    backgroundColor: "rgba(92, 22, 22, 0.05)",
+    paddingHorizontal: scale(10),
+    paddingVertical: scale(4),
+    borderRadius: scale(20),
+    borderWidth: 1,
+    borderColor: "rgba(92, 22, 22, 0.1)",
+  },
+  hotText: {
+    fontSize: moderateScale(9),
+    fontWeight: "900",
+    color: "#5c1616",
+    marginLeft: scale(4),
   },
 
-  ctaText: { fontWeight: "900" },
-
-  modalBackdrop: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.8)",
-    justifyContent: "flex-end",
-  },
-
-  modal: {
-    backgroundColor: "#FFFFFF",
-    padding: 30,
-    borderTopLeftRadius: 40,
-    borderTopRightRadius: 40,
+  horizontalScroll: { paddingLeft: GRID_PADDING, paddingRight: scale(8) },
+  trendingCard: { width: scale(160), marginRight: scale(20) },
+  bookCover: {
+    height: scale(220),
+    backgroundColor: "#FFF",
+    borderRadius: scale(32),
+    borderWidth: 1,
+    borderColor: "#F3EEE0",
+    justifyContent: "center",
     alignItems: "center",
-
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: -6 },
-    shadowOpacity: 0.15,
-    shadowRadius: 20,
-    elevation: 20,
+    position: "relative",
   },
-
-  close: {
+  eBookBadge: {
     position: "absolute",
-    top: 20,
-    right: 20,
+    top: scale(12),
+    left: scale(12),
+    backgroundColor: "rgba(26, 26, 26, 0.8)",
+    paddingHorizontal: scale(8),
+    paddingVertical: scale(4),
+    borderRadius: scale(6),
   },
-
-  modalTitle: {
-    fontSize: 24,
+  eBookText: { fontSize: moderateScale(7), fontWeight: "900", color: "#FFF" },
+  heartIcon: {
+    position: "absolute",
+    top: scale(12),
+    right: scale(12),
+    width: scale(36),
+    height: scale(36),
+    backgroundColor: "rgba(255,255,255,0.9)",
+    borderRadius: scale(12),
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  trendingTitle: {
+    fontSize: moderateScale(15),
     fontWeight: "900",
-    marginTop: 12,
+    color: "#1A1A1A",
+    marginTop: scale(12),
+  },
+  statsRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: scale(8),
+    paddingTop: scale(8),
+    borderTopWidth: 1,
+    borderTopColor: "rgba(0,0,0,0.05)",
+  },
+  statItem: { flexDirection: "row", alignItems: "center" },
+  statText: {
+    fontSize: moderateScale(10),
+    fontWeight: "900",
+    color: "#1A1A1A",
+    marginLeft: scale(4),
   },
 
-  modalAuthor: {
-    color: "#777",
-    marginBottom: 16,
+  marketplace: {
+    backgroundColor: "#F7F6F2",
+    borderTopLeftRadius: scale(50),
+    borderTopRightRadius: scale(50),
+    padding: GRID_PADDING,
+    paddingTop: scale(40),
+    borderTopWidth: 1,
+    borderColor: "#EFE8DA",
+    minHeight: scale(400),
+  },
+  buttonGroup: { flexDirection: "row" },
+  smallBtn: {
+    backgroundColor: "#FFF",
+    paddingHorizontal: scale(12),
+    paddingVertical: scale(6),
+    borderRadius: scale(10),
+    borderWidth: 1,
+    borderColor: "#E5E0D5",
+    marginLeft: scale(8),
+  },
+  smallBtnText: {
+    fontSize: moderateScale(9),
+    fontWeight: "900",
+    color: "#1A1A1A",
   },
 
-  modalDesc: {
-    textAlign: "center",
-    color: "#666",
-    marginBottom: 30,
+  exchangeCard: {
+    backgroundColor: "#FFF",
+    borderRadius: scale(28),
+    padding: scale(16),
+    flexDirection: "row",
+    marginBottom: scale(12),
+    borderWidth: 1,
+    borderColor: "#F3EEE0",
   },
-
-  startBtn: {
+  exchangeIconBox: {
+    width: scale(64),
+    height: scale(80),
+    backgroundColor: "#F4F1EA",
+    borderRadius: scale(18),
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  typeTag: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    width: scale(20),
+    height: scale(20),
+    borderBottomLeftRadius: scale(10),
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  typeTagText: { fontSize: moderateScale(8), fontWeight: "900", color: "#FFF" },
+  exchangeInfo: { flex: 1, marginLeft: scale(16), justifyContent: "center" },
+  priceTag: { fontSize: moderateScale(13), fontWeight: "900" },
+  exchangeFooter: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: scale(12),
+    paddingTop: scale(8),
+    borderTopWidth: 1,
+    borderTopColor: "rgba(0,0,0,0.05)",
+  },
+  tagGroup: { flexDirection: "row" },
+  iconTag: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#1A1A1A",
-    paddingVertical: 16,
-    paddingHorizontal: 30,
-    borderRadius: 30,
-    gap: 10,
-
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-    elevation: 10,
+    marginRight: scale(12),
   },
-
-  startText: {
-    color: "#fff",
+  tagText: {
+    fontSize: moderateScale(9),
     fontWeight: "900",
-    textTransform: "uppercase",
+    color: "#6B705C",
+    marginLeft: scale(4),
   },
 
-  smallText: { fontSize: 11, color: "#777" },
+  ctaBanner: {
+    backgroundColor: "#1A1A1A",
+    borderRadius: scale(40),
+    padding: scale(32),
+    marginTop: scale(40),
+    overflow: "hidden",
+  },
+  ctaSparkle: { position: "absolute", right: scale(-20), top: scale(-10) },
+  ctaTitle: { fontSize: moderateScale(28), fontWeight: "900", color: "#FFF" },
+  ctaSub: {
+    fontSize: moderateScale(12),
+    fontWeight: "700",
+    color: "#6B705C",
+    marginTop: scale(8),
+    letterSpacing: 0.5,
+  },
+  ctaButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#FBBF24",
+    borderRadius: scale(24),
+    paddingLeft: scale(20),
+    paddingRight: scale(8),
+    paddingVertical: scale(8),
+    marginTop: scale(32),
+  },
+  ctaButtonText: {
+    fontSize: moderateScale(11),
+    fontWeight: "900",
+    color: "#1A1A1A",
+    letterSpacing: 1,
+  },
+  plusBox: {
+    width: scale(36),
+    height: scale(36),
+    backgroundColor: "#1A1A1A",
+    borderRadius: scale(12),
+    justifyContent: "center",
+    alignItems: "center",
+  },
 });
