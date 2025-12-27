@@ -6,6 +6,7 @@ import {
   ScrollView,
   TextInput,
   Pressable,
+  StatusBar,
 } from "react-native";
 import {
   Book,
@@ -21,7 +22,7 @@ import {
   MoreHorizontal,
   Star,
 } from "lucide-react-native";
-import { styles } from "@/components/styles/sellerStyles/mybookStyles";
+import { styles } from "@/components/styles/sellerStyles/mybookStyles"; 
 
 export default function InventoryScreen() {
   const [activeType, setActiveType] = useState("Novel");
@@ -35,9 +36,9 @@ export default function InventoryScreen() {
   };
 
   const typeIcons: any = {
-    Educational: <GraduationCap size={18} color="#FBBF24" />,
-    Novel: <Library size={18} color="#FBBF24" />,
-    Other: <MoreHorizontal size={18} color="#FBBF24" />,
+    Educational: <GraduationCap size={16} color={activeType === "Educational" ? "#FFF" : "#D4AF37"} />,
+    Novel: <Library size={16} color={activeType === "Novel" ? "#FFF" : "#D4AF37"} />,
+    Other: <MoreHorizontal size={16} color={activeType === "Other" ? "#FFF" : "#D4AF37"} />,
   };
 
   const inventory = [
@@ -59,33 +60,35 @@ export default function InventoryScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <StatusBar barStyle="dark-content" />
+      <ScrollView showsVerticalScrollIndicator={false} stickyHeaderIndices={[1]}>
 
         <View style={styles.header}>
           <View>
-            <Text style={styles.title}>My Inventory</Text>
             <Text style={styles.subtitle}>MANAGE YOUR COLLECTION</Text>
+            <Text style={styles.title}>My Inventory</Text>
           </View>
-
           <Pressable style={styles.addBtn}>
-            <Plus size={22} color="#FBBF24" />
+            <Plus size={24} color="#FFF" strokeWidth={3} />
           </Pressable>
         </View>
 
-        <View style={styles.searchBox}>
-          <Search size={18} color="#A5A58D" />
-          <TextInput
-            value={searchTerm}
-            onChangeText={setSearchTerm}
-            placeholder={`Search in ${activeType}...`}
-            placeholderTextColor="#A5A58D"
-            style={styles.searchInput}
-          />
-          {searchTerm.length > 0 && (
-            <Pressable onPress={() => setSearchTerm("")}>
-              <X size={16} color="#A5A58D" />
-            </Pressable>
-          )}
+        <View style={styles.stickyWrapper}>
+          <View style={styles.searchBox}>
+            <Search size={18} color="#A5A58D" strokeWidth={2.5} />
+            <TextInput
+              value={searchTerm}
+              onChangeText={setSearchTerm}
+              placeholder={`Search in ${activeType.toLowerCase()}...`}
+              placeholderTextColor="#A5A58D99"
+              style={styles.searchInput}
+            />
+            {searchTerm.length > 0 && (
+              <Pressable onPress={() => setSearchTerm("")} style={styles.clearBtn}>
+                <X size={14} color="#A5A58D" />
+              </Pressable>
+            )}
+          </View>
         </View>
 
         <View style={styles.typeRow}>
@@ -109,7 +112,7 @@ export default function InventoryScreen() {
           })}
         </View>
 
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.genreRow}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.genreRow} contentContainerStyle={{ paddingRight: 40 }}>
           {categoryMap[activeType].map((genre) => {
             const active = genre === activeGenre;
             return (
@@ -127,10 +130,13 @@ export default function InventoryScreen() {
         </ScrollView>
 
         <View style={styles.countRow}>
-          <Text style={styles.countText}>
-            {filteredBooks.length} {activeType} Found
-          </Text>
-          <Filter size={14} color="#6B705C" />
+          <View style={styles.flexRowCenter}>
+            <View style={styles.accentLine} />
+            <Text style={styles.countText}>
+              {filteredBooks.length} {activeType.toUpperCase()} ITEMS
+            </Text>
+          </View>
+          <Filter size={16} color="#1A1A1A" opacity={0.6} />
         </View>
 
         <View style={styles.list}>
@@ -138,9 +144,11 @@ export default function InventoryScreen() {
             filteredBooks.map((book) => (
               <Pressable key={book.id} style={styles.card}>
                 <View style={styles.cover}>
-                  <Book size={22} color="#FBBF24" />
+                  <Book size={24} color="#D4AF37" opacity={0.3} />
                   {book.condition === "Rare" && (
-                    <Sparkles size={12} color="#B07D05" style={styles.sparkle} />
+                    <View style={styles.rareBadge}>
+                       <Sparkles size={10} color="#FFF" />
+                    </View>
                   )}
                 </View>
 
@@ -148,15 +156,20 @@ export default function InventoryScreen() {
                   <View style={styles.cardHeader}>
                     <View style={{ flex: 1 }}>
                       <Text style={styles.bookTitle}>{book.title}</Text>
-                      <Text style={styles.bookAuthor}>{book.author}</Text>
+                      <View style={styles.authorRow}>
+                         <View style={styles.dot} />
+                         <Text style={styles.bookAuthor}>{book.author}</Text>
+                      </View>
                     </View>
-                    <ChevronRight size={18} color="#E5E0D5" />
+                    <View style={styles.chevronBg}>
+                      <ChevronRight size={14} color="#1A1A1A" strokeWidth={3} />
+                    </View>
                   </View>
 
                   <View style={styles.cardFooter}>
                     <Text style={styles.price}>{book.price}</Text>
                     <View style={styles.rating}>
-                      <Star size={12} fill="#FBBF24" color="#FBBF24" />
+                      <Star size={12} fill="#D4AF37" color="#D4AF37" />
                       <Text style={styles.ratingText}>4.9</Text>
                     </View>
                   </View>
@@ -165,23 +178,25 @@ export default function InventoryScreen() {
             ))
           ) : (
             <View style={styles.empty}>
-              <BookOpen size={26} color="#A5A58D" />
-              <Text style={styles.emptyTitle}>No Books Found</Text>
+              <View style={styles.emptyIconCircle}>
+                <BookOpen size={32} color="#D4AF37" opacity={0.4} />
+              </View>
+              <Text style={styles.emptyTitle}>No matching titles</Text>
               <Text style={styles.emptyText}>
-                Try changing the genre or search term
+                We couldn't find anything in your collection.
               </Text>
               <Pressable
                 onPress={() => {
                   setActiveGenre("All");
                   setSearchTerm("");
                 }}
+                style={styles.resetBtn}
               >
-                <Text style={styles.reset}>RESET FILTERS</Text>
+                <Text style={styles.resetText}>RESET FILTERS</Text>
               </Pressable>
             </View>
           )}
         </View>
-
       </ScrollView>
     </SafeAreaView>
   );

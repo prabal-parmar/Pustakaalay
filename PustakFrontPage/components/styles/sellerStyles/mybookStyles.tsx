@@ -1,53 +1,92 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Platform } from "react-native";
 
 export const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: "#FFFDF0" },
+  safe: { flex: 1, backgroundColor: "#FCF9F1" },
 
   header: {
-    padding: 20,
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 20,
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-end",
   },
 
-  title: { fontSize: 22, fontWeight: "900", color: "#1A1A1A" },
+  title: {
+    fontSize: 28,
+    fontWeight: "900",
+    color: "#1A1A1A",
+    letterSpacing: -1,
+  },
   subtitle: {
     fontSize: 10,
     fontWeight: "900",
-    letterSpacing: 3,
-    color: "#B07D05",
-    marginTop: 4,
+    letterSpacing: 4,
+    color: "#D4AF37",
+    marginBottom: 4,
   },
 
   addBtn: {
-    width: 48,
-    height: 48,
+    width: 52,
+    height: 52,
     backgroundColor: "#1A1A1A",
-    borderRadius: 18,
+    borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+
+  stickyWrapper: {
+    backgroundColor: "#FCF9F1",
+    paddingBottom: 4,
   },
 
   searchBox: {
-    marginHorizontal: 20,
+    marginHorizontal: 24,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#fff",
-    borderRadius: 22,
+    backgroundColor: "#FFF",
+    borderRadius: 20,
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    marginBottom: 18,
+    height: 54,
+    borderWidth: 1,
+    borderColor: "#E5E0D5",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 10,
+      },
+      android: { elevation: 2 },
+    }),
   },
 
-  searchInput: { flex: 1, marginLeft: 10, fontSize: 14 },
+  searchInput: {
+    flex: 1,
+    marginLeft: 12,
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#1A1A1A",
+  },
+
+  clearBtn: {
+    backgroundColor: "#FCF9F1",
+    padding: 6,
+    borderRadius: 8,
+  },
 
   typeRow: {
-    marginHorizontal: 20,
+    marginHorizontal: 24,
     flexDirection: "row",
-    backgroundColor: "#F4F1EA",
-    padding: 6,
-    borderRadius: 22,
-    marginBottom: 16,
+    backgroundColor: "rgba(0,0,0,0.03)",
+    padding: 4,
+    borderRadius: 18,
+    marginVertical: 20,
   },
 
   typeBtn: {
@@ -55,53 +94,72 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 6,
-    paddingVertical: 10,
-    borderRadius: 18,
+    gap: 8,
+    paddingVertical: 12,
+    borderRadius: 14,
   },
 
-  typeBtnActive: { backgroundColor: "#1A1A1A" },
+  typeBtnActive: {
+    backgroundColor: "#1A1A1A",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
 
   typeText: {
-    fontSize: 11,
-    fontWeight: "900",
+    fontSize: 12,
+    fontWeight: "800",
     color: "#6B705C",
   },
 
-  typeTextActive: { color: "#fff" },
+  typeTextActive: { color: "#FFF" },
 
   genreRow: {
-    paddingHorizontal: 20,
-    marginBottom: 14,
+    paddingLeft: 24,
+    marginBottom: 20,
   },
 
   genrePill: {
-    backgroundColor: "#fff",
+    backgroundColor: "#FFF",
     paddingHorizontal: 18,
-    paddingVertical: 8,
-    borderRadius: 20,
-    marginRight: 8,
+    paddingVertical: 10,
+    borderRadius: 14,
+    marginRight: 10,
     borderWidth: 1,
-    borderColor: "#F3EEE0",
+    borderColor: "#E5E0D5",
   },
 
-  genreActive: { backgroundColor: "#FBBF24" },
+  genreActive: {
+    backgroundColor: "#721C24",
+    borderColor: "#721C24",
+  },
 
   genreText: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: "900",
     color: "#6B705C",
     letterSpacing: 1,
   },
 
-  genreTextActive: { color: "#1A1A1A" },
+  genreTextActive: { color: "#FFF" },
 
   countRow: {
-    marginHorizontal: 20,
+    marginHorizontal: 24,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: 16,
+  },
+
+  flexRowCenter: { flexDirection: "row", alignItems: "center" },
+
+  accentLine: {
+    width: 4,
+    height: 14,
+    backgroundColor: "#721C24",
+    borderRadius: 2,
+    marginRight: 8,
   },
 
   countText: {
@@ -111,70 +169,132 @@ export const styles = StyleSheet.create({
     color: "#6B705C",
   },
 
-  list: { paddingHorizontal: 20 },
+  list: { paddingHorizontal: 24, paddingBottom: 40 },
 
   card: {
-    backgroundColor: "#fff",
-    borderRadius: 28,
-    padding: 14,
-    marginBottom: 14,
+    backgroundColor: "#FFF",
+    borderRadius: 32,
+    padding: 16,
+    marginBottom: 16,
     flexDirection: "row",
-    gap: 14,
+    gap: 16,
+    borderWidth: 1,
+    borderColor: "rgba(0,0,0,0.03)",
   },
 
   cover: {
-    width: 60,
-    height: 80,
-    borderRadius: 18,
-    backgroundColor: "#FFF9E5",
+    width: 70,
+    height: 90,
+    borderRadius: 20,
+    backgroundColor: "#FCF9F1",
     alignItems: "center",
     justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "#E5E0D5",
   },
 
-  sparkle: { position: "absolute", top: 4, right: 4 },
+  rareBadge: {
+    position: "absolute",
+    top: -4,
+    right: -4,
+    backgroundColor: "#721C24",
+    padding: 6,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: "#FFF",
+  },
 
-  cardContent: { flex: 1 },
+  cardContent: { flex: 1, justifyContent: "space-between" },
 
   cardHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start",
   },
 
-  bookTitle: { fontSize: 14, fontWeight: "900" },
-  bookAuthor: { fontSize: 11, color: "#A5A58D", marginTop: 2 },
+  bookTitle: {
+    fontSize: 16,
+    fontWeight: "900",
+    color: "#1A1A1A",
+    letterSpacing: -0.5,
+  },
+
+  authorRow: { flexDirection: "row", alignItems: "center", marginTop: 4 },
+  dot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: "#D4AF37",
+    marginRight: 6,
+  },
+  bookAuthor: { fontSize: 12, fontWeight: "600", color: "#6B705C" },
+
+  chevronBg: {
+    width: 28,
+    height: 28,
+    backgroundColor: "#FCF9F1",
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "#E5E0D5",
+  },
 
   cardFooter: {
-    marginTop: 10,
+    marginTop: 12,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     borderTopWidth: 1,
-    borderColor: "#F4F1EA",
-    paddingTop: 8,
+    borderColor: "rgba(0,0,0,0.04)",
+    paddingTop: 10,
   },
 
-  price: { fontWeight: "900", fontSize: 12 },
+  price: { fontWeight: "900", fontSize: 14, color: "#1A1A1A" },
 
   rating: { flexDirection: "row", alignItems: "center", gap: 4 },
-  ratingText: { fontSize: 11, fontWeight: "900" },
+  ratingText: { fontSize: 11, fontWeight: "900", color: "#1A1A1A" },
 
   empty: {
     alignItems: "center",
-    padding: 40,
-    borderWidth: 2,
+    padding: 48,
+    borderWidth: 1,
     borderStyle: "dashed",
-    borderColor: "#E5E0D5",
-    borderRadius: 32,
+    borderColor: "#D4AF3750",
+    borderRadius: 40,
+    backgroundColor: "rgba(212, 175, 55, 0.02)",
   },
 
-  emptyTitle: { marginTop: 10, fontWeight: "900" },
-  emptyText: { fontSize: 11, color: "#6B705C", marginTop: 4 },
-  reset: {
-    marginTop: 16,
+  emptyIconCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: "#FFF",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
+  },
+
+  emptyTitle: { fontSize: 18, fontWeight: "900", color: "#1A1A1A" },
+  emptyText: {
+    fontSize: 13,
+    color: "#6B705C",
+    textAlign: "center",
+    marginTop: 8,
+    lineHeight: 18,
+  },
+
+  resetBtn: {
+    marginTop: 24,
+    backgroundColor: "#1A1A1A",
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 16,
+  },
+  resetText: {
     fontSize: 10,
     fontWeight: "900",
-    color: "#B07D05",
+    color: "#FFF",
     letterSpacing: 2,
   },
 });
