@@ -22,6 +22,7 @@ import {
   Book,
   MoreHorizontal,
   AtSign,
+  MapPin,
 } from "lucide-react-native";
 import { styles } from "@/components/styles/authStyles/registerSellerStyle";
 import { router } from "expo-router";
@@ -33,6 +34,7 @@ export default function SellerRegisterScreen() {
     username: "",
     password: "",
     sellerType: "bookstore",
+    location: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -144,20 +146,11 @@ export default function SellerRegisterScreen() {
                 <Pressable
                   key={id}
                   onPress={() => handleChange("sellerType", id)}
-                  style={[
-                    styles.typeButton,
-                    active && styles.typeButtonActive,
-                  ]}
+                  style={[styles.typeButton, active && styles.typeButtonActive]}
                 >
-                  <Icon
-                    size={16}
-                    color={active ? "#FBBF24" : "#6B705C"}
-                  />
+                  <Icon size={16} color={active ? "#FBBF24" : "#6B705C"} />
                   <Text
-                    style={[
-                      styles.typeText,
-                      active && styles.typeTextActive,
-                    ]}
+                    style={[styles.typeText, active && styles.typeTextActive]}
                   >
                     {label}
                   </Text>
@@ -165,6 +158,13 @@ export default function SellerRegisterScreen() {
               );
             })}
           </View>
+
+          <Label text="Business Location" />
+          <Input
+            Icon={MapPin}
+            placeholder="Vallabh Nagar Indore, (M.P.)"
+            onChangeText={(v: any) => handleChange("location", v)}
+          />
 
           <Label text="Password" />
           <View style={styles.inputBox}>
@@ -194,20 +194,16 @@ export default function SellerRegisterScreen() {
             }}
           >
             <Text style={styles.submitText}>
-              {isSubmitting
-                ? "CREATING ACCOUNT..."
-                : "CREATE ACCOUNT"}
+              {isSubmitting ? "CREATING ACCOUNT..." : "CREATE ACCOUNT"}
             </Text>
-            {!isSubmitting && (
-              <ChevronRight size={20} color="#fff" />
-            )}
+            {!isSubmitting && <ChevronRight size={20} color="#fff" />}
           </Pressable>
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>
               Already have a collector account?
             </Text>
-            <Pressable onPress={() => router.navigate('/login')}>
+            <Pressable onPress={() => router.navigate("/login")}>
               <Text style={styles.footerLink}>Log In</Text>
             </Pressable>
           </View>
@@ -220,9 +216,7 @@ export default function SellerRegisterScreen() {
 }
 
 function Label({ text }: any) {
-  return (
-    <Text style={styles.label}>{text.toUpperCase()}</Text>
-  );
+  return <Text style={styles.label}>{text.toUpperCase()}</Text>;
 }
 
 function Input({ Icon, placeholder, onChangeText }: any) {
