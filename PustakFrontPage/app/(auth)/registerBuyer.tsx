@@ -21,6 +21,7 @@ import {
   Phone,
   Calendar,
   Users,
+  MapPin,
 } from "lucide-react-native";
 import { styles } from "@/components/styles/authStyles/registerBuyerStyle";
 import { router } from "expo-router";
@@ -34,6 +35,7 @@ export default function RegisterBuyerScreen() {
     password: "",
     gender: "Other",
     age: "",
+    city: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -157,6 +159,18 @@ export default function RegisterBuyerScreen() {
               />
             </View>
 
+            <View style={styles.flex}>
+              <Label text="City" />
+              <Input
+                Icon={MapPin}
+                placeholder="e.g. Delhi"
+                value={formData.city}
+                onChangeText={(v: string) => handleChange("city", v)}
+              />
+            </View>
+          </View>
+
+          <View style={styles.row}>
             <View style={styles.flex}>
               <Label text="Age" />
               <Input
