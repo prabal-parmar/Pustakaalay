@@ -126,8 +126,8 @@ export const styles = StyleSheet.create({
     borderColor: "#E5E0D5",
     borderRadius: 18,
     paddingHorizontal: 14,
-    paddingVertical: 12,
-    marginBottom: 12,
+    paddingVertical: 10,
+    marginBottom: 10,
   },
 
   input: {
@@ -217,5 +217,9 @@ export const styles = StyleSheet.create({
     letterSpacing: 4,
     opacity: 0.25,
     color: "#7A6B44",
+  },
+  locationContainer: {
+    position: "relative",
+    justifyContent: "center",
   },
 });

@@ -89,7 +89,7 @@ export const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 12,
     color: "#7A6B44",
-    marginVertical: 14,
+    marginVertical: 10,
     fontStyle: "italic",
   },
 
@@ -109,7 +109,7 @@ export const styles = StyleSheet.create({
 
   row: {
     flexDirection: "row",
-    marginBottom: 8,
+    marginBottom: 4,
   },
 
   flex: { flex: 1, marginHorizontal: 4 },
@@ -121,8 +121,8 @@ export const styles = StyleSheet.create({
     borderColor: "#E5E0D5",
     borderRadius: 18,
     paddingHorizontal: 14,
-    paddingVertical: 12,
-    marginBottom: 12,
+    paddingVertical: 10,
+    marginBottom: 10,
   },
 
   input: {
