@@ -92,12 +92,12 @@ def register_seller(request):
     username = request.data.get("username")
     check_username = CustomUser.objects.filter(username=username).first()
     if check_username is not None:
-        return Response({"message": "Username already taken"}, status=status.HTTP_306_RESERVED)
+        return Response({"message": "Username already taken", "completed": False}, status=status.HTTP_306_RESERVED)
     
     email = request.data.get("email")
     check_email = BuyerModel.objects.filter(email=email).first()
     if check_email is not None:
-        return Response({"message": "Email already registered"}, status=status.HTTP_306_RESERVED)
+        return Response({"message": "Email already registered", "completed": False}, status=status.HTTP_306_RESERVED)
     
     password = request.data.get("password")
     name = request.data.get("name")
@@ -114,7 +114,7 @@ def register_seller(request):
                                       name=name)
     
     SellerProfile.objects.create(seller=seller)
-    return Response({"message": "Seller registered successfully!"}, status=status.HTTP_201_CREATED)
+    return Response({"message": "Seller registered successfully!", "completed": True}, status=status.HTTP_201_CREATED)
 
 @api_view(['POST'])
 def logout_user(request):
