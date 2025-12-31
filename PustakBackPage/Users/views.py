@@ -70,6 +70,7 @@ def register_buyer(request):
     age = int(request.data.get("age"))
     gender = request.data.get("gender")
     contact_number = request.data.get("contact_number")
+    city = request.data.get("city")
 
     user = CustomUser.objects.create(username=username, 
                                       password=password, 
@@ -81,7 +82,8 @@ def register_buyer(request):
                                       email=email, 
                                       age=age, 
                                       contact_number=contact_number,
-                                      gender=gender)
+                                      gender=gender,
+                                      city=city)
 
     return Response({"message": "Buyer registered successfully!"}, status=status.HTTP_201_CREATED)
 
@@ -101,7 +103,7 @@ def register_seller(request):
     first_name = request.data.get("first_name")
     last_name = request.data.get("last_name")
     sellertype = request.data.get("sellertype")
-
+    location = request.data.get("location")
     user = CustomUser.objects.create(username=username, 
                                       password=password, 
                                       first_name=first_name,
@@ -110,7 +112,8 @@ def register_seller(request):
     
     seller = SellerModel.objects.create(user=user, 
                                       email=email,
-                                      sellertype=sellertype)
+                                      sellertype=sellertype,
+                                      location=location)
     
     SellerProfile.objects.create(seller=seller)
     return Response({"message": "Seller registered successfully!"}, status=status.HTTP_201_CREATED)

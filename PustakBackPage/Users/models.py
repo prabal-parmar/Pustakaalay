@@ -23,6 +23,7 @@ class BuyerModel(models.Model):
     email = models.EmailField("email address", unique=True)
     age = models.IntegerField()
     gender = models.CharField(max_length=10, choices=GENDER_OPTION)
+    city = models.CharField(max_length=100)
 
     def __str__(self):
         return self.user.username
