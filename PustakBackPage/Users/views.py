@@ -100,20 +100,18 @@ def register_seller(request):
         return Response({"message": "Email already registered"}, status=status.HTTP_306_RESERVED)
     
     password = request.data.get("password")
-    first_name = request.data.get("first_name")
-    last_name = request.data.get("last_name")
+    name = request.data.get("name")
     sellertype = request.data.get("sellertype")
     location = request.data.get("location")
     user = CustomUser.objects.create(username=username, 
                                       password=password, 
-                                      first_name=first_name,
-                                      last_name=last_name,
                                       role="seller")
     
-    seller = SellerModel.objects.create(user=user, 
+    seller = SellerModel.objects.create(user=user,
                                       email=email,
                                       sellertype=sellertype,
-                                      location=location)
+                                      location=location,
+                                      name=name)
     
     SellerProfile.objects.create(seller=seller)
     return Response({"message": "Seller registered successfully!"}, status=status.HTTP_201_CREATED)
