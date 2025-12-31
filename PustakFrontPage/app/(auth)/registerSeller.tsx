@@ -47,7 +47,7 @@ export default function SellerRegisterScreen() {
   const handleRegisterSeller = async () => {
     const [completed, message] = await registerSeller(formData);
     setIsSubmitting(false)
-    console.log(formData)
+    // console.log(formData)
     console.log(message, completed)
   }
 

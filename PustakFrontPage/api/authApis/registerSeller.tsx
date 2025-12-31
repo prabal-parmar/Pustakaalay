@@ -41,12 +41,12 @@ export const registerSeller = async (sellerData: any) => {
             email: sellerData.email.toLowerCase(),
             username: sellerData.username.toLowerCase(),
             password: sellerData.password,
-            sellertype: sellerData.sellerType,
+            sellertype: sellerData.sellerType.toLowerCase(),
             location: sellerData.location,
         }
 
         const request = await axios.post('http://127.0.0.1:8000/api/register-seller/', data)
-        
+
         return [request.data.completed, request.data.message]
     } catch (error) {
         console.log(error)

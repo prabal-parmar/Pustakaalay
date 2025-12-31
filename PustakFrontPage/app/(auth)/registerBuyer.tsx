@@ -25,10 +25,12 @@ import {
 } from "lucide-react-native";
 import { styles } from "@/components/styles/authStyles/registerBuyerStyle";
 import { router } from "expo-router";
+import { registerBuyer } from "@/api/authApis/registerBuyer";
 
 export default function RegisterBuyerScreen() {
   const [formData, setFormData] = useState({
-    name: "",
+    first_name: "",
+    last_name: "",
     email: "",
     mobile: "",
     username: "",
@@ -43,6 +45,13 @@ export default function RegisterBuyerScreen() {
 
   const fade = useRef(new Animated.Value(0)).current;
   const rise = useRef(new Animated.Value(30)).current;
+
+  const handleRegisterBuyer = async () => {
+    const [completed, message] = await registerBuyer(formData);
+    setIsSubmitting(false);
+    console.log(message, completed);
+
+  }
 
   useEffect(() => {
     Animated.parallel([
@@ -116,14 +125,27 @@ export default function RegisterBuyerScreen() {
             Join our community of readers and{" "}
             <Text style={styles.highlight}>explore worlds</Text>.
           </Text>
+          <View style={styles.row}>
+            <View style={styles.flex}>
+              <Label text="First Name" />
+              <Input
+                Icon={User}
+                placeholder="Firstname"
+                value={formData.first_name}
+                onChangeText={(v: string) => handleChange("first_name", v)}
+              />
+            </View>
 
-          <Label text="Full Name" />
-          <Input
-            Icon={User}
-            placeholder="Enter your name"
-            value={formData.name}
-            onChangeText={(v: string) => handleChange("name", v)}
-          />
+            <View style={styles.flex}>
+              <Label text="Last Name" />
+              <Input
+                Icon={User}
+                placeholder="Lastname"
+                value={formData.last_name}
+                onChangeText={(v: string) => handleChange("last_name", v)}
+              />
+            </View>
+          </View>
 
           <View style={styles.row}>
             <View style={styles.flex}>
@@ -234,7 +256,7 @@ export default function RegisterBuyerScreen() {
             style={styles.submit}
             onPress={() => {
               setIsSubmitting(true);
-              setTimeout(() => setIsSubmitting(false), 2000);
+              handleRegisterBuyer();
             }}
           >
             <Text style={styles.submitText}>
