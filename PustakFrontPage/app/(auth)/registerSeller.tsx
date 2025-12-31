@@ -26,6 +26,7 @@ import {
 } from "lucide-react-native";
 import { styles } from "@/components/styles/authStyles/registerSellerStyle";
 import { router } from "expo-router";
+import { registerSeller } from "@/api/authApis/registerSeller";
 
 export default function SellerRegisterScreen() {
   const [formData, setFormData] = useState({
@@ -42,6 +43,13 @@ export default function SellerRegisterScreen() {
 
   const fade = useRef(new Animated.Value(0)).current;
   const rise = useRef(new Animated.Value(30)).current;
+
+  const handleRegisterSeller = async () => {
+    const [completed, message] = await registerSeller(formData);
+    setIsSubmitting(false)
+    console.log(formData)
+    console.log(message, completed)
+  }
 
   useEffect(() => {
     Animated.parallel([
@@ -190,7 +198,7 @@ export default function SellerRegisterScreen() {
             style={styles.submit}
             onPress={() => {
               setIsSubmitting(true);
-              setTimeout(() => setIsSubmitting(false), 2000);
+              handleRegisterSeller();
             }}
           >
             <Text style={styles.submitText}>
