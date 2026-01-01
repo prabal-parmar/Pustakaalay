@@ -22,11 +22,14 @@ import {
 } from "lucide-react-native";
 import { styles } from "@/components/styles/authStyles/loginStyle";
 import { router } from "expo-router";
+import { loginBuyer } from "@/api/authApis/loginUser";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function LoginScreen() {
   const [role, setRole] = useState<"Reader" | "Collector">("Reader");
   const [toggleWidth, setToggleWidth] = useState(0);
-
+  const [username, setUsername] = useState<string>("")
+  const [password, setPassword] = useState<string>("")
   const fade = useRef(new Animated.Value(0)).current;
   const rise = useRef(new Animated.Value(30)).current;
 
@@ -46,14 +49,18 @@ export default function LoginScreen() {
   }, []);
 
   const loginUser = async () => {
-    setRole("Collector")
     if(role == "Collector"){
       router.navigate('/(seller)/mybook')
     }
     else{
-      router.navigate('/(buyer)/explore')
+      const res = await loginBuyer({username, password});
+      console.log(res[1]);
+      if(res[0] == true){
+        await AsyncStorage.setItem("role", "buyer");
+        await AsyncStorage.setItem("username", username);
+        return router.navigate('/(buyer)/home')
+      }
     }
-    return null;
   }
 
   return (
@@ -152,6 +159,8 @@ export default function LoginScreen() {
             <Mail size={18} color="#A5A58D" />
             <TextInput
               placeholder="Username or Email"
+              value={username}
+              onChangeText={setUsername}
               placeholderTextColor="#A5A58D"
               style={styles.input}
             />
@@ -161,6 +170,8 @@ export default function LoginScreen() {
             <Lock size={18} color="#A5A58D" />
             <TextInput
               placeholder="Password"
+              value={password}
+              onChangeText={setPassword}
               placeholderTextColor="#A5A58D"
               secureTextEntry
               style={styles.input}
