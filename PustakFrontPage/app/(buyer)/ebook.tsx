@@ -13,13 +13,13 @@ import {
   Search,
   X,
   Eye,
-  Clock,
-  Shield,
+  Calendar,
+  ShieldCheck,
   ChevronRight,
   Info,
-  MoreVertical,
+  MoreHorizontal,
 } from "lucide-react-native";
-import { styles } from "../../components/styles/buyerStyles/ebookStyles";
+import { styles } from "@/components/styles/buyerStyles/ebookStyles";
 
 export default function MyEbooksScreen() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -30,8 +30,8 @@ export default function MyEbooksScreen() {
       title: "The Silent Patient",
       author: "Alex Michaelides",
       postedDate: "Oct 12, 2024",
-      reads: 1240,
-      genre: "Thriller",
+      reads: "1.2k",
+      genre: "THRILLER",
       description:
         "A shocking psychological thriller of a woman's act of violence.",
     },
@@ -40,8 +40,8 @@ export default function MyEbooksScreen() {
       title: "Think and Grow Rich",
       author: "Napoleon Hill",
       postedDate: "Sept 28, 2024",
-      reads: 3105,
-      genre: "Self-Help",
+      reads: "3.1k",
+      genre: "SELF-HELP",
       description:
         "A landmark bestseller that has helped millions achieve success.",
     },
@@ -55,110 +55,104 @@ export default function MyEbooksScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
         <View style={styles.header}>
-          <View>
-            <Text style={styles.title}>My Ebooks</Text>
+          <View style={styles.headerTitleGroup}>
             <View style={styles.badgeRow}>
-              <Shield size={10} color="#FBBF24" />
-              <Text style={styles.badgeText}>SHARED PORTFOLIO</Text>
+              <ShieldCheck size={12} color="#B07D05" />
+              <Text style={styles.badgeText}>SECURE PORTFOLIO</Text>
             </View>
+            <Text style={styles.title}>My Library</Text>
           </View>
-
           <Pressable style={styles.postBtn}>
-            <Plus size={16} color="#fff" />
-            <Text style={styles.postText}>POST EBOOK</Text>
+            <Plus size={20} color="#fff" />
           </Pressable>
         </View>
 
-        <View style={styles.searchBox}>
-          <Search size={18} color="#A5A58D" />
-          <TextInput
-            placeholder="Search your uploads..."
-            placeholderTextColor="#A5A58D"
-            value={searchTerm}
-            onChangeText={setSearchTerm}
-            style={styles.searchInput}
-          />
-          {searchTerm.length > 0 && (
-            <Pressable onPress={() => setSearchTerm("")}>
-              <X size={16} color="#A5A58D" />
-            </Pressable>
-          )}
+        <View style={styles.searchContainer}>
+          <View style={styles.searchBox}>
+            <Search size={20} color="#9A9A8C" />
+            <TextInput
+              placeholder="Search library..."
+              placeholderTextColor="#A5A58D"
+              value={searchTerm}
+              onChangeText={setSearchTerm}
+              style={styles.searchInput}
+            />
+            {searchTerm.length > 0 && (
+              <Pressable onPress={() => setSearchTerm("")}>
+                <X size={18} color="#A5A58D" />
+              </Pressable>
+            )}
+          </View>
         </View>
 
         <View style={styles.infoBanner}>
-          <View style={styles.infoIcon}>
-            <Info size={16} color="#FBBF24" />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.infoTitle}>IN-APP PROTECTION</Text>
+          <Info size={18} color="#B07D05" />
+          <View style={styles.infoContent}>
+            <Text style={styles.infoTitle}>Read-Only Protection</Text>
             <Text style={styles.infoText}>
-              Ebooks are read-only inside the app. Downloads are disabled.
+              In-app viewing only. Downloads disabled.
             </Text>
           </View>
         </View>
 
-        <Text style={styles.count}>
-          {filtered.length} EBOOKS PUBLISHED
-        </Text>
+        <View style={styles.listContainer}>
+          <View style={styles.listHeader}>
+            <Text style={styles.countText}>
+              {filtered.length} BOOKS PUBLISHED
+            </Text>
+            <View style={styles.divider} />
+          </View>
 
-        <View style={styles.list}>
-          {filtered.length > 0 ? (
-            filtered.map((ebook) => (
-              <View key={ebook.id} style={styles.card}>
+          {filtered.map((ebook) => (
+            <View key={ebook.id} style={styles.card}>
+              <View style={styles.coverSection}>
                 <View style={styles.cover}>
-                  <FileText size={30} color="#FBBF24" />
-                  <View style={styles.pdfBadge}>
-                    <Text style={styles.pdfText}>PDF</Text>
-                  </View>
-                </View>
-
-                <View style={styles.content}>
-                  <View style={styles.cardTop}>
-                    <View style={{ flex: 1 }}>
-                      <Text style={styles.genre}>{ebook.genre}</Text>
-                      <Text style={styles.bookTitle}>{ebook.title}</Text>
-                      <Text style={styles.author}>by {ebook.author}</Text>
-                    </View>
-                    <MoreVertical size={18} color="#A5A58D" />
-                  </View>
-
-                  <Text style={styles.description} numberOfLines={2}>
-                    “{ebook.description}”
-                  </Text>
-
-                  <View style={styles.cardBottom}>
-                    <View style={styles.metaRow}>
-                      <View style={styles.meta}>
-                        <Eye size={12} color="#B07D05" />
-                        <Text style={styles.metaText}>{ebook.reads}</Text>
-                      </View>
-                      <View style={styles.meta}>
-                        <Clock size={12} color="#A5A58D" />
-                        <Text style={styles.metaMuted}>
-                          {ebook.postedDate}
-                        </Text>
-                      </View>
-                    </View>
-
-                    <Pressable style={styles.openBtn}>
-                      <Text style={styles.openText}>OPEN READER</Text>
-                      <ChevronRight size={12} />
-                    </Pressable>
+                  <FileText size={28} color="#B07D05" strokeWidth={1.5} />
+                  <View style={styles.pdfTag}>
+                    <Text style={styles.pdfTagText}>PDF</Text>
                   </View>
                 </View>
               </View>
-            ))
-          ) : (
-            <View style={styles.empty}>
-              <FileText size={24} color="#A5A58D" />
-              <Text style={styles.emptyTitle}>No Ebooks Found</Text>
-              <Text style={styles.emptyText}>
-                You haven’t posted any ebooks yet.
-              </Text>
+
+              <View style={styles.cardBody}>
+                <View style={styles.cardHeader}>
+                  <Text style={styles.genreTag}>{ebook.genre}</Text>
+                  <MoreHorizontal size={18} color="#A5A58D" />
+                </View>
+
+                <View>
+                  <Text style={styles.bookTitle} numberOfLines={1}>
+                    {ebook.title}
+                  </Text>
+                  <Text style={styles.authorName}>by {ebook.author}</Text>
+                </View>
+
+                <Text style={styles.description} numberOfLines={2}>
+                  {ebook.description}
+                </Text>
+
+                <View style={styles.cardFooter}>
+                  <View style={styles.statsGroup}>
+                    <View style={styles.statItem}>
+                      <Eye size={12} color="#6B705C" />
+                      <Text style={styles.statText}>{ebook.reads}</Text>
+                    </View>
+                    <View style={styles.statItem}>
+                      <Calendar size={11} color="#6B705C" />
+                      <Text style={styles.statText}>{ebook.postedDate}</Text>
+                    </View>
+                  </View>
+
+                  <Pressable style={styles.readBtn}>
+                    <Text style={styles.readBtnText}>READ</Text>
+                    <ChevronRight size={12} color="#1A1A1A" strokeWidth={4} />
+                  </Pressable>
+                </View>
+              </View>
             </View>
-          )}
+          ))}
         </View>
       </ScrollView>
     </SafeAreaView>
