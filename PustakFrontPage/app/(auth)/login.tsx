@@ -22,7 +22,7 @@ import {
 } from "lucide-react-native";
 import { styles } from "@/components/styles/authStyles/loginStyle";
 import { router } from "expo-router";
-import { loginBuyer } from "@/api/authApis/loginUser";
+import { loginBuyer, loginSeller } from "@/api/authApis/loginUser";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function LoginScreen() {
@@ -50,7 +50,16 @@ export default function LoginScreen() {
 
   const loginUser = async () => {
     if(role == "Collector"){
-      router.navigate('/(seller)/mybook')
+      const res = await loginSeller({username, password});
+      if(res[0] == true){
+        await AsyncStorage.setItem("role", "seller");
+        await AsyncStorage.setItem("username", username);
+        return router.replace('/(seller)/home')
+      }
+      else{
+        console.log(res[1])
+        return null;
+      }
     }
     else{
       const res = await loginBuyer({username, password});
@@ -58,7 +67,11 @@ export default function LoginScreen() {
       if(res[0] == true){
         await AsyncStorage.setItem("role", "buyer");
         await AsyncStorage.setItem("username", username);
-        return router.navigate('/(buyer)/home')
+        return router.replace('/(buyer)/home');
+      }
+      else{
+        console.log(res[1])
+        return null;
       }
     }
   }
