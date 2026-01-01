@@ -1,6 +1,9 @@
 from django.urls import path, include
 from Users import views
+from rest_framework_simplejwt.views import TokenRefreshView
+
 urlpatterns = [
+    path('api/token/refresh/', TokenRefreshView.as_view(), name="Token Refresh"),
     path('api/login-buyer/', views.login_buyer, name="Login Buyer"),
     path('api/login-seller/', views.login_seller, name="Login Seller"),
     path('api/register-buyer/', views.register_buyer, name="Register Buyer"),
