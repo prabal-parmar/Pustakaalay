@@ -14,8 +14,8 @@ def login_buyer(request):
     password = request.data.get("password")
 
     buyer = authenticate(username=username, password=password)
-
-    if buyer is not None and buyer.role == "buyer":
+    print(buyer)
+    if buyer is not None:
         refresh = RefreshToken.for_user(buyer)
         return Response({
             "role": "buyer",
@@ -24,10 +24,11 @@ def login_buyer(request):
                 "username": username
             },
             "access": str(refresh.access_token),
-            "refresh": str(refresh)
+            "refresh": str(refresh),
+            "completed": True
         }, status=status.HTTP_200_OK)
-    
-    return Response({"message": "Invalid Credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+
+    return Response({"message": "Invalid Credentials", "completed": False}, status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['POST'])
 def login_seller(request):
@@ -45,17 +46,18 @@ def login_seller(request):
                 "username": username
             },
             "access": str(refresh.access_token),
-            "refresh": str(refresh)
+            "refresh": str(refresh),
+            "completed": True
         }, status=status.HTTP_200_OK)
     
-    return Response({"message": "Invalid Credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+    return Response({"message": "Invalid Credentials", "completed": False}, status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['POST'])
 def register_buyer(request):
     username = request.data.get("username")
     
     check_username = CustomUser.objects.filter(username=username).values().first()
-    print(check_username)
+    # print(check_username)
     if check_username is not None:
         return Response({"message": "Username already taken", "completed": False}, status=status.HTTP_306_RESERVED)
     
@@ -72,13 +74,14 @@ def register_buyer(request):
     contact_number = request.data.get("contact_number")
     city = request.data.get("city")
 
-    user = CustomUser.objects.create(username=username, 
-                                      password=password, 
+    user = CustomUser.objects.create(username=username,
                                       first_name=first_name,
                                       last_name=last_name,
                                       role="buyer")
     
-    buyer = BuyerModel.objects.create(user=user, 
+    user.set_password(password)
+    user.save()
+    BuyerModel.objects.create(user=user, 
                                       email=email, 
                                       age=age, 
                                       contact_number=contact_number,
@@ -118,5 +121,8 @@ def register_seller(request):
 
 @api_view(['POST'])
 def logout_user(request):
-    logout(request)
-    return Response({"message": "Logout Successfully"}, status=status.HTTP_200_OK)
+    try:
+        logout(request)
+        return Response({"message": "Logout Successfully", "completed": True}, status=status.HTTP_200_OK)
+    except:
+        return Response({"message": "Something went wrong", "completed": False}, status=status.HTTP_400_BAD_REQUEST)
