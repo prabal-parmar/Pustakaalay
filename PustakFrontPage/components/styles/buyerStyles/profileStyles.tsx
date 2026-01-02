@@ -1,4 +1,8 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions, Platform } from "react-native";
+
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
+
+const scale = (size: number) => (SCREEN_WIDTH / 375) * size;
 
 export const styles = StyleSheet.create({
   safe: {
@@ -6,246 +10,324 @@ export const styles = StyleSheet.create({
     backgroundColor: "#FFFDF0",
   },
 
-  header: {
-    height: 110,
+  topSection: {
+    height: scale(160),
     backgroundColor: "#5c1616",
+    paddingTop: scale(20),
   },
 
   headerActions: {
-    position: "absolute",
-    top: 16,
-    right: 16,
     flexDirection: "row",
-    gap: 10,
+    justifyContent: "flex-end",
+    paddingHorizontal: scale(20),
+    gap: scale(12),
   },
 
   iconBtn: {
-    backgroundColor: "rgba(255,255,255,0.25)",
-    padding: 8,
-    borderRadius: 20,
+    width: scale(40),
+    height: scale(40),
+    backgroundColor: "rgba(255,255,255,0.15)",
+    borderRadius: scale(20),
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  dot: {
+    position: "absolute",
+    top: scale(10),
+    right: scale(10),
+    width: scale(8),
+    height: scale(8),
+    backgroundColor: "#FBBF24",
+    borderRadius: scale(4),
+    borderWidth: scale(2),
+    borderColor: "#5c1616",
+  },
+
+  profileCard: {
+    backgroundColor: "#fff",
+    marginTop: scale(-60),
+    marginHorizontal: scale(20),
+    borderRadius: scale(32),
+    padding: scale(24),
+    alignItems: "center",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#5c1616",
+        shadowOffset: { width: 0, height: scale(10) },
+        shadowOpacity: 0.1,
+        shadowRadius: scale(20),
+      },
+      android: { elevation: 10 },
+    }),
   },
 
   avatarContainer: {
-    alignItems: "center",
-    marginTop: -45,
+    marginTop: scale(-65),
+    marginBottom: scale(16),
   },
 
   avatarWrap: {
-    width: 90,
-    height: 90,
-    borderRadius: 24,
+    width: scale(100),
+    height: scale(100),
+    borderRadius: scale(35),
     backgroundColor: "#FBBF24",
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 4,
+    borderWidth: scale(5),
     borderColor: "#fff",
   },
 
   avatarPlus: {
     position: "absolute",
-    bottom: -6,
-    right: -6,
+    bottom: scale(2),
+    right: scale(2),
     backgroundColor: "#1A1A1A",
-    padding: 6,
-    borderRadius: 10,
-    borderWidth: 2,
+    width: scale(28),
+    height: scale(28),
+    borderRadius: scale(10),
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: scale(3),
     borderColor: "#fff",
   },
 
-  card: {
-    backgroundColor: "#fff",
-    marginTop: 16,
-    marginHorizontal: 16,
-    borderRadius: 28,
-    padding: 20,
+  identityBlock: {
+    alignItems: "center",
+    marginBottom: scale(20),
   },
 
   nameRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
-  },
-  
-  nameBlock: {
-    alignItems: "center",
-    justifyContent: "center",
+    gap: scale(6),
   },
 
-  name: {
-    fontSize: 22,
+  nameText: {
+    fontSize: scale(24),
     fontWeight: "900",
     color: "#1A1A1A",
-    textAlign: "center",
   },
 
-  username: {
-    marginTop: 4,
-    fontSize: 13,
-    fontWeight: "700",
-    color: "#6B705C",
-    textAlign: "center",
+  usernameText: {
+    fontSize: scale(14),
+    fontWeight: "600",
+    color: "#A5A58D",
+    marginTop: scale(2),
   },
 
-  statsRow: {
+  statsContainer: {
     flexDirection: "row",
-    justifyContent: "center",
+    backgroundColor: "#F9F8F3",
+    borderRadius: scale(20),
+    paddingVertical: scale(12),
+    paddingHorizontal: scale(20),
+    width: "100%",
+  },
+
+  statBox: {
+    flex: 1,
     alignItems: "center",
-    marginTop: 20,
   },
 
-  stat: {
-    alignItems: "center",
-    width: 100,
-  },
-
-  statDivider: {
-    width: 1,
-    height: 36,
-    backgroundColor: "#E5E0D5",
-    marginHorizontal: 20,
-  },
-
-  statValue: {
-    fontSize: 18,
+  statNum: {
+    fontSize: scale(18),
     fontWeight: "900",
+    color: "#1A1A1A",
   },
 
   statLabel: {
-    fontSize: 10,
-    letterSpacing: 1,
+    fontSize: scale(9),
+    fontWeight: "800",
     color: "#A5A58D",
-    marginTop: 2,
+    letterSpacing: scale(1),
+    marginTop: scale(2),
   },
 
-  bio: {
-    marginTop: 18,
-    fontSize: 13,
-    color: "#7A6B44",
-    fontStyle: "italic",
+  statPipe: {
+    width: 1,
+    height: "60%",
+    backgroundColor: "#E5E0D5",
+    alignSelf: "center",
+  },
+
+  bioContainer: {
+    marginVertical: scale(20),
+  },
+
+  bioText: {
+    fontSize: scale(13),
+    color: "#6B705C",
     textAlign: "center",
+    lineHeight: scale(20),
+    paddingHorizontal: scale(10),
   },
 
-  actionsRow: {
+  buttonRow: {
     flexDirection: "row",
-    gap: 12,
-    marginTop: 20,
+    gap: scale(12),
+    width: "100%",
   },
 
-  primaryBtn: {
-    flex: 1,
+  btnPrimary: {
+    flex: 1.2,
     backgroundColor: "#1A1A1A",
-    paddingVertical: 14,
-    borderRadius: 18,
+    height: scale(54),
+    borderRadius: scale(18),
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    gap: 8,
+    gap: scale(8),
   },
 
-  primaryText: {
+  btnTextPrimary: {
     color: "#fff",
-    fontWeight: "800",
-    fontSize: 11,
-    letterSpacing: 1,
+    fontWeight: "900",
+    fontSize: scale(11),
+    letterSpacing: scale(1),
   },
 
-  secondaryBtn: {
+  btnSecondary: {
     flex: 1,
-    borderWidth: 1,
-    borderColor: "#E5E0D5",
-    paddingVertical: 14,
-    borderRadius: 18,
+    backgroundColor: "#FBBF24",
+    height: scale(54),
+    borderRadius: scale(18),
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    gap: 8,
+    gap: scale(8),
   },
 
-  secondaryText: {
-    fontWeight: "800",
-    fontSize: 11,
-    letterSpacing: 1,
+  btnTextSecondary: {
+    color: "#1A1A1A",
+    fontWeight: "900",
+    fontSize: scale(11),
+    letterSpacing: scale(1),
+  },
+
+  historySection: {
+    padding: scale(20),
+    marginTop: scale(10),
   },
 
   sectionHeader: {
-    marginTop: 30,
-    marginHorizontal: 16,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: scale(16),
+  },
+
+  titleGroup: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: scale(10),
   },
 
   sectionTitle: {
-    fontSize: 18,
+    fontSize: scale(20),
     fontWeight: "900",
+    color: "#1A1A1A",
   },
 
-  searchBox: {
-    margin: 16,
+  historyCount: {
+    fontSize: scale(12),
+    color: "#A5A58D",
+    fontWeight: "600",
+  },
+
+  searchWrapper: {
     flexDirection: "row",
     alignItems: "center",
+    backgroundColor: "#fff",
+    borderRadius: scale(16),
+    paddingHorizontal: scale(16),
+    height: scale(50),
     borderWidth: 1,
     borderColor: "#E5E0D5",
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    gap: 8,
+    marginBottom: scale(20),
   },
 
   searchInput: {
     flex: 1,
-    fontSize: 14,
+    marginLeft: scale(10),
+    fontSize: scale(14),
     fontWeight: "600",
+    color: "#1A1A1A",
   },
 
-  historyCard: {
-    marginHorizontal: 16,
-    marginBottom: 12,
-    padding: 14,
+  listContainer: {
+    gap: scale(12),
+  },
+
+  historyItem: {
     backgroundColor: "#fff",
-    borderRadius: 24,
+    padding: scale(16),
+    borderRadius: scale(20),
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
     borderWidth: 1,
-    borderColor: "#F3EEE0",
+    borderColor: "#F0EFEA",
   },
 
-  bookIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 16,
+  bookArt: {
+    width: scale(50),
+    height: scale(50),
     backgroundColor: "#FFF9E5",
+    borderRadius: scale(14),
     alignItems: "center",
     justifyContent: "center",
   },
 
-  historyText: {
+  typeIndicator: {
+    position: "absolute",
+    top: scale(-2),
+    right: scale(-2),
+    width: scale(12),
+    height: scale(12),
+    borderRadius: scale(6),
+    borderWidth: scale(2),
+    borderColor: "#fff",
+  },
+
+  historyDetails: {
     flex: 1,
+    marginLeft: scale(16),
   },
 
-  bookTitle: {
-    fontSize: 14,
-    fontWeight: "900",
+  historyBookTitle: {
+    fontSize: scale(15),
+    fontWeight: "800",
+    color: "#1A1A1A",
   },
 
-  toRow: {
+  metaRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 4,
-    marginTop: 2,
+    marginTop: scale(4),
   },
 
-  toText: {
-    fontSize: 11,
+  metaLabel: {
+    fontSize: scale(12),
+    color: "#A5A58D",
+  },
+
+  metaUser: {
+    fontSize: scale(12),
     color: "#B07D05",
     fontWeight: "700",
+    marginLeft: scale(4),
   },
 
-  date: {
-    fontSize: 10,
+  miniDot: {
+    width: scale(3),
+    height: scale(3),
+    borderRadius: scale(2),
+    backgroundColor: "#DCDAD1",
+    marginHorizontal: scale(8),
+  },
+
+  metaDate: {
+    fontSize: scale(11),
     color: "#A5A58D",
-    marginTop: 2,
   },
 });
