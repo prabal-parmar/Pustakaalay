@@ -107,9 +107,10 @@ def register_seller(request):
     sellertype = request.data.get("sellertype")
     location = request.data.get("location")
     user = CustomUser.objects.create(username=username, 
-                                      password=password, 
                                       role="seller")
     
+    user.set_password(password)
+    user.save()
     seller = SellerModel.objects.create(user=user,
                                       email=email,
                                       sellertype=sellertype,

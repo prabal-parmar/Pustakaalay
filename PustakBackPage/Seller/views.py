@@ -8,24 +8,30 @@ from rest_framework import status
 # Seller profile
 @api_view(['GET'])
 def get_profile(request):
-    username = request.data.get("username")
+    username = request.query_params.get("username")
     user = CustomUser.objects.filter(username=username).first()
     seller = SellerModel.objects.filter(user=user).first()
     seller_profile = SellerProfile.objects.filter(seller=seller).first()
 
-    data = {
-        "first_name" : seller_profile.seller.user.first_name,
-        "last_name" : seller_profile.seller.user.last_name,
-        "username" : seller_profile.seller.user.username,
-        "total_books" : seller_profile.total_books,
-        "followers" : seller_profile.followers,
-        "description" : seller_profile.description
-    }
-
-    return Response(
-        {"data": data,
-         "message": "Seller Profile data sent"}, 
-         status=status.HTTP_200_OK)
+    if seller_profile is not None:
+        data = {
+            "name" : f"{seller_profile.seller.name}",
+            "username" : seller_profile.seller.user.username,
+            "location" : seller_profile.seller.location,
+            "totalBooks" : seller_profile.total_books,
+            "followers" : seller_profile.followers,
+            "description" : seller_profile.description,
+            "rating": seller_profile.rating
+        }
+        return Response(
+            {"data": data,
+            "message": "Seller Profile data sent"}, 
+            status=status.HTTP_200_OK)
+    else:
+        return Response(
+            {"data": None,
+            "message": "Unable to fetch seller profile data"}, 
+            status=status.HTTP_204_NO_CONTENT)
 
 def update_profile(request):
     return Response({"data": "Update Profile"})
