@@ -1,7 +1,7 @@
 import axios from "axios"
 import {getAccess, getRefresh, setTokens, clearTokens} from './tokens'
 
-const api = axios.create({
+export const api = axios.create({
     baseURL: "http://127.0.0.1:8000/api"
 });
 

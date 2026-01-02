@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -26,11 +26,13 @@ import {
 } from "lucide-react-native";
 
 import { styles } from "@/components/styles/sellerStyles/profileStyles"
+import { fetchProfileData } from "@/api/sellerApis/profile";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function CollectorProfileScreen() {
   const [searchTerm, setSearchTerm] = useState("");
 
-  const collector = {
+  const [collector, setCollector] = useState({
     name: "Prabal Parmar",
     username: "prabal",
     followers: "1000",
@@ -39,7 +41,7 @@ export default function CollectorProfileScreen() {
       "I am new here.",
     location: "Indore, India",
     rating: 4.8,
-  };
+  });
 
   const myBooks = [
     { id: 1, title: "The Great Gatsby", author: "F. Scott Fitzgerald", price: "Trade Only" },
@@ -53,6 +55,17 @@ export default function CollectorProfileScreen() {
       b.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       b.author.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  useEffect(() => {
+    const fetchProfileContent = async () => {
+      const username = await AsyncStorage.getItem("username");
+      if (username) {
+        const data = await fetchProfileData(username);
+        setCollector(data)
+      }
+    }
+    fetchProfileContent()
+  }, [])
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -76,10 +89,10 @@ export default function CollectorProfileScreen() {
               <View style={styles.rowBetween}>
                 <View>
                   <View style={styles.nameRow}>
-                    <Text style={styles.name}>{collector.name}</Text>
+                    <Text style={styles.name}>{collector?.name}</Text>
                     <ShieldCheck size={18} color="#B07D05" />
                   </View>
-                  <Text style={styles.username}>@{collector.username}</Text>
+                  <Text style={styles.username}>@{collector?.username}</Text>
                 </View>
 
                 <Pressable style={styles.editBtn}>
@@ -89,16 +102,16 @@ export default function CollectorProfileScreen() {
               </View>
 
               <View style={styles.stats}>
-                <Stat value={collector.followers} label="Followers" icon={<Users size={12} color="#FBBF24" />} />
-                <Stat value={collector.totalBooks} label="My Books" icon={<BookOpen size={12} color="#FBBF24" />} />
-                <Stat value={collector.rating} label="Rating" icon={<Star size={12} color="#FBBF24" />} />
+                <Stat value={collector?.followers} label="Followers" icon={<Users size={12} color="#FBBF24" />} />
+                <Stat value={collector?.totalBooks} label="My Books" icon={<BookOpen size={12} color="#FBBF24" />} />
+                <Stat value={collector?.rating} label="Rating" icon={<Star size={12} color="#FBBF24" />} />
               </View>
 
-              <Text style={styles.bio}>“{collector.description}”</Text>
+              <Text style={styles.bio}>“{collector?.description}”</Text>
 
               <View style={styles.location}>
                 <MapPin size={14} color="#B07D05" />
-                <Text style={styles.locationText}>{collector.location}</Text>
+                <Text style={styles.locationText}>{collector?.location}</Text>
               </View>
 
               <View style={styles.actions}>
