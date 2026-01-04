@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -23,18 +23,20 @@ import {
   ChevronRight,
 } from "lucide-react-native";
 import { styles } from "@/components/styles/buyerStyles/profileStyles";
+import { fetchBuyerProfileData } from "@/api/buyerApis/profile";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function ReaderDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
 
-  const reader = {
+  const [reader, setReader] = useState({
     name: "Prabal Parmar",
     username: "parmar",
     followers: "1.2k",
     following: "600",
     description:
       "Avid reader of psychological thrillers and ancient history. Always down for a book trade!",
-  };
+  });
 
   const history = [
     {
@@ -52,6 +54,17 @@ export default function ReaderDashboard() {
       type: "RECEIVED",
     },
   ];
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const username = await AsyncStorage.getItem("username")
+      if(username){
+        const buyerData = await fetchBuyerProfileData(username)
+        setReader(buyerData)
+      }
+    }
+    fetchProfile()
+  }, [])
 
   const filtered = history.filter(
     (i) =>
@@ -87,26 +100,26 @@ export default function ReaderDashboard() {
 
           <View style={styles.identityBlock}>
             <View style={styles.nameRow}>
-              <Text style={styles.nameText}>{reader.name}</Text>
+              <Text style={styles.nameText}>{reader?.name}</Text>
               <ShieldCheck size={18} color="#FBBF24" fill="#5c1616" />
             </View>
-            <Text style={styles.usernameText}>@{reader.username}</Text>
+            <Text style={styles.usernameText}>@{reader?.username}</Text>
           </View>
 
           <View style={styles.statsContainer}>
             <View style={styles.statBox}>
-              <Text style={styles.statNum}>{reader.followers}</Text>
+              <Text style={styles.statNum}>{reader?.followers}</Text>
               <Text style={styles.statLabel}>FOLLOWERS</Text>
             </View>
             <View style={styles.statPipe} />
             <View style={styles.statBox}>
-              <Text style={styles.statNum}>{reader.following}</Text>
+              <Text style={styles.statNum}>{reader?.following}</Text>
               <Text style={styles.statLabel}>FOLLOWING</Text>
             </View>
           </View>
 
           <View style={styles.bioContainer}>
-            <Text style={styles.bioText}>{reader.description}</Text>
+            <Text style={styles.bioText}>{reader?.description}</Text>
           </View>
 
           <View style={styles.buttonRow}>
