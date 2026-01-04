@@ -6,6 +6,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
 from .models import BuyerModel, SellerModel, CustomUser
 from Seller.models import SellerProfile
+from Buyer.models import BuyerProfile
 # Create your views here.
 
 @api_view(['POST'])
@@ -81,13 +82,14 @@ def register_buyer(request):
     
     user.set_password(password)
     user.save()
-    BuyerModel.objects.create(user=user, 
+    buyer = BuyerModel.objects.create(user=user, 
                                       email=email, 
                                       age=age, 
                                       contact_number=contact_number,
                                       gender=gender,
                                       city=city)
 
+    BuyerProfile.objects.create(buyer=buyer)
     return Response({"message": "Buyer registered successfully!", "completed": True}, status=status.HTTP_201_CREATED)
 
 @api_view(['POST'])
