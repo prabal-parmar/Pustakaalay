@@ -1,5 +1,6 @@
 from django.db import models
 from Users.models import SellerModel
+import uuid
 # Create your models here.
 
 class SellerProfile(models.Model):
@@ -11,3 +12,31 @@ class SellerProfile(models.Model):
 
     def __str__(self):
         return f"{self.seller.user.username}"
+    
+class BookDataModel(models.Model):
+    CATEGORY_TYPE = (
+        ("novel", "Novel"),
+        ("historical", "Historical"),
+        ("biography", "Biography"),
+        ("scientific", "Scientific"),
+        ("other", "Other")
+    )
+
+    CONDITION_TYPE = (
+        ("new", "New"),
+        ("old", "Old")
+    )
+
+    book_id = models.UUIDField(primary_key=True, default=uuid.uuid4,editable=False)
+    seller = models.OneToOneField(SellerModel, on_delete=models.CASCADE, related_name="books")
+    name = models.CharField(max_length=100)
+    author = models.CharField(max_length=100)
+    description = models.TextField(default="None")
+    price = models.DecimalField(max_digits=6,decimal_places=2)
+    quantity = models.PositiveIntegerField(default=1)
+    educational_content = models.BooleanField(default=False)
+    category = models.CharField(max_length=20, choices=CATEGORY_TYPE)
+    condition = models.CharField(max_length=5, choices=CONDITION_TYPE)
+
+    def __str__(self):
+        return f"{self.seller.user.username} - {self.name} - {self.condition}"
