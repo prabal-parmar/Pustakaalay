@@ -28,6 +28,7 @@ import {
 import { styles } from "@/components/styles/sellerStyles/profileStyles"
 import { fetchProfileData } from "@/api/sellerApis/profile";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
 
 export default function CollectorProfileScreen() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -170,8 +171,9 @@ function Stat({ value, label, icon }: any) {
 }
 
 function PrimaryButton({ text, icon }: any) {
+  const router = useRouter()
   return (
-    <Pressable style={styles.primaryBtn}>
+    <Pressable style={styles.primaryBtn} onPress={() => router.push("/sellerPages/bookForm")} >
       {icon}
       <Text style={styles.primaryText}>{text}</Text>
     </Pressable>

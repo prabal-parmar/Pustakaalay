@@ -32,6 +32,7 @@ import {
   LayoutGrid,
 } from "lucide-react-native";
 import { styles } from "@/components/styles/sellerStyles/homeStyles";
+import { router } from "expo-router";
 
 const { width } = Dimensions.get("window");
 
@@ -157,7 +158,7 @@ export default function App() {
         </View>
 
         <View style={styles.actionHub}>
-          <TouchableOpacity style={styles.actionCard}>
+          <TouchableOpacity style={styles.actionCard} onPress={() => router.push('/sellerPages/bookForm')}>
             <View style={styles.iconBoxDark}>
               <Plus size={s(24)} color="#D4AF37" strokeWidth={3} />
             </View>

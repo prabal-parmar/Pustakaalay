@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from "react";
+import { useRouter } from "expo-router";
 import {
   View,
   Text,
@@ -28,6 +29,7 @@ export default function InventoryScreen() {
   const [activeType, setActiveType] = useState("Novel");
   const [activeGenre, setActiveGenre] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
+  const router = useRouter()
 
   const categoryMap: Record<string, string[]> = {
     Educational: ["All", "Science", "History", "Technology", "Mathematics", "Medicine"],
@@ -68,7 +70,7 @@ export default function InventoryScreen() {
             <Text style={styles.subtitle}>MANAGE YOUR COLLECTION</Text>
             <Text style={styles.title}>My Inventory</Text>
           </View>
-          <Pressable style={styles.addBtn}>
+          <Pressable style={styles.addBtn} onPress={() => router.push('/sellerPages/bookForm')}>
             <Plus size={24} color="#FFF" strokeWidth={3} />
           </Pressable>
         </View>
