@@ -49,8 +49,22 @@ export default function RegisterBuyerScreen() {
   const handleRegisterBuyer = async () => {
     const [completed, message] = await registerBuyer(formData);
     setIsSubmitting(false);
-    console.log(message, completed);
-
+    setFormData({first_name: "",
+    last_name: "",
+    email: "",
+    mobile: "",
+    username: "",
+    password: "",
+    gender: "Other",
+    age: "",
+    city: "",})
+    if(completed){
+      return router.replace('/(auth)/login');
+    }
+    else{
+      console.log(message);
+    }
+    // console.log(message, completed);
   }
 
   useEffect(() => {

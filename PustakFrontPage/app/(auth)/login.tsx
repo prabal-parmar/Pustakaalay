@@ -54,6 +54,8 @@ export default function LoginScreen() {
       if(res[0] == true){
         await AsyncStorage.setItem("role", "seller");
         await AsyncStorage.setItem("username", username);
+        setPassword("")
+        setUsername("")
         return router.replace('/(seller)/home')
       }
       else{
@@ -67,6 +69,8 @@ export default function LoginScreen() {
       if(res[0] == true){
         await AsyncStorage.setItem("role", "buyer");
         await AsyncStorage.setItem("username", username);
+        setPassword("")
+        setUsername("")
         return router.replace('/(buyer)/home');
       }
       else{

@@ -47,8 +47,21 @@ export default function SellerRegisterScreen() {
   const handleRegisterSeller = async () => {
     const [completed, message] = await registerSeller(formData);
     setIsSubmitting(false)
+    setFormData({name: "",
+    email: "",
+    username: "",
+    password: "",
+    sellerType: "bookstore",
+    location: "",})
+    
+    if(completed){
+      return router.replace('/(auth)/login');
+    }
+    else{
+      console.log(message);
+    }
     // console.log(formData)
-    console.log(message, completed)
+    // console.log(message, completed)
   }
 
   useEffect(() => {
