@@ -33,6 +33,7 @@ import {
 } from "lucide-react-native";
 import { router } from "expo-router";
 import { styles } from "@/components/styles/sellerStyles/bookFormStyles";
+import { addBookData } from "@/api/sellerApis/addBookForm";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -52,6 +53,10 @@ const App = () => {
     genre: "Fiction",
     isEducational: false,
   });
+
+  const handleBookForm = async () => {
+    await addBookData(bookData);
+  }
 
   const categories = [
     "Novel",
