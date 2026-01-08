@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import {
-  StyleSheet,
   View,
   Text,
   TextInput,
@@ -13,7 +12,10 @@ import {
   Platform,
   Switch,
   Modal,
+  Image,
+  Alert,
 } from "react-native";
+import * as ImagePicker from "expo-image-picker";
 import {
   BookOpen,
   Plus,
@@ -27,7 +29,6 @@ import {
   Sparkles,
   Info,
   GraduationCap,
-  Library,
   CheckCircle2,
   X,
 } from "lucide-react-native";
@@ -52,11 +53,17 @@ const App = () => {
     type: "Novel",
     genre: "Fiction",
     isEducational: false,
+    condition: "New",
+    image: null as string | null,
   });
 
   const handleBookForm = async () => {
+    if (!bookData.title || !bookData.price || !bookData.image) {
+      Alert.alert("Missing Info", "Please provide a title, price, and image.");
+      return;
+    }
     await addBookData(bookData);
-  }
+  };
 
   const categories = [
     "Novel",
@@ -68,6 +75,29 @@ const App = () => {
 
   const handleInputChange = (name: string, value: any) => {
     setBookData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (status !== "granted") {
+      Alert.alert(
+        "Permission Denied",
+        "We need access to your photos to upload a book cover."
+      );
+      return;
+    }
+
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [3, 4],
+      quality: 0.7,
+    });
+
+    if (!result.canceled) {
+      handleInputChange("image", result.assets[0].uri);
+    }
   };
 
   const handlePriceChange = (text: string) => {
@@ -145,16 +175,14 @@ const App = () => {
               style={styles.backButton}
               onPress={() => router.back()}
             >
-              <ArrowLeft size={moderateScale(18)} color="#6B705C" onPressOut={() => router.back()}/>
+              <ArrowLeft size={moderateScale(18)} color="#6B705C" />
               <Text style={styles.backLabel}>GO BACK</Text>
             </TouchableOpacity>
           </View>
 
           <View style={styles.hero}>
             <Text style={styles.heroTitle}>Add Book</Text>
-            <Text style={styles.heroSub}>
-              Add a new book to the library.
-            </Text>
+            <Text style={styles.heroSub}>Add a new book to the library.</Text>
           </View>
 
           <View style={styles.formCard}>
@@ -191,10 +219,64 @@ const App = () => {
                 <ImageIcon size={moderateScale(14)} color="#D4AF37" />
                 <Text style={styles.labelText}>BOOK IMAGE</Text>
               </View>
-              <TouchableOpacity style={styles.uploadBox}>
-                <Plus size={moderateScale(24)} color="#A5A58D" />
-                <Text style={styles.uploadText}>Upload Visual</Text>
+              <TouchableOpacity style={styles.uploadBox} onPress={pickImage}>
+                {bookData.image ? (
+                  <Image
+                    source={{ uri: bookData.image }}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      borderRadius: moderateScale(8),
+                    }}
+                  />
+                ) : (
+                  <>
+                    <Plus size={moderateScale(24)} color="#A5A58D" />
+                    <Text style={styles.uploadText}>Upload Visual</Text>
+                  </>
+                )}
               </TouchableOpacity>
+            </View>
+
+            <View style={styles.inputGroup}>
+              <View style={styles.labelRow}>
+                <Sparkles size={moderateScale(14)} color="#D4AF37" />
+                <Text style={styles.labelText}>CONDITION</Text>
+              </View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  gap: moderateScale(10),
+                  marginTop: moderateScale(8),
+                }}
+              >
+                {["New", "Used"].map((item) => (
+                  <TouchableOpacity
+                    key={item}
+                    style={{
+                      flex: 1,
+                      paddingVertical: moderateScale(12),
+                      borderRadius: moderateScale(8),
+                      borderWidth: 1,
+                      borderColor: "#D4AF37",
+                      alignItems: "center",
+                      backgroundColor:
+                        bookData.condition === item ? "#D4AF37" : "transparent",
+                    }}
+                    onPress={() => handleInputChange("condition", item)}
+                  >
+                    <Text
+                      style={{
+                        color: bookData.condition === item ? "#FFF" : "#D4AF37",
+                        fontWeight: "700",
+                        fontSize: moderateScale(12),
+                      }}
+                    >
+                      {item.toUpperCase()}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
             </View>
 
             <View style={styles.row}>
@@ -279,7 +361,11 @@ const App = () => {
               />
             </View>
 
-            <TouchableOpacity style={styles.submitBtn} activeOpacity={0.8}>
+            <TouchableOpacity
+              style={styles.submitBtn}
+              activeOpacity={0.8}
+              onPress={handleBookForm}
+            >
               <Text style={styles.submitText}>COMMIT TO ARCHIVE</Text>
               <View style={styles.submitCircle}>
                 <Plus
