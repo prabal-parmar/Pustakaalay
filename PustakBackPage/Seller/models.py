@@ -28,7 +28,7 @@ class BookDataModel(models.Model):
     )
 
     book_id = models.UUIDField(primary_key=True, default=uuid.uuid4,editable=False)
-    seller = models.OneToOneField(SellerModel, on_delete=models.CASCADE, related_name="books")
+    seller = models.ForeignKey(SellerModel, on_delete=models.CASCADE, related_name="books")
     name = models.CharField(max_length=100)
     author = models.CharField(max_length=100)
     description = models.TextField(default="None")
