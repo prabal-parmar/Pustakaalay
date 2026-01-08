@@ -38,8 +38,11 @@ def get_profile(request):
 def add_book(request):
     name = request.data.get("name")
     author = request.data.get("author")
+    username = request.data.get("username")
+    user = CustomUser.objects.filter(username=username).first()
+    seller = SellerModel.objects.filter(user=user).first()
 
-    find_book = BookDataModel.objects.filter(name=name, author=author).first()
+    find_book = BookDataModel.objects.filter(name=name, author=author, seller=seller).first()
 
     if find_book is not None:
         return Response({"message": "Book already added.", "completed": False}, status=status.HTTP_200_OK)
@@ -57,7 +60,8 @@ def add_book(request):
                                  quantity=quantity,
                                  educational_content=educational_content,
                                  category=category,
-                                 condition=condition)
+                                 condition=condition,
+                                 seller=seller)
     
     return Response({"message": f"{name} added successfully.", "completed": True}, status=status.HTTP_201_CREATED)
 
