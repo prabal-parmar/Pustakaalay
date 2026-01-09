@@ -12,10 +12,10 @@ export const addBookData = async (data: any) => {
             quantity: data.quantity,
             category: data.type.toLowerCase(),
             educational_content: data.isEducational,
-            condition: data.condition.toLowerCase(),
+            condition: data.condition.toLowerCase() === "used" ? "old" : "new",
             username: username?.toLowerCase()
         }
-        console.log(formData)
+        // console.log(formData)
         const response = await api.post('/seller/add-book/', formData);
         return [response.data.message, response.data.completed]
 
