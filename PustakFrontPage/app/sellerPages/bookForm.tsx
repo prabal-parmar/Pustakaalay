@@ -58,11 +58,30 @@ const App = () => {
   });
 
   const handleBookForm = async () => {
-    if (!bookData.title || !bookData.price || !bookData.image) {
+    if (!bookData.title || !bookData.price) {
       Alert.alert("Missing Info", "Please provide a title, price, and image.");
       return;
     }
-    await addBookData(bookData);
+    const [message, completed] = await addBookData(bookData);
+    if(completed){
+      setBookData({
+        title: "",
+        author: "",
+        description: "",
+        price: "",
+        quantity: "1",
+        type: "Novel",
+        genre: "Fiction",
+        isEducational: false,
+        condition: "New",
+        image: null as string | null,
+      })
+      return router.back();
+    }
+    else{
+      Alert.alert(message);
+      return null;
+    }
   };
 
   const categories = [
