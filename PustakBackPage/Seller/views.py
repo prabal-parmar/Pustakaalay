@@ -65,6 +65,35 @@ def add_book(request):
     
     return Response({"message": f"{name} added successfully.", "completed": True}, status=status.HTTP_201_CREATED)
 
+@api_view(['GET'])
+def seller_books_data(request):
+
+    username = request.query_params.get("username")
+
+    user = CustomUser.objects.filter(username=username).first()
+    seller = SellerModel.objects.filter(user=user).first()
+    all_books = BookDataModel.objects.filter(seller=seller).values()
+
+    books = []
+    for book in all_books:
+        data = { 
+            "id": book["book_id"], 
+            "title": book["name"], 
+            "author": book["author"], 
+            "type": book["category"], 
+            "genre": book["genre"], 
+            "condition": book["condition"], 
+            "price": book["price"] 
+        }
+        
+        books.append(data)
+
+    # print(books, "mybooks")
+
+    return Response({"allBooks": books,
+                     "message": "All books by seller sent", 
+                     "completed": True}, status=status.HTTP_200_OK)
+
 def update_profile(request):
     return Response({"data": "Update Profile"})
 
