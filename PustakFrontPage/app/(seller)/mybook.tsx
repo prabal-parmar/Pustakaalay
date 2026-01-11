@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useRouter } from "expo-router";
 import {
   View,
@@ -8,6 +8,7 @@ import {
   TextInput,
   Pressable,
   StatusBar,
+  Alert,
 } from "react-native";
 import {
   Book,
@@ -24,6 +25,7 @@ import {
   Star,
 } from "lucide-react-native";
 import { styles } from "@/components/styles/sellerStyles/mybookStyles"; 
+import { fetchAllBooksOfSeller } from "@/api/sellerApis/myBooksApi";
 
 export default function InventoryScreen() {
   const [activeType, setActiveType] = useState("Novel");
@@ -43,14 +45,24 @@ export default function InventoryScreen() {
     Other: <MoreHorizontal size={16} color={activeType === "Other" ? "#FFF" : "#D4AF37"} />,
   };
 
-  const inventory = [
-    { id: 1, title: "The Great Gatsby", author: "F. Scott Fitzgerald", type: "Novel", genre: "Fiction", condition: "Rare", price: "Trade" },
-    { id: 2, title: "A Brief History of Time", author: "Stephen Hawking", type: "Educational", genre: "Science", condition: "New", price: "₹850" },
-    { id: 3, title: "The Hobbit", author: "J.R.R. Tolkien", type: "Novel", genre: "Fantasy", condition: "Rare", price: "Trade" },
-  ];
+  const [inventory, setInventory] = useState<any>([]);
+
+
+  useEffect(() => {
+    const fetchBooksData = async () => {
+      const [bookData, message, completed] = await fetchAllBooksOfSeller();
+      if(completed){
+        setInventory(bookData)
+      }
+      else{
+        return Alert.alert(message)
+      }
+    }
+    fetchBooksData()
+  }, [])
 
   const filteredBooks = useMemo(() => {
-    return inventory.filter((book) => {
+    return inventory.filter((book: any) => {
       const matchesType = book.type === activeType;
       const matchesGenre = activeGenre === "All" || book.genre === activeGenre;
       const matchesSearch =
@@ -143,7 +155,7 @@ export default function InventoryScreen() {
 
         <View style={styles.list}>
           {filteredBooks.length > 0 ? (
-            filteredBooks.map((book) => (
+            filteredBooks.map((book: any) => (
               <Pressable key={book.id} style={styles.card}>
                 <View style={styles.cover}>
                   <Book size={24} color="#D4AF37" opacity={0.3} />
