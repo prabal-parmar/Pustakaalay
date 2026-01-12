@@ -226,4 +226,32 @@ export const styles = StyleSheet.create({
     marginTop: moderateScale(10),
     letterSpacing: 2,
   },
+  genreContainer: {
+    marginBottom: moderateScale(20),
+  },
+  genreScroll: {
+    paddingVertical: moderateScale(10),
+    gap: moderateScale(8),
+  },
+  genrePill: {
+    paddingHorizontal: moderateScale(16),
+    paddingVertical: moderateScale(8),
+    borderRadius: moderateScale(20),
+    borderWidth: 1,
+    borderColor: "#E5E0D5",
+    backgroundColor: "#F9F8F4",
+    marginRight: moderateScale(8),
+  },
+  genrePillActive: {
+    backgroundColor: "#D4AF37",
+    borderColor: "#D4AF37",
+  },
+  genrePillText: {
+    fontSize: moderateScale(12),
+    color: "#6B705C",
+    fontWeight: "600",
+  },
+  genrePillTextActive: {
+    color: "#FFF",
+  },
 });

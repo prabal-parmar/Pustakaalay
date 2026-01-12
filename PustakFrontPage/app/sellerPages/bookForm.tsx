@@ -63,7 +63,7 @@ const App = () => {
       return;
     }
     const [message, completed] = await addBookData(bookData);
-    if(completed){
+    if (completed) {
       setBookData({
         title: "",
         author: "",
@@ -75,10 +75,9 @@ const App = () => {
         isEducational: false,
         condition: "New",
         image: null as string | null,
-      })
+      });
       return router.back();
-    }
-    else{
+    } else {
       Alert.alert(message);
       return null;
     }
@@ -345,6 +344,47 @@ const App = () => {
                 <ChevronDown size={moderateScale(20)} color="#A5A58D" />
               </TouchableOpacity>
             </View>
+
+            {bookData.type === "Novel" && (
+              <View style={styles.genreContainer}>
+                <View style={styles.labelRow}>
+                  <Sparkles size={moderateScale(14)} color="#D4AF37" />
+                  <Text style={styles.labelText}>GENRE</Text>
+                </View>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.genreScroll}
+                >
+                  {[
+                    "Fiction",
+                    "Fantasy",
+                    "Mystery",
+                    "Romance",
+                    "Sci-fi",
+                    "Thriller",
+                  ].map((g) => (
+                    <TouchableOpacity
+                      key={g}
+                      onPress={() => handleInputChange("genre", g)}
+                      style={[
+                        styles.genrePill,
+                        bookData.genre === g && styles.genrePillActive,
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.genrePillText,
+                          bookData.genre === g && styles.genrePillTextActive,
+                        ]}
+                      >
+                        {g}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+            )}
 
             <View style={styles.toggleCard}>
               <View style={styles.toggleInfo}>
