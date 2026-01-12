@@ -22,13 +22,21 @@ class BookDataModel(models.Model):
         ("other", "Other")
     )
 
-    GENRE_TYPE = (
+    NOVEL_GENRE_TYPE = (
         ("fiction", "Fiction"),
         ("fantasy", "Fantasy"),
         ("mystery", "Mystery"),
         ("romance", "Romance"),
         ("sci-fi", "Sci-fi"),
         ("thriller", "Thriller")
+    )
+
+    EDUCATIONAL_TYPE = (
+        ("science", "Science"),
+        ("history", "History"),
+        ("technology", "Technology"),
+        ("mathematics", "Mathematics"),
+        ("medicine", "Medicine")
     )
 
     CONDITION_TYPE = (
@@ -46,7 +54,8 @@ class BookDataModel(models.Model):
     educational_content = models.BooleanField(default=False)
     category = models.CharField(max_length=20, choices=CATEGORY_TYPE)
     condition = models.CharField(max_length=5, choices=CONDITION_TYPE)
-    genre = models.CharField(max_length=10, choices=GENRE_TYPE, null=True, blank=True)
+    genre = models.CharField(max_length=10, choices=NOVEL_GENRE_TYPE, null=True, blank=True)
+    educational_type = models.CharField(max_length=15, choices=EDUCATIONAL_TYPE, null=True, blank=True)
 
     def __str__(self):
         return f"{self.seller.user.username} - {self.name} - {self.condition}"
