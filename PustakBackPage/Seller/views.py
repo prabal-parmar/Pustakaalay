@@ -53,6 +53,7 @@ def add_book(request):
     educational_content = request.data.get("educational_content")
     category = request.data.get("category")
     condition = request.data.get("condition")
+    genre = request.data.get("genre")
     BookDataModel.objects.create(name=name, 
                                  author=author,
                                  description=description,
@@ -61,7 +62,8 @@ def add_book(request):
                                  educational_content=educational_content,
                                  category=category,
                                  condition=condition,
-                                 seller=seller)
+                                 seller=seller,
+                                 genre=genre)
     
     return Response({"message": f"{name} added successfully.", "completed": True}, status=status.HTTP_201_CREATED)
 
@@ -76,12 +78,16 @@ def seller_books_data(request):
 
     books = []
     for book in all_books:
+        bookType = str(book["category"])
+        bookType = bookType[0].upper() + bookType[1:]
+        genre = str(book["genre"])
+        genre = genre[0].upper() + genre[1:]
         data = { 
             "id": book["book_id"], 
             "title": book["name"], 
             "author": book["author"], 
-            "type": book["category"], 
-            "genre": book["genre"], 
+            "type": bookType, 
+            "genre": genre, 
             "condition": book["condition"], 
             "price": book["price"] 
         }
