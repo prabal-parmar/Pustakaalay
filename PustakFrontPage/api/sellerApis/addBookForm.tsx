@@ -13,7 +13,8 @@ export const addBookData = async (data: any) => {
             category: data.type.toLowerCase(),
             educational_content: data.isEducational,
             condition: data.condition.toLowerCase() === "used" ? "old" : "new",
-            username: username?.toLowerCase()
+            username: username?.toLowerCase(),
+            genre: data.genre
         }
         // console.log(formData)
         const response = await api.post('/seller/add-book/', formData);
