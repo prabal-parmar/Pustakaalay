@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useEffect } from "react";
-import { useRouter } from "expo-router";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
+import { useFocusEffect, useRouter } from "expo-router";
 import {
   View,
   Text,
@@ -47,8 +47,8 @@ export default function InventoryScreen() {
 
   const [inventory, setInventory] = useState<any>([]);
 
-
-  useEffect(() => {
+useFocusEffect(
+  useCallback(() => {
     const fetchBooksData = async () => {
       const [bookData, message, completed] = await fetchAllBooksOfSeller();
       if(completed){
@@ -59,8 +59,8 @@ export default function InventoryScreen() {
       }
     }
     fetchBooksData()
-  }, [])
-
+  }, [inventory])
+)
   const filteredBooks = useMemo(() => {
     return inventory.filter((book: any) => {
       const matchesType = book.type === activeType;
@@ -70,7 +70,7 @@ export default function InventoryScreen() {
         book.author.toLowerCase().includes(searchTerm.toLowerCase());
       return matchesType && matchesGenre && matchesSearch;
     });
-  }, [activeType, activeGenre, searchTerm]);
+  }, [activeType, activeGenre, searchTerm, inventory]);
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -169,10 +169,10 @@ export default function InventoryScreen() {
                 <View style={styles.cardContent}>
                   <View style={styles.cardHeader}>
                     <View style={{ flex: 1 }}>
-                      <Text style={styles.bookTitle}>{book.title}</Text>
+                      <Text style={styles.bookTitle}>{book.title.toUpperCase()}</Text>
                       <View style={styles.authorRow}>
                          <View style={styles.dot} />
-                         <Text style={styles.bookAuthor}>{book.author}</Text>
+                         <Text style={styles.bookAuthor}>{book.author.toUpperCase()}</Text>
                       </View>
                     </View>
                     <View style={styles.chevronBg}>

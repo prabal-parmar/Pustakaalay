@@ -213,7 +213,7 @@ export const styles = StyleSheet.create({
   },
 
   bookTitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "900",
     color: "#1A1A1A",
     letterSpacing: -0.5,
@@ -227,7 +227,7 @@ export const styles = StyleSheet.create({
     backgroundColor: "#D4AF37",
     marginRight: 6,
   },
-  bookAuthor: { fontSize: 12, fontWeight: "600", color: "#6B705C" },
+  bookAuthor: { fontSize: 11, fontWeight: "600", color: "#6B705C" },
 
   chevronBg: {
     width: 28,
