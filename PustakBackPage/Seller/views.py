@@ -51,7 +51,7 @@ def add_book(request):
     price = request.data.get("price")
     quantity = request.data.get("quantity")
     educational_content = request.data.get("educational_content")
-    category = request.data.get("category")
+    category = str(request.data.get("category")).split(" ")[0]
     condition = request.data.get("condition")
     genre = request.data.get("genre")
     BookDataModel.objects.create(name=name, 

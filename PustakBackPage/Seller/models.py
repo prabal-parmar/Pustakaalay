@@ -19,6 +19,7 @@ class BookDataModel(models.Model):
         ("historical", "Historical"),
         ("biography", "Biography"),
         ("scientific", "Scientific"),
+        ("miscellaneous", "Miscellaneous"),
         ("other", "Other")
     )
 
