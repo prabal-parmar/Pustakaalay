@@ -6,6 +6,9 @@ import {
   Pressable,
   ScrollView,
   SafeAreaView,
+  Modal,
+  TouchableWithoutFeedback,
+  Alert,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import {
@@ -23,29 +26,72 @@ import {
   TrendingUp,
   Search,
   X,
+  UserCircle,
+  Bell,
+  Lock,
+  LogOut,
+  ChevronRight,
 } from "lucide-react-native";
 
-import { styles } from "@/components/styles/sellerStyles/profileStyles"
+import { styles } from "@/components/styles/sellerStyles/profileStyles";
 import { fetchProfileData } from "@/api/sellerApis/profile";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useRouter } from "expo-router";
+import { router, useRouter } from "expo-router";
+import { logout } from "@/api/authApis/loginUser";
 
 export default function CollectorProfileScreen() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [isSettingsVisible, setIsSettingsVisible] = useState(false);
 
   const [collector, setCollector] = useState({
     name: "Prabal Parmar",
     username: "prabal",
     followers: "1000",
     totalBooks: "30",
-    description:
-      "I am new here.",
+    description: "I am new here.",
     location: "Indore, India",
     rating: 4.8,
   });
 
+  const handleLogout = async () => {
+    const [completed, message] = await logout();
+    if (completed) {
+      router.replace("/(auth)/login");
+      Alert.alert(message);
+    } else {
+      Alert.alert(message);
+    }
+  };
+
+  const toggleSettings = () => setIsSettingsVisible(!isSettingsVisible);
+
+  const settingsOptions = [
+    {
+      id: 1,
+      label: "Account Settings",
+      icon: <UserCircle size={20} color="#1A1A1A" />,
+    },
+    { id: 2, label: "Notifications", icon: <Bell size={20} color="#1A1A1A" /> },
+    {
+      id: 3,
+      label: "Privacy & Security",
+      icon: <Lock size={20} color="#1A1A1A" />,
+    },
+    {
+      id: 4,
+      label: "Logout",
+      icon: <LogOut size={20} color="#D90429" />,
+      isLogout: true,
+    },
+  ];
+
   const myBooks = [
-    { id: 1, title: "The Great Gatsby", author: "F. Scott Fitzgerald", price: "Trade Only" },
+    {
+      id: 1,
+      title: "The Great Gatsby",
+      author: "F. Scott Fitzgerald",
+      price: "Trade Only",
+    },
     { id: 2, title: "1984", author: "George Orwell", price: "₹250" },
     { id: 3, title: "Sapiens", author: "Yuval Noah Harari", price: "-" },
     { id: 4, title: "Atomic Habits", author: "James Clear", price: "₹300" },
@@ -62,11 +108,11 @@ export default function CollectorProfileScreen() {
       const username = await AsyncStorage.getItem("username");
       if (username) {
         const data = await fetchProfileData(username);
-        setCollector(data)
+        setCollector(data);
       }
-    }
-    fetchProfileContent()
-  }, [])
+    };
+    fetchProfileContent();
+  }, []);
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -81,8 +127,12 @@ export default function CollectorProfileScreen() {
               </View>
 
               <View style={styles.headerIcons}>
-                <Pressable><Share2 size={18} color="#fff" /></Pressable>
-                <Pressable><Settings size={18} color="#fff" /></Pressable>
+                <Pressable>
+                  <Share2 size={18} color="#fff" />
+                </Pressable>
+                <Pressable onPress={toggleSettings}>
+                  <Settings size={18} color="#fff" />
+                </Pressable>
               </View>
             </View>
 
@@ -103,9 +153,21 @@ export default function CollectorProfileScreen() {
               </View>
 
               <View style={styles.stats}>
-                <Stat value={collector?.followers} label="Followers" icon={<Users size={12} color="#FBBF24" />} />
-                <Stat value={collector?.totalBooks} label="My Books" icon={<BookOpen size={12} color="#FBBF24" />} />
-                <Stat value={collector?.rating} label="Rating" icon={<Star size={12} color="#FBBF24" />} />
+                <Stat
+                  value={collector?.followers}
+                  label="Followers"
+                  icon={<Users size={12} color="#FBBF24" />}
+                />
+                <Stat
+                  value={collector?.totalBooks}
+                  label="My Books"
+                  icon={<BookOpen size={12} color="#FBBF24" />}
+                />
+                <Stat
+                  value={collector?.rating}
+                  label="Rating"
+                  icon={<Star size={12} color="#FBBF24" />}
+                />
               </View>
 
               <Text style={styles.bio}>“{collector?.description}”</Text>
@@ -116,8 +178,14 @@ export default function CollectorProfileScreen() {
               </View>
 
               <View style={styles.actions}>
-                <PrimaryButton text="Add New Book" icon={<Plus size={16} color="#FFFFFF"/>} />
-                <SecondaryButton text="Insights" icon={<TrendingUp size={16} />} />
+                <PrimaryButton
+                  text="Add New Book"
+                  icon={<Plus size={16} color="#FFFFFF" />}
+                />
+                <SecondaryButton
+                  text="Insights"
+                  icon={<TrendingUp size={16} />}
+                />
               </View>
             </View>
           </View>
@@ -153,10 +221,56 @@ export default function CollectorProfileScreen() {
           </View>
         </ScrollView>
       </LinearGradient>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isSettingsVisible}
+        onRequestClose={toggleSettings}
+      >
+        <TouchableWithoutFeedback onPress={toggleSettings}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={styles.modalContent}>
+                <View style={styles.modalHeader}>
+                  <View style={styles.modalHandle} />
+                  <Text style={styles.modalTitle}>Settings</Text>
+                </View>
+
+                <ScrollView style={styles.settingsList}>
+                  {settingsOptions.map((option) => (
+                    <Pressable
+                      key={option.id}
+                      style={styles.settingsItem}
+                      onPress={() => {
+                        if (option.isLogout) handleLogout();
+                        toggleSettings();
+                      }}
+                    >
+                      <View style={styles.settingsItemLeft}>
+                        {option.icon}
+                        <Text
+                          style={[
+                            styles.settingsText,
+                            option.isLogout && { color: "#D90429" },
+                          ]}
+                        >
+                          {option.label}
+                        </Text>
+                      </View>
+                      {!option.isLogout && (
+                        <ChevronRight size={18} color="#A5A58D" />
+                      )}
+                    </Pressable>
+                  ))}
+                </ScrollView>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
     </SafeAreaView>
   );
 }
-
 
 function Stat({ value, label, icon }: any) {
   return (
@@ -171,9 +285,12 @@ function Stat({ value, label, icon }: any) {
 }
 
 function PrimaryButton({ text, icon }: any) {
-  const router = useRouter()
+  const router = useRouter();
   return (
-    <Pressable style={styles.primaryBtn} onPress={() => router.push("/sellerPages/bookForm")} >
+    <Pressable
+      style={styles.primaryBtn}
+      onPress={() => router.push("/sellerPages/bookForm")}
+    >
       {icon}
       <Text style={styles.primaryText}>{text}</Text>
     </Pressable>
