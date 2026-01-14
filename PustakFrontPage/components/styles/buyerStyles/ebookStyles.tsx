@@ -1,4 +1,4 @@
-import { StyleSheet, Dimensions, Platform } from "react-native";
+import { Dimensions, Platform, StyleSheet } from "react-native";
 
 const { width } = Dimensions.get("window");
 
@@ -8,7 +8,8 @@ export const styles = StyleSheet.create({
   header: {
     width: "100%",
     paddingHorizontal: width * 0.06,
-    paddingVertical: 20,
+    paddingTop: 20,
+    paddingBottom: 10,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -36,6 +37,35 @@ export const styles = StyleSheet.create({
     alignItems: "center",
   },
 
+  tabContainer: {
+    flexDirection: "row",
+    marginHorizontal: width * 0.06,
+    marginBottom: 15,
+    backgroundColor: "#EBE9E0",
+    borderRadius: 12,
+    padding: 4,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 8,
+    alignItems: "center",
+    borderRadius: 10,
+  },
+  activeTab: {
+    backgroundColor: "#FFF",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 3,
+      },
+      android: { elevation: 2 },
+    }),
+  },
+  tabText: { fontSize: 13, fontWeight: "600", color: "#9A9A8C" },
+  activeTabText: { color: "#1A1A1A", fontWeight: "800" },
+
   searchContainer: { paddingHorizontal: width * 0.06, marginBottom: 15 },
   searchBox: {
     width: "100%",
@@ -49,7 +79,6 @@ export const styles = StyleSheet.create({
     borderColor: "#EBE9E0",
   },
   searchInput: { flex: 1, marginLeft: 10, fontSize: 15, color: "#1A1A1A" },
-
   infoBanner: {
     marginHorizontal: width * 0.06,
     backgroundColor: "#FEF7E6",
@@ -66,7 +95,7 @@ export const styles = StyleSheet.create({
   infoTitle: { color: "#7A5E10", fontSize: 13, fontWeight: "700" },
   infoText: { color: "#947A30", fontSize: 11, marginTop: 1 },
 
-  listContainer: { paddingHorizontal: width * 0.05 },
+  listContainer: { paddingHorizontal: width * 0.05, paddingBottom: 40 },
   listHeader: {
     flexDirection: "row",
     alignItems: "center",
@@ -100,10 +129,7 @@ export const styles = StyleSheet.create({
     }),
   },
 
-  coverSection: {
-    width: width * 0.22,
-    aspectRatio: 0.75,
-  },
+  coverSection: { width: width * 0.22, aspectRatio: 0.75 },
   cover: {
     flex: 1,
     backgroundColor: "#F9F8F3",
@@ -121,6 +147,7 @@ export const styles = StyleSheet.create({
     paddingVertical: 2,
     borderRadius: 4,
   },
+  sellTag: { backgroundColor: "#8C2F00" },
   pdfTagText: { color: "#FFF", fontSize: 7, fontWeight: "900" },
 
   cardBody: { flex: 1, justifyContent: "space-between" },
@@ -137,7 +164,18 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,
+    overflow: "hidden",
   },
+  statusBadge: {
+    backgroundColor: "#E6F4EA",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  statusPending: { backgroundColor: "#FFF4E6" },
+  statusText: { fontSize: 9, fontWeight: "800", color: "#1E8E3E" },
+  statusTextPending: { color: "#B07D05" },
+
   bookTitle: {
     fontSize: 16,
     fontWeight: "800",
@@ -145,7 +183,21 @@ export const styles = StyleSheet.create({
     marginTop: 2,
   },
   authorName: { fontSize: 12, color: "#A5A58D" },
-  description: { fontSize: 11, color: "#6B705C", marginTop: 4, lineHeight: 15 },
+  description: {
+    fontSize: 11,
+    color: "#6B705C",
+    marginTop: 4,
+    lineHeight: 15,
+  },
+
+  priceRow: { flexDirection: "row", alignItems: "center", marginTop: 4 },
+  currency: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#1A1A1A",
+    marginTop: 2,
+  },
+  price: { fontSize: 18, fontWeight: "800", color: "#1A1A1A" },
 
   cardFooter: {
     flexDirection: "row",
@@ -167,4 +219,6 @@ export const styles = StyleSheet.create({
     borderRadius: 10,
   },
   readBtnText: { fontSize: 10, fontWeight: "900", color: "#1A1A1A" },
+  editBtn: { backgroundColor: "#1A1A1A" },
+  editBtnText: { color: "#FFF" },
 });
