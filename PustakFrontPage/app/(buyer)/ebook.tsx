@@ -22,6 +22,7 @@ import {
   TrendingUp,
 } from "lucide-react-native";
 import { styles } from "@/components/styles/buyerStyles/ebookStyles";
+import { router } from "expo-router";
 
 interface BaseItem {
   id: number;
@@ -113,6 +114,14 @@ export default function MyBooksScreen() {
       b.author.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleNavigateToPage = () => {
+    if (activeTab == "selling") {
+      return router.push("/buyerPages/buyerBookForm");
+    } else {
+      return null;
+    }
+  };
+
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
@@ -124,7 +133,10 @@ export default function MyBooksScreen() {
             </View>
             <Text style={styles.title}>My Books</Text>
           </View>
-          <Pressable style={styles.postBtn}>
+          <Pressable
+            style={styles.postBtn}
+            onPress={() => handleNavigateToPage()}
+          >
             <Plus size={20} color="#fff" />
           </Pressable>
         </View>
@@ -143,7 +155,7 @@ export default function MyBooksScreen() {
                 activeTab === "library" && styles.activeTabText,
               ]}
             >
-              My Library
+              E-Book ({myEbooks.length})
             </Text>
           </Pressable>
           <Pressable
@@ -164,7 +176,6 @@ export default function MyBooksScreen() {
           </Pressable>
         </View>
 
-        {/* Search */}
         <View style={styles.searchContainer}>
           <View style={styles.searchBox}>
             <Search size={20} color="#9A9A8C" />
