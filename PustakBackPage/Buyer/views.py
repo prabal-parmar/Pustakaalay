@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
 from Users.models import BuyerModel, CustomUser
-from .models import BuyerProfile
+from .models import BuyerProfile, BookForSellBuyer
 
 # Buyer Profile
 @api_view(['GET'])
@@ -50,7 +50,30 @@ def accept_exchange_request_from_buyer(request):
 # Sell book
 @api_view(['POST'])
 def sell_book_to_others(request):
-    return Response({"data": "Sell book request"})
+    name = request.data.get("name")
+    author = request.data.get("author")
+    username = request.data.get("username")
+    user = CustomUser.objects.filter(username=username).first()
+    buyer = BuyerModel.objects.filter(user=user).first()
+
+    find_book = BookForSellBuyer.objects.filter(name=name, author=author, buyer=buyer).first()
+
+    if find_book is not None:
+        return Response({"message": "Book already added.", "completed": False}, status=status.HTTP_200_OK)
+    
+    description = request.data.get("description")
+    price = request.data.get("price")
+    category = str(request.data.get("category")).split(" ")[0]
+    genre = request.data.get("genre")
+    BookForSellBuyer.objects.create(name=name, 
+                                 author=author,
+                                 description=description,
+                                 price=price,
+                                 category=category,
+                                 genre=genre,
+                                 buyer=buyer)
+    
+    return Response({"message": f"{name} added successfully.", "completed": True}, status=status.HTTP_201_CREATED)
 
 # Accept request to sell
 @api_view(['POST'])
