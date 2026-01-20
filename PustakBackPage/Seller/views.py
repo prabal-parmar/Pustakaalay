@@ -35,7 +35,7 @@ def get_profile(request):
 
 # Add book to sell with data
 @api_view(['POST'])
-def add_book(request):
+def add_book_to_sell(request):
     name = request.data.get("name")
     author = request.data.get("author")
     username = request.data.get("username")
