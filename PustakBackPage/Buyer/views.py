@@ -75,6 +75,11 @@ def sell_book_to_others(request):
     
     return Response({"message": f"{name} added successfully.", "completed": True}, status=status.HTTP_201_CREATED)
 
+# Buyer books to sell
+@api_view(['GET'])
+def buyer_books_to_sell(request):
+    return Response({"message": "Buyer Books to sell"}, status=status.HTTP_200_OK)
+
 # Accept request to sell
 @api_view(['POST'])
 def accept_sell_request_from_buyer(request):
