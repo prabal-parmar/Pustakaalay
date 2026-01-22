@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   ScrollView,
   TextInput,
   Pressable,
+  Alert,
 } from "react-native";
 import {
   FileText,
@@ -22,7 +23,8 @@ import {
   TrendingUp,
 } from "lucide-react-native";
 import { styles } from "@/components/styles/buyerStyles/ebookStyles";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
+import { fetchBuyerSellBooksData } from "@/api/buyerApis/ebookApi";
 
 interface BaseItem {
   id: number;
@@ -47,56 +49,6 @@ interface ListingItem extends BaseItem {
 
 type BookItem = LibraryItem | ListingItem;
 
-const myEbooks: LibraryItem[] = [
-  {
-    id: 1,
-    type: "library",
-    title: "The Silent Patient",
-    author: "Alex Michaelides",
-    postedDate: "Oct 12, 2024",
-    reads: "1.2k",
-    genre: "THRILLER",
-    description:
-      "A shocking psychological thriller of a woman's act of violence.",
-  },
-  {
-    id: 2,
-    type: "library",
-    title: "Think and Grow Rich",
-    author: "Napoleon Hill",
-    postedDate: "Sept 28, 2024",
-    reads: "3.1k",
-    genre: "SELF-HELP",
-    description:
-      "A landmark bestseller that has helped millions achieve success.",
-  },
-];
-
-const myListings: ListingItem[] = [
-  {
-    id: 101,
-    type: "selling",
-    title: "Concept of Physics - Vol 1",
-    author: "H.C. Verma",
-    price: "450",
-    status: "ACTIVE",
-    views: "45",
-    postedDate: "Jan 10, 2025",
-    genre: "EDUCATION",
-  },
-  {
-    id: 102,
-    type: "selling",
-    title: "Rich Dad Poor Dad",
-    author: "Robert Kiyosaki",
-    price: "200",
-    status: "PENDING",
-    views: "120",
-    postedDate: "Jan 05, 2025",
-    genre: "FINANCE",
-  },
-];
-
 function isListing(item: BookItem): item is ListingItem {
   return item.type === "selling";
 }
@@ -105,13 +57,63 @@ export default function MyBooksScreen() {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [activeTab, setActiveTab] = useState<"library" | "selling">("library");
 
+  const [myEbooks, setMyEbooks] = useState<LibraryItem[]>([
+    {
+      id: 1,
+      type: "library",
+      title: "The Silent Patient",
+      author: "Alex Michaelides",
+      postedDate: "Oct 12, 2024",
+      reads: "1.2k",
+      genre: "THRILLER",
+      description:
+        "A shocking psychological thriller of a woman's act of violence.",
+    },
+    {
+      id: 2,
+      type: "library",
+      title: "Think and Grow Rich",
+      author: "Napoleon Hill",
+      postedDate: "Sept 28, 2024",
+      reads: "3.1k",
+      genre: "SELF-HELP",
+      description:
+        "A landmark bestseller that has helped millions achieve success.",
+    },
+  ]);
+
+  const [myListings, setMyListings] = useState<ListingItem[]>([
+    {
+      id: 101,
+      type: "selling",
+      title: "Concept of Physics - Vol 1",
+      author: "H.C. Verma",
+      price: "450",
+      status: "ACTIVE",
+      views: "45",
+      postedDate: "Jan 10, 2025",
+      genre: "EDUCATION",
+    },
+    {
+      id: 102,
+      type: "selling",
+      title: "Rich Dad Poor Dad",
+      author: "Robert Kiyosaki",
+      price: "200",
+      status: "PENDING",
+      views: "120",
+      postedDate: "Jan 05, 2025",
+      genre: "FINANCE",
+    },
+  ]);
+
   const activeList: BookItem[] =
     activeTab === "library" ? myEbooks : myListings;
 
   const filtered = activeList.filter(
     (b) =>
       b.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      b.author.toLowerCase().includes(searchTerm.toLowerCase())
+      b.author.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const handleNavigateToPage = () => {
@@ -121,6 +123,21 @@ export default function MyBooksScreen() {
       return null;
     }
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchBooksData = async () => {
+        const [message, bookData, completed] = await fetchBuyerSellBooksData();
+        if (completed) {
+          setMyListings(bookData);
+          return Alert.alert(message);
+        } else {
+          return Alert.alert(message);
+        }
+      };
+      fetchBooksData();
+    }, [myListings]),
+  );
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -155,7 +172,7 @@ export default function MyBooksScreen() {
                 activeTab === "library" && styles.activeTabText,
               ]}
             >
-              E-Book ({myEbooks.length})
+              E-Book ({myEbooks?.length})
             </Text>
           </Pressable>
           <Pressable
@@ -171,7 +188,7 @@ export default function MyBooksScreen() {
                 activeTab === "selling" && styles.activeTabText,
               ]}
             >
-              Selling ({myListings.length})
+              Selling ({myListings?.length})
             </Text>
           </Pressable>
         </View>
@@ -190,7 +207,7 @@ export default function MyBooksScreen() {
               onChangeText={setSearchTerm}
               style={styles.searchInput}
             />
-            {searchTerm.length > 0 && (
+            {searchTerm?.length > 0 && (
               <Pressable onPress={() => setSearchTerm("")}>
                 <X size={18} color="#A5A58D" />
               </Pressable>
@@ -217,7 +234,7 @@ export default function MyBooksScreen() {
         <View style={styles.listContainer}>
           <View style={styles.listHeader}>
             <Text style={styles.countText}>
-              {filtered.length}{" "}
+              {filtered?.length}{" "}
               {activeTab === "library" ? "BOOKS OWNED" : "LISTINGS ACTIVE"}
             </Text>
             <View style={styles.divider} />
