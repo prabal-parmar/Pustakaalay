@@ -4,6 +4,7 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from Users.models import BuyerModel, CustomUser
 from .models import BuyerProfile, BookForSellBuyer
+from django.utils import timezone
 
 # Buyer Profile
 @api_view(['GET'])
@@ -78,7 +79,34 @@ def sell_book_to_others(request):
 # Buyer books to sell
 @api_view(['GET'])
 def buyer_books_to_sell(request):
-    return Response({"message": "Buyer Books to sell"}, status=status.HTTP_200_OK)
+    username = request.query_params.get("username")
+    user = CustomUser.objects.filter(username=username).first()
+    buyer = BuyerModel.objects.filter(user=user).first()
+
+    if buyer is None:
+        return Response({"message": "User not found", "data": None, "completed": True}, 
+                        status=status.HTTP_404_NOT_FOUND)
+    
+    all_books = BookForSellBuyer.objects.filter(buyer=buyer).all()
+
+    book_data = []
+
+    for book in all_books:
+        created_date = book.date
+        data = {
+            "id": book.book_id,
+            "type": "selling",
+            "title": book.name,
+            "author": book.author,
+            "price": book.price,
+            "status": "ACTIVE", # need to consider after
+            "views": "0",      # need to consider after
+            "postedDate": timezone.localtime(created_date).strftime("%b %d, %Y"),
+            "genre": book.genre,
+        }
+        book_data.append(data)
+
+    return Response({"message": "Buyer books sent", "data": book_data, "completed": True}, status=status.HTTP_200_OK)
 
 # Accept request to sell
 @api_view(['POST'])
