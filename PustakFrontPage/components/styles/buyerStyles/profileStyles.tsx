@@ -330,4 +330,66 @@ export const styles = StyleSheet.create({
     fontSize: scale(11),
     color: "#A5A58D",
   },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "transparent",
+    justifyContent: "flex-end",
+  },
+  modalContent: {
+    backgroundColor: "#FFFFFF",
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+    maxHeight: "50%",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: -4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 10,
+      },
+      android: {
+        elevation: 20,
+      },
+    }),
+  },
+  modalHeader: {
+    alignItems: "center",
+    paddingVertical: 12,
+  },
+  modalHandle: {
+    width: 40,
+    height: 4,
+    backgroundColor: "#E5E0D5",
+    borderRadius: 2,
+    marginBottom: 16,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "900",
+    color: "#1A1A1A",
+    marginBottom: 10,
+  },
+  settingsList: {
+    marginTop: 10,
+  },
+  settingsItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F4F1EA",
+  },
+  settingsItemLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  settingsText: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#1A1A1A",
+  },
 });
