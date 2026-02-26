@@ -130,7 +130,7 @@ export default function MyBooksScreen() {
         const [message, bookData, completed] = await fetchBuyerSellBooksData();
         if (completed) {
           setMyListings(bookData);
-          return Alert.alert(message);
+          // return Alert.alert(message);
         } else {
           return Alert.alert(message);
         }

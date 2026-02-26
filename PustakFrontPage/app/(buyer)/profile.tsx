@@ -7,6 +7,9 @@ import {
   TextInput,
   Pressable,
   StatusBar,
+  Modal,
+  TouchableWithoutFeedback,
+  Alert,
 } from "react-native";
 import {
   User,
@@ -21,13 +24,19 @@ import {
   X,
   Book,
   ChevronRight,
+  UserCircle,
+  LogOut,
+  Lock,
 } from "lucide-react-native";
 import { styles } from "@/components/styles/buyerStyles/profileStyles";
 import { fetchBuyerProfileData } from "@/api/buyerApis/profile";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router } from "expo-router";
+import { logout } from "@/api/authApis/loginUser";
 
 export default function ReaderDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [isSettingsVisible, setIsSettingsVisible] = useState(false);
 
   const [reader, setReader] = useState({
     name: "Prabal Parmar",
@@ -37,6 +46,38 @@ export default function ReaderDashboard() {
     description:
       "Avid reader of psychological thrillers and ancient history. Always down for a book trade!",
   });
+
+  const handleLogout = async () => {
+    const [completed, message] = await logout();
+    if (completed) {
+      router.replace("/(auth)/login");
+      Alert.alert(message);
+    } else {
+      Alert.alert(message);
+    }
+  };
+
+  const toggleSettings = () => setIsSettingsVisible(!isSettingsVisible);
+
+  const settingsOptions = [
+    {
+      id: 1,
+      label: "Account Settings",
+      icon: <UserCircle size={20} color="#1A1A1A" />,
+    },
+    { id: 2, label: "Notifications", icon: <Bell size={20} color="#1A1A1A" /> },
+    {
+      id: 3,
+      label: "Privacy & Security",
+      icon: <Lock size={20} color="#1A1A1A" />,
+    },
+    {
+      id: 4,
+      label: "Logout",
+      icon: <LogOut size={20} color="#D90429" />,
+      isLogout: true,
+    },
+  ];
 
   const history = [
     {
@@ -57,19 +98,19 @@ export default function ReaderDashboard() {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const username = await AsyncStorage.getItem("username")
-      if(username){
-        const buyerData = await fetchBuyerProfileData(username)
-        setReader(buyerData)
+      const username = await AsyncStorage.getItem("username");
+      if (username) {
+        const buyerData = await fetchBuyerProfileData(username);
+        setReader(buyerData);
       }
-    }
-    fetchProfile()
-  }, [])
+    };
+    fetchProfile();
+  }, []);
 
   const filtered = history.filter(
     (i) =>
       i.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      i.to.toLowerCase().includes(searchTerm.toLowerCase())
+      i.to.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   return (
@@ -82,7 +123,7 @@ export default function ReaderDashboard() {
               <Bell size={20} color="#fff" />
               <View style={styles.dot} />
             </Pressable>
-            <Pressable style={styles.iconBtn}>
+            <Pressable style={styles.iconBtn} onPress={toggleSettings}>
               <Settings size={20} color="#fff" />
             </Pressable>
           </View>
@@ -189,6 +230,53 @@ export default function ReaderDashboard() {
           </View>
         </View>
       </ScrollView>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isSettingsVisible}
+        onRequestClose={toggleSettings}
+      >
+        <TouchableWithoutFeedback onPress={toggleSettings}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={styles.modalContent}>
+                <View style={styles.modalHeader}>
+                  <View style={styles.modalHandle} />
+                  <Text style={styles.modalTitle}>Settings</Text>
+                </View>
+
+                <ScrollView style={styles.settingsList}>
+                  {settingsOptions.map((option) => (
+                    <Pressable
+                      key={option.id}
+                      style={styles.settingsItem}
+                      onPress={() => {
+                        if (option.isLogout) handleLogout();
+                        toggleSettings();
+                      }}
+                    >
+                      <View style={styles.settingsItemLeft}>
+                        {option.icon}
+                        <Text
+                          style={[
+                            styles.settingsText,
+                            option.isLogout && { color: "#D90429" },
+                          ]}
+                        >
+                          {option.label}
+                        </Text>
+                      </View>
+                      {!option.isLogout && (
+                        <ChevronRight size={18} color="#A5A58D" />
+                      )}
+                    </Pressable>
+                  ))}
+                </ScrollView>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
     </SafeAreaView>
   );
 }
