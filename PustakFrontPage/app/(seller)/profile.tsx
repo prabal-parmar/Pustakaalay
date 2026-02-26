@@ -34,23 +34,30 @@ import {
 } from "lucide-react-native";
 
 import { styles } from "@/components/styles/sellerStyles/profileStyles";
-import { fetchProfileData } from "@/api/sellerApis/profile";
+import { fetchProfileData, fetchSellerBookData } from "@/api/sellerApis/profile";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useRouter } from "expo-router";
 import { logout } from "@/api/authApis/loginUser";
 
+type BookData = {
+  author: string,
+  id: string,
+  title: string,
+  price: number
+}
+
 export default function CollectorProfileScreen() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isSettingsVisible, setIsSettingsVisible] = useState(false);
-
+  const [myBooks, setMyBooks] = useState<BookData[]>()
   const [collector, setCollector] = useState({
-    name: "Prabal Parmar",
-    username: "prabal",
-    followers: "1000",
-    totalBooks: "30",
-    description: "I am new here.",
-    location: "Indore, India",
-    rating: 4.8,
+    name: "",
+    username: "",
+    followers: "",
+    totalBooks: "",
+    description: "",
+    location: "",
+    rating: 0,
   });
 
   const handleLogout = async () => {
@@ -85,19 +92,8 @@ export default function CollectorProfileScreen() {
     },
   ];
 
-  const myBooks = [
-    {
-      id: 1,
-      title: "The Great Gatsby",
-      author: "F. Scott Fitzgerald",
-      price: "Trade Only",
-    },
-    { id: 2, title: "1984", author: "George Orwell", price: "₹250" },
-    { id: 3, title: "Sapiens", author: "Yuval Noah Harari", price: "-" },
-    { id: 4, title: "Atomic Habits", author: "James Clear", price: "₹300" },
-  ];
 
-  const filteredBooks = myBooks.filter(
+  const filteredBooks = myBooks?.filter(
     (b) =>
       b.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       b.author.toLowerCase().includes(searchTerm.toLowerCase())
@@ -111,6 +107,12 @@ export default function CollectorProfileScreen() {
         setCollector(data);
       }
     };
+    const fetchBookDatafromApi = async () => {
+      const username = await AsyncStorage.getItem("username");
+      const data = await fetchSellerBookData(username || "");
+      setMyBooks(data.reverse());
+    }
+    fetchBookDatafromApi();
     fetchProfileContent();
   }, []);
 
@@ -208,7 +210,7 @@ export default function CollectorProfileScreen() {
           </View>
 
           <View style={styles.grid}>
-            {filteredBooks.map((book) => (
+            {filteredBooks && filteredBooks.map((book) => (
               <View key={book.id} style={styles.bookCard}>
                 <View style={styles.bookCover}>
                   <Book size={32} color="#FBBF24" />

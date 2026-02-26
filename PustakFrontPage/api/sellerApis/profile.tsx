@@ -10,3 +10,14 @@ export const fetchProfileData = async (username: string) => {
         return null
     }
 }
+
+export const fetchSellerBookData = async (username: string) => {
+    try {
+        const response = await api.get('/seller/my-all-books/', {params: {username: username.toLowerCase()}})
+        // console.log(response.data.allBooks)
+        return response.data.allBooks
+    } catch (error) {
+        console.log(error)
+        return null
+    }
+}

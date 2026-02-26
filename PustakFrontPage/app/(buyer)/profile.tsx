@@ -39,12 +39,12 @@ export default function ReaderDashboard() {
   const [isSettingsVisible, setIsSettingsVisible] = useState(false);
 
   const [reader, setReader] = useState({
-    name: "Prabal Parmar",
-    username: "parmar",
-    followers: "1.2k",
-    following: "600",
+    name: "",
+    username: "",
+    followers: "",
+    following: "",
     description:
-      "Avid reader of psychological thrillers and ancient history. Always down for a book trade!",
+      "",
   });
 
   const handleLogout = async () => {
@@ -168,7 +168,7 @@ export default function ReaderDashboard() {
               <Heart size={16} color="#fff" fill="#fff" />
               <Text style={styles.btnTextPrimary}>FAVORITES</Text>
             </Pressable>
-            <Pressable style={styles.btnSecondary}>
+            <Pressable style={styles.btnSecondary} onPress={() => router.push('/buyerPages/buyerBookForm')}>
               <RefreshCcw size={16} color="#1A1A1A" />
               <Text style={styles.btnTextSecondary}>NEW TRADE</Text>
             </Pressable>
