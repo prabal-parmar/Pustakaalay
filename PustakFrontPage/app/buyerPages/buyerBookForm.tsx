@@ -29,6 +29,7 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import { styles } from "@/components/styles/buyerStyles/addBookStyles";
 import { router } from "expo-router";
+import { addBuyerBookToSell } from "@/api/buyerApis/ebookApi";
 
 interface FormData {
   name: string;
@@ -69,6 +70,13 @@ export default function App() {
     genre: "",
     imageUri: null,
   });
+
+  const handlePostNewBook = async () => {
+    const response = await addBuyerBookToSell(formData);
+    
+    Alert.alert(response[0])
+    return router.back()
+  }
 
   const [activeDropdown, setActiveDropdown] = useState<
     "category" | "genre" | null
@@ -379,7 +387,7 @@ export default function App() {
             <Text style={styles.tipsText}>Keep it correct and detailed.</Text>
           </View>
 
-          <TouchableOpacity style={styles.publishBtn} activeOpacity={0.8}>
+          <TouchableOpacity style={styles.publishBtn} activeOpacity={0.8} onPressOut={handlePostNewBook}>
             <Text style={styles.publishText}>PUBLISH LISTING</Text>
             <View style={styles.checkIcon}>
               <Check size={20} color="#5c1616" strokeWidth={3} />

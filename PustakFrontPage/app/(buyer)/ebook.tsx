@@ -82,30 +82,7 @@ export default function MyBooksScreen() {
     },
   ]);
 
-  const [myListings, setMyListings] = useState<ListingItem[]>([
-    {
-      id: 101,
-      type: "selling",
-      title: "Concept of Physics - Vol 1",
-      author: "H.C. Verma",
-      price: "450",
-      status: "ACTIVE",
-      views: "45",
-      postedDate: "Jan 10, 2025",
-      genre: "EDUCATION",
-    },
-    {
-      id: 102,
-      type: "selling",
-      title: "Rich Dad Poor Dad",
-      author: "Robert Kiyosaki",
-      price: "200",
-      status: "PENDING",
-      views: "120",
-      postedDate: "Jan 05, 2025",
-      genre: "FINANCE",
-    },
-  ]);
+  const [myListings, setMyListings] = useState<ListingItem[]>([]);
 
   const activeList: BookItem[] =
     activeTab === "library" ? myEbooks : myListings;
