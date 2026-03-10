@@ -12,3 +12,24 @@ export const fetchBuyerSellBooksData = async () => {
         return ["Something went wrong!" ,null ,false]
     }
 }
+
+export const addBuyerBookToSell = async (data: any) => {
+    try {
+        const username = await AsyncStorage.getItem("username");
+        const formData = {
+            username: username?.toLowerCase(),
+            name: data.name,
+            author: data.author,
+            description: data.description,
+            price: data.price,
+            category: data.category.toLowerCase(),
+            genre: data.genre.toLowerCase()
+        }
+        const response = await api.post('/buyer/sell-book/', formData);
+
+        return [response.data.message, true]
+    } catch (error) {
+        console.log(error)
+        return ["Something went wrong!", false]
+    }
+}
