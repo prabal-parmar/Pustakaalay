@@ -63,7 +63,7 @@ def sell_book_to_others(request):
         return Response({"message": "Book already added.", "completed": False}, status=status.HTTP_200_OK)
     
     description = request.data.get("description")
-    price = request.data.get("price")
+    price = float(request.data.get("price"))
     category = str(request.data.get("category")).split(" ")[0]
     genre = request.data.get("genre")
     BookForSellBuyer.objects.create(name=name, 
@@ -101,7 +101,7 @@ def buyer_books_to_sell(request):
             "price": book.price,
             "status": "ACTIVE", # need to consider after
             "views": "0",      # need to consider after
-            "postedDate": timezone.localtime(created_date).strftime("%b %d, %Y"),
+            "postedDate": created_date.strftime("%b %d, %Y"),
             "genre": book.genre,
         }
         book_data.append(data)

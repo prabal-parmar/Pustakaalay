@@ -86,15 +86,10 @@ def seller_books_data(request):
             "id": book["book_id"], 
             "title": book["name"], 
             "author": book["author"], 
-            "type": bookType, 
-            "genre": genre, 
-            "condition": book["condition"], 
             "price": book["price"] 
         }
         
         books.append(data)
-
-    # print(books, "mybooks")
 
     return Response({"allBooks": books,
                      "message": "All books by seller sent", 

@@ -56,7 +56,7 @@ class BookForSellBuyer(models.Model):
     price = models.DecimalField(max_digits=6,decimal_places=2)
     category = models.CharField(max_length=20, choices=CATEGORY_TYPE)
     genre = models.CharField(max_length=10, choices=NOVEL_GENRE_TYPE, null=True, blank=True)
-    date = models.DateField(default=timezone.now)
+    date = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.name} - {self.buyer.user.username}"
