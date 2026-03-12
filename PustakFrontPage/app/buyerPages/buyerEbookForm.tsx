@@ -29,8 +29,7 @@ import {
 import { styles } from "@/components/styles/buyerStyles/addEbookStyles";
 import * as DocumentPicker from "expo-document-picker";
 import { router } from "expo-router";
-
-const { width } = Dimensions.get("window");
+import { addBuyerNewEbook } from "@/api/buyerApis/ebookApi";
 
 interface FileData {
   name: string;
@@ -78,6 +77,11 @@ export default function App() {
     "category" | "genre" | null
   >(null);
 
+  const handleSubmitForm = async () => {
+    await addBuyerNewEbook(formData);
+    router.replace('/(buyer)/ebook');
+  }
+
   const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
@@ -119,7 +123,7 @@ export default function App() {
         });
       }
     } catch (err) {
-      Alert.alert("Error", "Failed to select document. Please try again.");
+        Alert.alert("Error", "Failed to select document. Please try again.");
     }
   };
 
@@ -393,14 +397,16 @@ export default function App() {
             style={styles.publishBtn}
             activeOpacity={0.8}
             onPress={() => {
-              if (!selectedFile) {
+              if (selectedFile) {
                 Alert.alert(
                   "Wait!",
                   "Please select a manuscript file before publishing.",
                 );
                 return;
               }
-              Alert.alert("Success", "Your ebook is being processed!");
+              else{
+                handleSubmitForm();
+              }
             }}
           >
             <Text style={styles.publishBtnText}>Publish Ebook</Text>
