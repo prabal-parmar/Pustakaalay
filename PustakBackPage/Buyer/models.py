@@ -40,7 +40,7 @@ class EbookModel(models.Model):
     description = models.TextField(default="No Description")
     category = models.CharField(max_length=20, choices=CATEGORY_TYPE)
     genre = models.CharField(max_length=10, choices=NOVEL_GENRE_TYPE, null=True, blank=True)
-    date = models.DateField(default=timezone.now)
+    date = models.DateField(auto_now_add=True)
     views = models.IntegerField(default=0)
 
     def __str__(self):
