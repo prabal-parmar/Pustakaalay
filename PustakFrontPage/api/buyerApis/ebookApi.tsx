@@ -33,3 +33,23 @@ export const addBuyerBookToSell = async (data: any) => {
         return ["Something went wrong!", false]
     }
 }
+
+export const addBuyerNewEbook = async (data: any) => {
+    try {
+        const username = await AsyncStorage.getItem("username");
+        const formData = {
+            username: username?.toLowerCase(),
+            name: data.name,
+            author: data.author,
+            description: data.description,
+            category: data.category.toLowerCase(),
+            genre: data.genre.toLowerCase()
+        }
+        console.log(data)
+        const response = await api.post('/buyer/e-book/', formData);
+        return [response.data.message, true]
+    } catch (error) {
+        console.log(error);
+        return ["Something went wrong!", false]
+    }
+}
