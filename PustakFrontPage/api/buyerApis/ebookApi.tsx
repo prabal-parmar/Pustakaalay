@@ -53,3 +53,15 @@ export const addBuyerNewEbook = async (data: any) => {
         return ["Something went wrong!", false]
     }
 }
+
+export const fetchBuyerEbook = async () => {
+    try {
+        const username = await AsyncStorage.getItem("username")
+        const response = await api.get('/buyer/my-ebooks/', {params: {username: username?.toLowerCase()}})
+
+        return [response.data.message, response.data.data, true];
+    } catch (error) {
+        console.log(error);
+        return ["Something went wrong!", null, false]
+    }
+}
