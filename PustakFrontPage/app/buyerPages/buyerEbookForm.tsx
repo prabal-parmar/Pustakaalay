@@ -397,7 +397,7 @@ export default function App() {
             style={styles.publishBtn}
             activeOpacity={0.8}
             onPress={() => {
-              if (selectedFile) {
+              if (selectedFile) { // Need to alter after so temp for now
                 Alert.alert(
                   "Wait!",
                   "Please select a manuscript file before publishing.",
