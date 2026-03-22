@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import BuyerProfile, BookForSellBuyer
+from .models import BuyerProfile, BookForSellBuyer, EbookModel
 # Register your models here.
 
 @admin.register(BuyerProfile)
@@ -9,3 +9,7 @@ class SellerProfileAdmin(admin.ModelAdmin):
 @admin.register(BookForSellBuyer)
 class SellerProfileAdmin(admin.ModelAdmin):
     list_display = [field.name for field in BookForSellBuyer._meta.fields]
+
+@admin.register(EbookModel)
+class SellerProfileAdmin(admin.ModelAdmin):
+    list_display = [field.name for field in EbookModel._meta.fields]

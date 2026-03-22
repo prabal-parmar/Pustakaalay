@@ -103,6 +103,35 @@ def add_new_ebook(request):
     
     return Response({"message": f"{name} uploaded successfully.", "completed": True}, status=status.HTTP_201_CREATED)
 
+# Fetch all E-book of buyer
+@api_view(['GET'])
+def fetch_buyer_ebook(request):
+    username = request.query_params.get("username")
+    user = CustomUser.objects.filter(username=username).first()
+    buyer = BuyerModel.objects.filter(user=user).first()
+
+    if buyer is None:
+        return Response({"message": "User not found", "data": None, "completed": True}, 
+                        status=status.HTTP_404_NOT_FOUND)
+    
+    all_ebooks = EbookModel.objects.filter(buyer=buyer).all()
+
+    ebook_data = []
+
+    for ebook in all_ebooks:
+        created_date = ebook.date
+        data = {
+            "id": ebook.ebook_id,
+            "title": ebook.name,
+            "author": ebook.author,
+            "status": "ACTIVE", # need to consider after
+            "postedDate": created_date.strftime("%b %d, %Y"),
+            "genre": ebook.genre,
+            "views": ebook.views
+        }
+        ebook_data.append(data)
+    return Response({"message": "Buyer E-books sent", "data": ebook_data, "completed": True}, status=status.HTTP_200_OK)
+
 # Buyer books to sell
 @api_view(['GET'])
 def buyer_books_to_sell(request):
