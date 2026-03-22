@@ -24,7 +24,7 @@ import {
 } from "lucide-react-native";
 import { styles } from "@/components/styles/buyerStyles/ebookStyles";
 import { router, useFocusEffect } from "expo-router";
-import { fetchBuyerSellBooksData } from "@/api/buyerApis/ebookApi";
+import { fetchBuyerEbook, fetchBuyerSellBooksData } from "@/api/buyerApis/ebookApi";
 
 interface BaseItem {
   id: number;
@@ -57,30 +57,7 @@ export default function MyBooksScreen() {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [activeTab, setActiveTab] = useState<"library" | "selling">("library");
 
-  const [myEbooks, setMyEbooks] = useState<LibraryItem[]>([
-    {
-      id: 1,
-      type: "library",
-      title: "The Silent Patient",
-      author: "Alex Michaelides",
-      postedDate: "Oct 12, 2024",
-      reads: "1.2k",
-      genre: "THRILLER",
-      description:
-        "A shocking psychological thriller of a woman's act of violence.",
-    },
-    {
-      id: 2,
-      type: "library",
-      title: "Think and Grow Rich",
-      author: "Napoleon Hill",
-      postedDate: "Sept 28, 2024",
-      reads: "3.1k",
-      genre: "SELF-HELP",
-      description:
-        "A landmark bestseller that has helped millions achieve success.",
-    },
-  ]);
+  const [myEbooks, setMyEbooks] = useState<LibraryItem[]>([]);
 
   const [myListings, setMyListings] = useState<ListingItem[]>([]);
 
@@ -103,6 +80,16 @@ export default function MyBooksScreen() {
 
   useFocusEffect(
     useCallback(() => {
+      const fetchBuyerEbookData = async () => {
+        const [message, ebookData, completed] = await fetchBuyerEbook();
+        if(completed) {
+          setMyEbooks(ebookData)
+          // return Alert.alert(message);
+        }
+        else{
+          return Alert.alert(message)
+        }
+      };
       const fetchBooksData = async () => {
         const [message, bookData, completed] = await fetchBuyerSellBooksData();
         if (completed) {
@@ -113,7 +100,8 @@ export default function MyBooksScreen() {
         }
       };
       fetchBooksData();
-    }, [myListings]),
+      fetchBuyerEbookData();
+    }, [myListings, myListings]),
   );
 
   return (
