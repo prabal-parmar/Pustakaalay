@@ -21,10 +21,14 @@ import {
   MoreHorizontal,
   Tag,
   TrendingUp,
+  ArrowLeftRight,
 } from "lucide-react-native";
 import { styles } from "@/components/styles/buyerStyles/ebookStyles";
 import { router, useFocusEffect } from "expo-router";
-import { fetchBuyerEbook, fetchBuyerSellBooksData } from "@/api/buyerApis/ebookApi";
+import {
+  fetchBuyerEbook,
+  fetchBuyerSellBooksData,
+} from "@/api/buyerApis/ebookApi";
 
 interface BaseItem {
   id: number;
@@ -47,22 +51,75 @@ interface ListingItem extends BaseItem {
   views: string;
 }
 
-type BookItem = LibraryItem | ListingItem;
+interface ExchangeItem extends BaseItem {
+  type: "exchange";
+  condition: "NEW" | "GOOD" | "FAIR";
+  preferredExchange: string;
+  location: string;
+}
+
+type BookItem = LibraryItem | ListingItem | ExchangeItem;
 
 function isListing(item: BookItem): item is ListingItem {
   return item.type === "selling";
 }
 
+function isExchange(item: BookItem): item is ExchangeItem {
+  return item.type === "exchange";
+}
+
 export default function MyBooksScreen() {
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [activeTab, setActiveTab] = useState<"library" | "selling">("library");
+  const [activeTab, setActiveTab] = useState<
+    "library" | "selling" | "exchange"
+  >("library");
 
   const [myEbooks, setMyEbooks] = useState<LibraryItem[]>([]);
 
   const [myListings, setMyListings] = useState<ListingItem[]>([]);
 
+  const [myExchanges, setMyExchanges] = useState<ExchangeItem[]>([
+    {
+      id: 1,
+      title: "To Kill a Mockingbird",
+      author: "Harper Lee",
+      postedDate: "2 days ago",
+      genre: "Fiction",
+      type: "exchange",
+      condition: "GOOD",
+      preferredExchange: "Any Mystery Novel",
+      location: "Delhi, India",
+    },
+    {
+      id: 2,
+      title: "1984",
+      author: "George Orwell",
+      postedDate: "1 week ago",
+      genre: "Dystopian",
+      type: "exchange",
+      condition: "FAIR",
+      preferredExchange: "Science Fiction",
+      location: "Mumbai, India",
+    },
+    {
+      id: 3,
+      title: "The Great Gatsby",
+      author: "F. Scott Fitzgerald",
+      postedDate: "3 days ago",
+      genre: "Classic",
+      type: "exchange",
+      condition: "NEW",
+      preferredExchange: "Literary Fiction",
+      location: "Bangalore, India",
+    },
+  ]);
+
   const activeList: BookItem[] =
-    activeTab === "library" ? myEbooks : myListings;
+    activeTab === "library"
+      ? myEbooks
+      : activeTab === "selling"
+        ? myListings
+        : myExchanges;
 
   const filtered = activeList.filter(
     (b) =>
@@ -73,6 +130,8 @@ export default function MyBooksScreen() {
   const handleNavigateToPage = () => {
     if (activeTab == "selling") {
       return router.push("/buyerPages/buyerBookForm");
+    } else if (activeTab == "exchange") {
+      return null;
     } else {
       return router.push("/buyerPages/buyerEbookForm");
     }
@@ -82,12 +141,11 @@ export default function MyBooksScreen() {
     useCallback(() => {
       const fetchBuyerEbookData = async () => {
         const [message, ebookData, completed] = await fetchBuyerEbook();
-        if(completed) {
-          setMyEbooks(ebookData)
+        if (completed) {
+          setMyEbooks(ebookData);
           // return Alert.alert(message);
-        }
-        else{
-          return Alert.alert(message)
+        } else {
+          return Alert.alert(message);
         }
       };
       const fetchBooksData = async () => {
@@ -156,6 +214,22 @@ export default function MyBooksScreen() {
               Selling ({myListings?.length})
             </Text>
           </Pressable>
+          <Pressable
+            style={[styles.tab, activeTab === "exchange" && styles.activeTab]}
+            onPress={() => {
+              setActiveTab("exchange");
+              setSearchTerm("");
+            }}
+          >
+            <Text
+              style={[
+                styles.tabText,
+                activeTab === "exchange" && styles.activeTabText,
+              ]}
+            >
+              Exchange ({myExchanges?.length})
+            </Text>
+          </Pressable>
         </View>
 
         <View style={styles.searchContainer}>
@@ -165,7 +239,9 @@ export default function MyBooksScreen() {
               placeholder={
                 activeTab === "library"
                   ? "Search your library..."
-                  : "Search your listings..."
+                  : activeTab === "selling"
+                    ? "Search your listings..."
+                    : "Search your exchanges..."
               }
               placeholderTextColor="#A5A58D"
               value={searchTerm}
@@ -186,12 +262,16 @@ export default function MyBooksScreen() {
             <Text style={styles.infoTitle}>
               {activeTab === "library"
                 ? "Read-Only Protection"
-                : "Seller Visibility"}
+                : activeTab === "selling"
+                  ? "Seller Visibility"
+                  : "Exchange Community"}
             </Text>
             <Text style={styles.infoText}>
               {activeTab === "library"
                 ? "In-app viewing only. Downloads disabled."
-                : "Your listings are visible to students near you."}
+                : activeTab === "selling"
+                  ? "Your listings are visible to students near you."
+                  : "Connect with readers for book exchanges in your area."}
             </Text>
           </View>
         </View>
@@ -200,13 +280,18 @@ export default function MyBooksScreen() {
           <View style={styles.listHeader}>
             <Text style={styles.countText}>
               {filtered?.length}{" "}
-              {activeTab === "library" ? "BOOKS OWNED" : "LISTINGS ACTIVE"}
+              {activeTab === "library"
+                ? "BOOKS OWNED"
+                : activeTab === "selling"
+                  ? "LISTINGS ACTIVE"
+                  : "EXCHANGES AVAILABLE"}
             </Text>
             <View style={styles.divider} />
           </View>
 
           {filtered.map((item) => {
             const isItemListing = isListing(item);
+            const isItemExchange = isExchange(item);
 
             return (
               <View key={item.id} style={styles.card}>
@@ -214,18 +299,25 @@ export default function MyBooksScreen() {
                   <View style={styles.cover}>
                     {activeTab === "library" ? (
                       <FileText size={28} color="#B07D05" strokeWidth={1.5} />
-                    ) : (
+                    ) : activeTab === "selling" ? (
                       <Tag size={28} color="#B07D05" strokeWidth={1.5} />
+                    ) : (
+                      <TrendingUp size={28} color="#B07D05" strokeWidth={1.5} />
                     )}
 
                     <View
                       style={[
                         styles.pdfTag,
                         activeTab === "selling" && styles.sellTag,
+                        activeTab === "exchange" && styles.exchangeTag,
                       ]}
                     >
                       <Text style={styles.pdfTagText}>
-                        {activeTab === "library" ? "PDF" : "PHYSICAL"}
+                        {activeTab === "library"
+                          ? "PDF"
+                          : activeTab === "selling"
+                            ? "PHYSICAL"
+                            : "EXCHANGE"}
                       </Text>
                     </View>
                   </View>
@@ -252,7 +344,30 @@ export default function MyBooksScreen() {
                         </Text>
                       </View>
                     )}
-                    {!isItemListing && (
+                    {isItemExchange && (
+                      <View
+                        style={[
+                          styles.conditionBadge,
+                          item.condition === "NEW" && styles.conditionNew,
+                          item.condition === "GOOD" && styles.conditionGood,
+                          item.condition === "FAIR" && styles.conditionFair,
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            styles.conditionText,
+                            item.condition === "NEW" && styles.conditionTextNew,
+                            item.condition === "GOOD" &&
+                              styles.conditionTextGood,
+                            item.condition === "FAIR" &&
+                              styles.conditionTextFair,
+                          ]}
+                        >
+                          {item.condition}
+                        </Text>
+                      </View>
+                    )}
+                    {!isItemListing && !isItemExchange && (
                       <MoreHorizontal size={18} color="#A5A58D" />
                     )}
                   </View>
@@ -264,27 +379,41 @@ export default function MyBooksScreen() {
                     <Text style={styles.authorName}>by {item.author}</Text>
                   </View>
 
-                  {!isItemListing ? (
+                  {!isItemListing && !isItemExchange ? (
                     <Text style={styles.description} numberOfLines={2}>
                       {item.description}
                     </Text>
-                  ) : (
+                  ) : isItemListing ? (
                     <View style={styles.priceRow}>
                       <Text style={styles.currency}>₹</Text>
                       <Text style={styles.price}>{item.price}</Text>
+                    </View>
+                  ) : (
+                    <View style={styles.exchangeInfo}>
+                      <Text style={styles.exchangeLabel}>Looking for:</Text>
+                      <Text style={styles.exchangeValue} numberOfLines={1}>
+                        {item.preferredExchange}
+                      </Text>
+                      <Text style={styles.locationText}>{item.location}</Text>
                     </View>
                   )}
 
                   <View style={styles.cardFooter}>
                     <View style={styles.statsGroup}>
                       <View style={styles.statItem}>
-                        {!isItemListing ? (
+                        {!isItemListing && !isItemExchange ? (
                           <Eye size={12} color="#6B705C" />
-                        ) : (
+                        ) : isItemListing ? (
                           <TrendingUp size={12} color="#6B705C" />
+                        ) : (
+                          <ShieldCheck size={12} color="#6B705C" />
                         )}
                         <Text style={styles.statText}>
-                          {!isItemListing ? item.reads : item.views}
+                          {!isItemListing && !isItemExchange
+                            ? item.reads
+                            : isItemListing
+                              ? item.views
+                              : "Verified"}
                         </Text>
                       </View>
                       <View style={styles.statItem}>
@@ -297,21 +426,28 @@ export default function MyBooksScreen() {
                       style={[
                         styles.readBtn,
                         activeTab === "selling" && styles.editBtn,
+                        activeTab === "exchange" && styles.exchangeBtn,
                       ]}
                     >
                       <Text
                         style={[
                           styles.readBtnText,
                           activeTab === "selling" && styles.editBtnText,
+                          activeTab === "exchange" && styles.exchangeBtnText,
                         ]}
                       >
-                        {activeTab === "library" ? "READ" : "MANAGE"}
+                        {activeTab === "library" ? (
+                          "READ"
+                        ) : activeTab === "selling" ? (
+                          "MANAGE"
+                        ) : (
+                          <ArrowLeftRight
+                            size={14}
+                            color="#ece9e9"
+                            strokeWidth={4}
+                          />
+                        )}
                       </Text>
-                      <ChevronRight
-                        size={12}
-                        color={activeTab === "library" ? "#1A1A1A" : "#FFF"}
-                        strokeWidth={4}
-                      />
                     </Pressable>
                   </View>
                 </View>
