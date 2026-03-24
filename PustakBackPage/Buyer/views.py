@@ -127,7 +127,7 @@ def fetch_buyer_ebook(request):
             "status": "ACTIVE", # need to consider after
             "postedDate": created_date.strftime("%b %d, %Y"),
             "genre": ebook.genre,
-            "views": ebook.views
+            "reads": ebook.views
         }
         ebook_data.append(data)
     return Response({"message": "Buyer E-books sent", "data": ebook_data, "completed": True}, status=status.HTTP_200_OK)
@@ -156,7 +156,7 @@ def buyer_books_to_sell(request):
             "author": book.author,
             "price": book.price,
             "status": "ACTIVE", # need to consider after
-            "views": "0",      # need to consider after
+            "reads": "0",      # need to consider after
             "postedDate": created_date.strftime("%b %d, %Y"),
             "genre": book.genre,
         }
