@@ -37,14 +37,14 @@ import { logout } from "@/api/authApis/loginUser";
 export default function ReaderDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isSettingsVisible, setIsSettingsVisible] = useState(false);
+  const [isNotificationActive, setIsNotificationActive] = useState(false);
 
   const [reader, setReader] = useState({
     name: "",
     username: "",
     followers: "",
     following: "",
-    description:
-      "",
+    description: "",
   });
 
   const handleLogout = async () => {
@@ -58,6 +58,11 @@ export default function ReaderDashboard() {
   };
 
   const toggleSettings = () => setIsSettingsVisible(!isSettingsVisible);
+
+  const handleNotificationPress = () => {
+    // To be added
+    setIsNotificationActive((prev) => !prev);
+  };
 
   const settingsOptions = [
     {
@@ -119,11 +124,17 @@ export default function ReaderDashboard() {
       <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
         <View style={styles.topSection}>
           <View style={styles.headerActions}>
-            <Pressable style={styles.iconBtn}>
+            <Pressable
+              style={[styles.iconBtn, isNotificationActive && { opacity: 0.5 }]}
+              onPress={handleNotificationPress}
+            >
               <Bell size={20} color="#fff" />
               <View style={styles.dot} />
             </Pressable>
-            <Pressable style={styles.iconBtn} onPress={toggleSettings}>
+            <Pressable
+              style={[styles.iconBtn, isSettingsVisible && { opacity: 0.5 }]}
+              onPress={toggleSettings}
+            >
               <Settings size={20} color="#fff" />
             </Pressable>
           </View>
@@ -168,7 +179,10 @@ export default function ReaderDashboard() {
               <Heart size={16} color="#fff" fill="#fff" />
               <Text style={styles.btnTextPrimary}>FAVORITES</Text>
             </Pressable>
-            <Pressable style={styles.btnSecondary} onPress={() => router.push('/buyerPages/buyerBookForm')}>
+            <Pressable
+              style={styles.btnSecondary}
+              onPress={() => router.push("/buyerPages/buyerBookForm")}
+            >
               <RefreshCcw size={16} color="#1A1A1A" />
               <Text style={styles.btnTextSecondary}>NEW TRADE</Text>
             </Pressable>
@@ -234,7 +248,10 @@ export default function ReaderDashboard() {
         animationType="slide"
         transparent={true}
         visible={isSettingsVisible}
-        onRequestClose={toggleSettings}
+        onRequestClose={() => {
+          toggleSettings();
+          setIsNotificationActive(false);
+        }}
       >
         <TouchableWithoutFeedback onPress={toggleSettings}>
           <View style={styles.modalOverlay}>
@@ -252,6 +269,7 @@ export default function ReaderDashboard() {
                       style={styles.settingsItem}
                       onPress={() => {
                         if (option.isLogout) handleLogout();
+                        setIsNotificationActive(false);
                         toggleSettings();
                       }}
                     >
