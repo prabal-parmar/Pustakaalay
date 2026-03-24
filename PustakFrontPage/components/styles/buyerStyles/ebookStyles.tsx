@@ -148,6 +148,7 @@ export const styles = StyleSheet.create({
     borderRadius: 4,
   },
   sellTag: { backgroundColor: "#8C2F00" },
+  exchangeTag: { backgroundColor: "#2D5F2D" },
   pdfTagText: { color: "#FFF", fontSize: 7, fontWeight: "900" },
 
   cardBody: { flex: 1, justifyContent: "space-between" },
@@ -176,6 +177,20 @@ export const styles = StyleSheet.create({
   statusText: { fontSize: 9, fontWeight: "800", color: "#1E8E3E" },
   statusTextPending: { color: "#B07D05" },
 
+  conditionBadge: {
+    backgroundColor: "#E6F4EA",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  conditionNew: { backgroundColor: "#E6F4EA" },
+  conditionGood: { backgroundColor: "#FFF4E6" },
+  conditionFair: { backgroundColor: "#FCE8E6" },
+  conditionText: { fontSize: 9, fontWeight: "800", color: "#1E8E3E" },
+  conditionTextNew: { color: "#1E8E3E" },
+  conditionTextGood: { color: "#B07D05" },
+  conditionTextFair: { color: "#D93025" },
+
   bookTitle: {
     fontSize: 16,
     fontWeight: "800",
@@ -199,6 +214,21 @@ export const styles = StyleSheet.create({
   },
   price: { fontSize: 18, fontWeight: "800", color: "#1A1A1A" },
 
+  exchangeInfo: { marginTop: 4 },
+  exchangeLabel: {
+    fontSize: 10,
+    fontWeight: "600",
+    color: "#6B705C",
+    marginBottom: 2,
+  },
+  exchangeValue: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#1A1A1A",
+    marginBottom: 2,
+  },
+  locationText: { fontSize: 10, color: "#A5A58D" },
+
   cardFooter: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -221,4 +251,6 @@ export const styles = StyleSheet.create({
   readBtnText: { fontSize: 10, fontWeight: "900", color: "#1A1A1A" },
   editBtn: { backgroundColor: "#1A1A1A" },
   editBtnText: { color: "#FFF" },
+  exchangeBtn: { backgroundColor: "#2D5F2D", fontSize: 0.2 },
+  exchangeBtnText: { color: "#FFF" },
 });
