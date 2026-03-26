@@ -2,7 +2,7 @@ from django.db import models
 from Users.models import BuyerModel
 import uuid
 from django.utils import timezone
-# Create your models here.
+
 
 class BuyerProfile(models.Model):
     buyer = models.OneToOneField(BuyerModel, on_delete=models.CASCADE, related_name="buyer")
@@ -46,7 +46,6 @@ class EbookModel(models.Model):
     def __str__(self):
         return f"{self.name} - {self.buyer.user.username}"
     
-
 class BookForSellBuyer(models.Model):
     book_id = models.UUIDField(primary_key=True, default=uuid.uuid4,editable=False)
     buyer = models.ForeignKey(BuyerModel, on_delete=models.CASCADE, related_name="buyer_books_sell")
@@ -60,3 +59,13 @@ class BookForSellBuyer(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.buyer.user.username}"
+    
+class EbookHistory(models.Model):
+    ebook_id = models.ForeignKey(EbookModel, on_delete=models.CASCADE, related_name='ebook')
+    buyer_seen = models.ForeignKey(BuyerModel, on_delete=models.CASCADE, related_name='buyerebook_buyer')
+    last_page_number = models.IntegerField(default=1)
+    saved = models.BooleanField(default=False)
+    liked = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.buyer_seen.user.username} - {self.ebook_id}"
