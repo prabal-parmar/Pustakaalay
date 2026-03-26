@@ -25,6 +25,7 @@ import {
 import { styles } from "@/components/styles/buyerStyles/ebookStyles";
 import { router, useFocusEffect } from "expo-router";
 import {
+  checkBuyerSeenEbook,
   fetchBuyerEbook,
   fetchBuyerSellBooksData,
 } from "@/api/buyerApis/ebookApi";
@@ -125,6 +126,20 @@ export default function MyBooksScreen() {
       b.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       b.author.toLowerCase().includes(searchTerm.toLowerCase()),
   );
+
+  const handleClickEbook = async (ebook_id: string) => {
+    const [message, data, completed] = await checkBuyerSeenEbook(ebook_id);
+
+    if (completed) {
+      ebook_id = data.book_id;
+      setMyEbooks(prev => (prev.map(e => String(e.id) === ebook_id ? {...e, reads: e.reads += 1} : {...e})))
+      Alert.alert(message);
+      return null;
+    } else {
+      Alert.alert(message);
+      return null;
+    }
+  };
 
   const handleNavigateToPage = () => {
     if (activeTab == "selling") {
@@ -427,6 +442,7 @@ export default function MyBooksScreen() {
                         activeTab === "selling" && styles.editBtn,
                         activeTab === "exchange" && styles.exchangeBtn,
                       ]}
+                      onPressOut={() => activeTab === "library" ? handleClickEbook(String(item.id)): null}
                     >
                       <Text
                         style={[
@@ -436,11 +452,7 @@ export default function MyBooksScreen() {
                         ]}
                       >
                         {activeTab === "library" ? (
-                          <FileText
-                            size={14}
-                            color="#000000"
-                            strokeWidth={3}
-                          />
+                          <FileText size={14} color="#000000" strokeWidth={3} />
                         ) : activeTab === "selling" ? (
                           "MANAGE"
                         ) : (
