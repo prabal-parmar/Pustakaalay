@@ -1,9 +1,17 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { api } from "../authApis/api";
 
+const getUsername = async () => {
+    const username = await AsyncStorage.getItem("username");
+    if (username){
+        return username.toLowerCase();
+    }
+    return ""
+}
+
 export const fetchBuyerSellBooksData = async () => {
     try {
-        const username = await AsyncStorage.getItem("username");
+        const username = await getUsername();
         const response = await api.get('/buyer/my-sell-books/', {params: {username: username?.toLowerCase()}})
 
         return [response.data.message, response.data.data, true];
@@ -15,7 +23,7 @@ export const fetchBuyerSellBooksData = async () => {
 
 export const addBuyerBookToSell = async (data: any) => {
     try {
-        const username = await AsyncStorage.getItem("username");
+        const username = await getUsername();
         const formData = {
             username: username?.toLowerCase(),
             name: data.name,
@@ -36,7 +44,7 @@ export const addBuyerBookToSell = async (data: any) => {
 
 export const addBuyerNewEbook = async (data: any) => {
     try {
-        const username = await AsyncStorage.getItem("username");
+        const username = await getUsername();
         const formData = {
             username: username?.toLowerCase(),
             name: data.name,
@@ -56,12 +64,24 @@ export const addBuyerNewEbook = async (data: any) => {
 
 export const fetchBuyerEbook = async () => {
     try {
-        const username = await AsyncStorage.getItem("username")
+        const username = await getUsername();
         const response = await api.get('/buyer/my-ebooks/', {params: {username: username?.toLowerCase()}})
 
         return [response.data.message, response.data.data, true];
     } catch (error) {
         console.log(error);
+        return ["Something went wrong!", null, false]
+    }
+}
+
+export const checkBuyerSeenEbook = async (ebook_id: string) => {
+    try {
+        const username = await getUsername();
+        const response = await api.get(`/buyer/${username}/ebook/${ebook_id}`)
+
+        return [response.data.message, response.data.data, true]
+    } catch (error) {
+        console.log(error)
         return ["Something went wrong!", null, false]
     }
 }
