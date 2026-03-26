@@ -16,7 +16,6 @@ import {
   Eye,
   Calendar,
   ShieldCheck,
-  ChevronRight,
   Info,
   MoreHorizontal,
   Tag,
@@ -437,7 +436,11 @@ export default function MyBooksScreen() {
                         ]}
                       >
                         {activeTab === "library" ? (
-                          "READ"
+                          <FileText
+                            size={14}
+                            color="#000000"
+                            strokeWidth={3}
+                          />
                         ) : activeTab === "selling" ? (
                           "MANAGE"
                         ) : (
