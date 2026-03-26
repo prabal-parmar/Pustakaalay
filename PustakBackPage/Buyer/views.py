@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
 from Users.models import BuyerModel, CustomUser
-from .models import BuyerProfile, BookForSellBuyer, EbookModel
+from .models import BuyerProfile, BookForSellBuyer, EbookModel, EbookHistory
 from django.utils import timezone
 
 # Buyer Profile
@@ -178,3 +178,27 @@ def all_buy_book_requests(request):
 @api_view(['GET'])
 def all_exchange_book_requests(request):
     return Response({"data": "Exchange book requests"})
+
+# Check if buyer had opened ebook or not
+@api_view(['GET'])
+def viewed_ebook(request, ebook_id, username):
+    user = CustomUser.objects.filter(username=username).first()
+    if not user:
+        return Response({"message": "Can not find User", "data": None})
+    
+    buyer = BuyerModel.objects.filter(user=user).first()
+    if not buyer:
+        return Response({"message": "Can not find buyer", "data": None})
+    
+    ebook = EbookModel.objects.filter(ebook_id=ebook_id).first()
+    if not ebook:
+        return Response({"message": f"No E-book found with id: {ebook_id}", "data": None})
+    
+    check_view = EbookHistory.objects.filter(ebook_id=ebook, buyer_seen=buyer)
+    if check_view:
+        return Response({"message": "Already Opened", "data": {"id": None}})
+    else:
+        ebook.views += 1
+        ebook.save()
+        EbookHistory.objects.create(ebook_id=ebook, buyer_seen=buyer).save()
+        return Response({"message": "Views Updated", "data": { "id": ebook_id }})
