@@ -57,10 +57,18 @@ export default function ReaderDashboard() {
     }
   };
 
-  const toggleSettings = () => setIsSettingsVisible(!isSettingsVisible);
+  const toggleSettings = () => {
+    if(isNotificationActive){
+      setIsNotificationActive(false);
+    }
+    setIsSettingsVisible(!isSettingsVisible)
+  };
 
   const handleNotificationPress = () => {
     // To be added
+    if(isSettingsVisible){
+      setIsSettingsVisible(false);
+    }
     setIsNotificationActive((prev) => !prev);
   };
 
