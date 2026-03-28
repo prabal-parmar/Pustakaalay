@@ -31,6 +31,12 @@ NOVEL_GENRE_TYPE = (
     ("thriller", "Thriller")
 )
 
+BOOK_CONDITION = (
+    ("new", "New"),
+    ("good", "Good"),
+    ("fair", "Fair"),
+    ("old", "Old")
+)
 
 class EbookModel(models.Model):
     ebook_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -56,6 +62,7 @@ class BookForSellBuyer(models.Model):
     category = models.CharField(max_length=20, choices=CATEGORY_TYPE)
     genre = models.CharField(max_length=10, choices=NOVEL_GENRE_TYPE, null=True, blank=True)
     date = models.DateField(auto_now_add=True)
+    condition = models.CharField(max_length=10, choices=BOOK_CONDITION, default="fair")
 
     def __str__(self):
         return f"{self.name} - {self.buyer.user.username}"
@@ -69,3 +76,20 @@ class EbookHistory(models.Model):
 
     def __str__(self):
         return f"{self.buyer_seen.user.username} - {self.ebook_id}"
+    
+class ExchangeBookModel(models.Model):
+    book_id = models.UUIDField(primary_key=True, default=uuid.uuid4,editable=False)
+    buyer = models.ForeignKey(BuyerModel, on_delete=models.CASCADE, related_name="exchange_book_buyer")
+    name = models.CharField(max_length=100, null=False)
+    author = models.CharField(max_length=100)
+    category = models.CharField(max_length=20, choices=CATEGORY_TYPE)
+    genre = models.CharField(max_length=10, choices=NOVEL_GENRE_TYPE, null=True, blank=True)
+    date = models.DateField(auto_now_add=True)
+    condition = models.CharField(max_length=10, choices=BOOK_CONDITION, default="fair")
+
+    desired_genre = models.CharField(max_length=10, choices=NOVEL_GENRE_TYPE)
+    wanted_condition = models.CharField(max_length=10, choices=BOOK_CONDITION, default="fair")
+    description = models.TextField()
+    
+    def __str__(self):
+        return f"{self.name} - {self.buyer.user.username}"
