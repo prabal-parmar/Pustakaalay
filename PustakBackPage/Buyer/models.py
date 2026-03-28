@@ -86,7 +86,7 @@ class ExchangeBookModel(models.Model):
     genre = models.CharField(max_length=10, choices=NOVEL_GENRE_TYPE, null=True, blank=True)
     date = models.DateField(auto_now_add=True)
     condition = models.CharField(max_length=10, choices=BOOK_CONDITION, default="fair")
-
+    desired_category = models.CharField(max_length=20, choices=CATEGORY_TYPE)
     desired_genre = models.CharField(max_length=10, choices=NOVEL_GENRE_TYPE)
     wanted_condition = models.CharField(max_length=10, choices=BOOK_CONDITION, default="fair")
     description = models.TextField()
