@@ -145,7 +145,7 @@ export default function MyBooksScreen() {
     if (activeTab == "selling") {
       return router.push("/buyerPages/buyerBookForm");
     } else if (activeTab == "exchange") {
-      return null;
+      return router.push('/buyerPages/buyerExchangeBookForm');
     } else {
       return router.push("/buyerPages/buyerEbookForm");
     }
