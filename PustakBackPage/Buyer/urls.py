@@ -9,5 +9,6 @@ urlpatterns = [
     path('my-sell-books/', views.fetch_buyer_book, name="Buyer Book to sell"),
     path('my-ebooks/', views.fetch_buyer_ebook, name="Buyer All E-book"),
     path('exchange-books/', views.fetch_buyer_exchange_book, name="Send all exchange books of buyer"),
-    path('<str:username>/ebook/<str:ebook_id>/', views.viewed_ebook, name="Open Ebook with id")
+    path('<str:username>/ebook/<str:ebook_id>/', views.viewed_ebook, name="Open Ebook with id"),
+    path('hot-picks/', views.get_hot_ebook_picks, name="Hot Ebook data for Buyer")
 ]

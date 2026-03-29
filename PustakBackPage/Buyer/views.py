@@ -5,6 +5,7 @@ from rest_framework import status
 from Users.models import BuyerModel, CustomUser
 from .models import BuyerProfile, BookForSellBuyer, EbookModel, EbookHistory, ExchangeBookModel
 from django.utils import timezone
+from  Models.buyerModels import calculate_score
 
 # Buyer Profile
 @api_view(['GET'])
@@ -276,3 +277,40 @@ def viewed_ebook(request, ebook_id, username):
         ebook.save()
         EbookHistory.objects.create(ebook_id=ebook, buyer_seen=buyer).save()
         return Response({"message": "Views Updated", "data": { "id": ebook_id }}, status=status.HTTP_200_OK)
+
+# Fetch Hot Ebooks for home page
+@api_view(['GET'])
+def get_hot_ebook_picks(request):
+    username = request.query_params.get("username")
+    user = CustomUser.objects.filter(username=username).first()
+    buyer = BuyerModel.objects.filter(user=user).first()
+
+    if buyer is None:
+        return Response({"message": "Unable to find buyer.", 
+                         "data": None, 
+                         "completed": False}, status=status.HTTP_404_NOT_FOUND)
+
+    ebooks = list(EbookModel.objects.exclude(buyer=buyer).all())
+    for ebook in ebooks:
+        ebook.score = calculate_score(ebook)
+        ebook.save()
+    
+    ebooks.sort(key=lambda e: e.score, reverse=True)
+
+    hot_ebooks = ebooks[:3]
+
+    data_to_send = []
+    for ebook in hot_ebooks:
+        data = {
+            "id": ebook.ebook_id,
+            "title": ebook.name,
+            "author": ebook.author,
+            "rating": float(ebook.rating),
+            "reads": int(ebook.views)
+        }
+        data_to_send.append(data)
+
+    
+    return Response({"message": "Hot Ebooks data sent.", 
+                     "data": data_to_send, 
+                     "completed": True}, status=status.HTTP_200_OK)
