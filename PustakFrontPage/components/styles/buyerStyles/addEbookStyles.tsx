@@ -5,30 +5,14 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FFFDF0",
   },
-  blobContainer: {
-    ...StyleSheet.absoluteFillObject,
-    overflow: "hidden",
-  },
-  blob1: {
+  blob: {
     position: "absolute",
-    width: 600,
-    height: 600,
-    borderRadius: 300,
     backgroundColor: "#FFE8A3",
-    top: -200,
-    right: -150,
-    opacity: 0.3,
-  },
-  blob2: {
-    position: "absolute",
-    width: 500,
-    height: 500,
-    borderRadius: 250,
-    backgroundColor: "#FFF1C1",
-    bottom: "10%",
-    left: -150,
     opacity: 0.2,
+    borderRadius: 1000,
   },
+  blobTop: { width: 600, height: 600, top: -200 },
+  blobBottom: { width: 500, height: 500, bottom: 50 },
   scrollContainer: {
     paddingHorizontal: 24,
     paddingBottom: 40,
@@ -83,7 +67,7 @@ export const styles = StyleSheet.create({
     letterSpacing: 2.5,
   },
   headerTitle: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: "900",
     color: "#1A1A1A",
     letterSpacing: -0.5,
@@ -336,5 +320,46 @@ export const styles = StyleSheet.create({
     color: "#A5A58D",
     letterSpacing: 2,
     marginTop: 12,
+  },
+  navigationContainer: {
+    flexDirection: "row",
+    backgroundColor: "white",
+    borderBottomWidth: 1,
+    borderRadius: 20,
+    borderBottomColor: "#E5E0D5",
+    paddingHorizontal: 20,
+    marginTop: 15,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
+  },
+  navigationTab: {
+    flex: 1,
+    paddingVertical: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    borderBottomWidth: 3,
+    borderBottomColor: "transparent",
+  },
+  navigationTabActive: {
+    borderBottomColor: "#5c1616",
+  },
+  navigationTabText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#A5A58D",
+    letterSpacing: 0.5,
+  },
+  navigationTabTextActive: {
+    color: "#5c1616",
+    fontWeight: "900",
   },
 });

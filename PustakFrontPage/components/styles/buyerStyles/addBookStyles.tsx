@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: "#FFFDF0" },
@@ -232,5 +232,46 @@ export const styles = StyleSheet.create({
     color: "#A5A58D",
     letterSpacing: 3,
     marginTop: 8,
+  },
+  navigationContainer: {
+    flexDirection: "row",
+    backgroundColor: "white",
+    borderBottomWidth: 1,
+    borderRadius: 20,
+    borderBottomColor: "#E5E0D5",
+    paddingHorizontal: 20,
+    marginTop: 15,
+    ...Platform.select({
+          ios: {
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 4,
+          },
+          android: {
+            elevation: 3,
+          },
+        }),
+  },
+  navigationTab: {
+    flex: 1,
+    paddingVertical: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    borderBottomWidth: 3,
+    borderBottomColor: "transparent",
+  },
+  navigationTabActive: {
+    borderBottomColor: "#5c1616",
+  },
+  navigationTabText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#A5A58D",
+    letterSpacing: 0.5,
+  },
+  navigationTabTextActive: {
+    color: "#5c1616",
+    fontWeight: "900",
   },
 });
