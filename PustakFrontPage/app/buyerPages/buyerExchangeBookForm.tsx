@@ -10,6 +10,9 @@ import {
   SafeAreaView,
   Platform,
   KeyboardAvoidingView,
+  Alert,
+  useWindowDimensions,
+  StatusBar,
 } from "react-native";
 import {
   ArrowLeft,
@@ -18,6 +21,7 @@ import {
   Check,
   Info,
   Book as BookIcon,
+  User as UserIcon,
   AlignLeft,
   Sparkles,
   Repeat,
@@ -28,6 +32,8 @@ import {
 } from "lucide-react-native";
 import * as ImagePicker from "expo-image-picker";
 import { styles } from "@/components/styles/buyerStyles/addExchangeBookStyles";
+import { router } from "expo-router";
+import { addExchangeBook } from "@/api/buyerApis/ebookApi";
 
 const CATEGORY_TYPE = [
   { value: "novel", label: "Novel" },
@@ -54,8 +60,22 @@ const CONDITION_TYPE = [
   { value: "old", label: "Old / Collectible" },
 ];
 
+type ExchangeForm = {
+  myBookName: string;
+  myAuthor: string;
+  myCondition: string;
+  myCategory: string;
+  myGenre: string;
+  myImageUri: string | null;
+  desiredCategory: string;
+  desiredGenre: string;
+  desiredCondition: string;
+  exchangeNotes: string;
+};
+
 export default function CreateExchange() {
-  const [formData, setFormData] = useState({
+  const { width: windowWidth } = useWindowDimensions();
+  const [formData, setFormData] = useState<ExchangeForm>({
     myBookName: "",
     myAuthor: "",
     myCondition: "",
@@ -73,6 +93,26 @@ export default function CreateExchange() {
     options: any[];
   } | null>(null);
   const [rulesModalVisible, setRulesModalVisible] = useState(false);
+
+  const handleAddExchange = async () => {
+    if (
+      formData.myBookName &&
+      formData.myAuthor &&
+      formData.myCategory &&
+      formData.desiredCategory
+    ) {
+      const [message, data, completed] = await addExchangeBook(formData);
+      if (completed) {
+        router.back();
+        return Alert.alert(message);
+      } else {
+        return Alert.alert(message);
+      }
+    } else {
+      console.log("Some fields are required!");
+      return Alert.alert("Fill important details.");
+    }
+  };
 
   const handleInputChange = (field: string, value: any) => {
     setFormData((prev) => {
@@ -195,6 +235,13 @@ export default function CreateExchange() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" />
+      <View
+        style={[styles.blob, styles.blobTop, { right: -windowWidth * 0.2 }]}
+      />
+      <View
+        style={[styles.blob, styles.blobBottom, { left: -windowWidth * 0.2 }]}
+      />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
@@ -205,7 +252,12 @@ export default function CreateExchange() {
         >
           <View style={styles.header}>
             <TouchableOpacity style={styles.iconBtn}>
-              <ArrowLeft size={22} color="#5c1616" strokeWidth={2.5} />
+              <ArrowLeft
+                size={22}
+                color="#5c1616"
+                strokeWidth={2.5}
+                onPressOut={() => router.back()}
+              />
             </TouchableOpacity>
             <View style={styles.headerTitleArea}>
               <View style={styles.badge}>
@@ -218,7 +270,37 @@ export default function CreateExchange() {
               <Sparkles size={20} color="#FBBF24" />
             </View>
           </View>
-
+        <View style={styles.navigationWrapper}>
+          <View style={styles.navigationContainer}>
+            <TouchableOpacity
+              style={[styles.navigationTab]}
+              onPress={() => router.replace("/buyerPages/buyerBookForm")}
+            >
+              <Text style={[styles.navigationTabText]}>SELL</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.navigationTab]}
+              onPress={() => router.replace("/buyerPages/buyerEbookForm")}
+            >
+              <Text style={[styles.navigationTabText]}>EBOOK</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.navigationTab, styles.navigationTabActive]}
+              onPress={() =>
+                null
+              }
+            >
+              <Text
+                style={[
+                  styles.navigationTabText,
+                  styles.navigationTabTextActive,
+                ]}
+              >
+                EXCHANGE
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
           <View style={styles.sectionTitleRow}>
             <Layers size={18} color="#5c1616" />
             <Text style={styles.sectionTitle}>YOUR BOOK DETAILS</Text>
@@ -275,6 +357,19 @@ export default function CreateExchange() {
               </View>
             </View>
 
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>AUTHOR</Text>
+              <View style={styles.inputWrapper}>
+                <UserIcon size={18} color="#A5A58D" style={styles.inputIcon} />
+                <TextInput
+                  placeholder="Who wrote this book?"
+                  style={styles.input}
+                  value={formData.myAuthor}
+                  onChangeText={(val) => handleInputChange("myAuthor", val)}
+                />
+              </View>
+            </View>
+
             <View style={styles.row}>
               <View style={{ flex: 1, marginRight: 8 }}>
                 {renderDropdown("CATEGORY", "myCategory", CATEGORY_TYPE)}
@@ -305,15 +400,12 @@ export default function CreateExchange() {
                 )}
               </View>
               <View style={{ flex: 1, marginLeft: 8 }}>
-                <Text style={styles.label}>WANTED CONDITION</Text>
-                <TextInput
-                  placeholder="e.g. Readable"
-                  style={styles.inputSimple}
-                  value={formData.desiredCondition}
-                  onChangeText={(val) =>
-                    handleInputChange("desiredCondition", val)
-                  }
-                />
+                {renderDropdown(
+                  "WANTED CONDITION",
+                  "desiredCondition",
+                  CONDITION_TYPE,
+                  true,
+                )}
               </View>
             </View>
 
@@ -360,18 +452,15 @@ export default function CreateExchange() {
               </Text>
             </View>
 
-            <TouchableOpacity style={styles.primaryBtn}>
+            <TouchableOpacity
+              style={styles.primaryBtn}
+              onPress={handleAddExchange}
+            >
               <Text style={styles.primaryBtnText}>CREATE EXCHANGE</Text>
               <View style={styles.primaryBtnIcon}>
                 <Repeat size={20} color="#5c1616" strokeWidth={3} />
               </View>
             </TouchableOpacity>
-
-            <View style={styles.footer}>
-              <View style={styles.footerLine} />
-              <Text style={styles.brand}>PUSTAKAALAY</Text>
-              <Text style={styles.tagline}>SWAP • READ • REPEAT</Text>
-            </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -415,37 +504,90 @@ export default function CreateExchange() {
       <Modal
         visible={rulesModalVisible}
         transparent={true}
-        animationType="fade"
+        animationType="slide"
         onRequestClose={() => setRulesModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
           <View style={styles.rulesModal}>
+            <View style={styles.modalHandle} />
+
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Exchange Rules</Text>
-              <TouchableOpacity onPress={() => setRulesModalVisible(false)}>
-                <X size={20} color="#A5A58D" />
+              <View style={styles.titleWrapper}>
+                <View style={styles.headerIconBg}>
+                  <Info size={18} color="white" strokeWidth={2.5} />
+                </View>
+                <Text style={styles.modalTitle}>Exchange Rules</Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => setRulesModalVisible(false)}
+                style={styles.closeCircle}
+              >
+                <X size={20} color="#5c1616" strokeWidth={2.5} />
               </TouchableOpacity>
             </View>
-            <ScrollView style={styles.rulesContent}>
-              <Text style={styles.rulesText}>
-                📚 Fair Exchange System:{"\n"}• Selecting &quot;Novel&quot; in
-                your book details auto-selects &quot;Novel&quot; in desired
-                category{"\n"}• Complete your book details first to unlock
-                desired book selection{"\n"}
-                {"\n"}
-                📖 Book Categories:{"\n"}• Fiction, Non-Fiction, Educational,
-                Novels{"\n"}• Novels can only be exchanged with other novels
-                {"\n"}• Auto-selection prevents category mismatches{"\n"}
-                {"\n"}
-                🔒 Auto-Locking:{"\n"}• Desired category auto-locks when
-                &quot;Novel&quot; is selected{"\n"}• Prevents accidental changes
-                to auto-selected values{"\n"}• Desired book section is locked
-                until your book details are complete{"\n"}• Fill in book name,
-                category, and condition to proceed{"\n"}
-                {"\n"}✅ Validation:{"\n"}• All required fields must be filled
-                {"\n"}• Category matching ensures fair exchanges{"\n"}• System
-                prevents invalid exchange combinations{"\n"}
+
+            <ScrollView
+              style={styles.rulesContent}
+              showsVerticalScrollIndicator={false}
+            >
+              <Text style={styles.introText}>
+                To ensure a fair and high-quality swapping experience for
+                everyone, please follow these guidelines:
               </Text>
+
+              <View style={styles.ruleCard}>
+                <View
+                  style={[styles.ruleIconBg, { backgroundColor: "#FBBF24" }]}
+                >
+                  <Repeat size={16} color="#5c1616" />
+                </View>
+                <View style={styles.ruleTextContent}>
+                  <Text style={styles.ruleTitle}>Fair Exchange System</Text>
+                  <Text style={styles.ruleDescription}>
+                    Selecting "Novel" in your details auto-matches the desired
+                    category to maintain swap value.
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.ruleCard}>
+                <View
+                  style={[styles.ruleIconBg, { backgroundColor: "#5c1616" }]}
+                >
+                  <Layers size={16} color="white" />
+                </View>
+                <View style={styles.ruleTextContent}>
+                  <Text style={styles.ruleTitle}>Smart Locking</Text>
+                  <Text style={styles.ruleDescription}>
+                    Desired sections unlock only after your book details are
+                    complete. This prevents invalid matches.
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.ruleCard}>
+                <View
+                  style={[styles.ruleIconBg, { backgroundColor: "#A5A58D" }]}
+                >
+                  <Check size={16} color="white" />
+                </View>
+                <View style={styles.ruleTextContent}>
+                  <Text style={styles.ruleTitle}>Verification</Text>
+                  <Text style={styles.ruleDescription}>
+                    All fields are required. Clear photos of the cover and spine
+                    increase your chance of a successful swap.
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.modalFooter}>
+                <TouchableOpacity
+                  style={styles.understandBtn}
+                  onPress={() => setRulesModalVisible(false)}
+                >
+                  <Text style={styles.understandBtnText}>I UNDERSTAND</Text>
+                </TouchableOpacity>
+              </View>
             </ScrollView>
           </View>
         </View>
