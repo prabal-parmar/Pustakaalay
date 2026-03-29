@@ -28,6 +28,7 @@ import {
   checkBuyerSeenEbook,
   fetchBuyerEbook,
   fetchBuyerSellBooksData,
+  fetchExchangeBookData,
 } from "@/api/buyerApis/ebookApi";
 
 interface BaseItem {
@@ -78,41 +79,7 @@ export default function MyBooksScreen() {
 
   const [myListings, setMyListings] = useState<ListingItem[]>([]);
 
-  const [myExchanges, setMyExchanges] = useState<ExchangeItem[]>([
-    {
-      id: 1,
-      title: "To Kill a Mockingbird",
-      author: "Harper Lee",
-      postedDate: "2 days ago",
-      genre: "Fiction",
-      type: "exchange",
-      condition: "GOOD",
-      preferredExchange: "Any Mystery Novel",
-      location: "Delhi, India",
-    },
-    {
-      id: 2,
-      title: "1984",
-      author: "George Orwell",
-      postedDate: "1 week ago",
-      genre: "Dystopian",
-      type: "exchange",
-      condition: "FAIR",
-      preferredExchange: "Science Fiction",
-      location: "Mumbai, India",
-    },
-    {
-      id: 3,
-      title: "The Great Gatsby",
-      author: "F. Scott Fitzgerald",
-      postedDate: "3 days ago",
-      genre: "Classic",
-      type: "exchange",
-      condition: "NEW",
-      preferredExchange: "Literary Fiction",
-      location: "Bangalore, India",
-    },
-  ]);
+  const [myExchanges, setMyExchanges] = useState<ExchangeItem[]>([]);
 
   const activeList: BookItem[] =
     activeTab === "library"
@@ -162,6 +129,12 @@ export default function MyBooksScreen() {
           return Alert.alert(message);
         }
       };
+      fetchBuyerEbookData();
+    }, []),
+  );
+
+  useFocusEffect(
+    useCallback(() => {
       const fetchBooksData = async () => {
         const [message, bookData, completed] = await fetchBuyerSellBooksData();
         if (completed) {
@@ -172,8 +145,24 @@ export default function MyBooksScreen() {
         }
       };
       fetchBooksData();
-      fetchBuyerEbookData();
-    }, [myListings, myListings]),
+    }, []),
+  );
+
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchExchangeBooks = async () => {
+        const [message, exchangebookData, completed] = await fetchExchangeBookData();
+        if(completed){
+          setMyExchanges(exchangebookData);
+          // return Alert.alert(message);
+        }
+        else{
+          return Alert.alert(message);
+        }
+      };
+      fetchExchangeBooks();
+    }, []),
   );
 
   return (
