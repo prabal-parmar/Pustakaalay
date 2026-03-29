@@ -1,10 +1,18 @@
-import { Dimensions, StyleSheet } from "react-native";
+import { Dimensions, Platform, StyleSheet } from "react-native";
 
 const { width, height } = Dimensions.get("window");
 
 export const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#FFFDF0" },
   scrollContainer: { paddingBottom: 60 },
+  blob: {
+    position: "absolute",
+    backgroundColor: "#FFE8A3",
+    opacity: 0.2,
+    borderRadius: 1000,
+  },
+  blobTop: { width: 600, height: 600, top: -200 },
+  blobBottom: { width: 500, height: 500, bottom: 50 },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -46,7 +54,7 @@ export const styles = StyleSheet.create({
     color: "#A5A58D",
     letterSpacing: 2,
   },
-  title: { fontSize: 18, fontWeight: "900", color: "#1A1A1A" },
+  title: { fontSize: 24, fontWeight: "900", color: "#1A1A1A" },
   sectionTitleRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -240,25 +248,12 @@ export const styles = StyleSheet.create({
     marginTop: 8,
     letterSpacing: 4,
   },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.4)",
-    justifyContent: "flex-end",
-  },
   modalContent: {
     backgroundColor: "white",
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     padding: 20,
     maxHeight: height * 0.7,
-  },
-  modalHandle: {
-    width: 50,
-    height: 5,
-    backgroundColor: "#E5E0D5",
-    borderRadius: 5,
-    alignSelf: "center",
-    marginBottom: 20,
   },
   optionItem: {
     flexDirection: "row",
@@ -269,37 +264,6 @@ export const styles = StyleSheet.create({
     borderBottomColor: "#FDFCF6",
   },
   optionLabel: { fontSize: 16, fontWeight: "700", color: "#1A1A1A" },
-  rulesModal: {
-    backgroundColor: "white",
-    marginHorizontal: 20,
-    marginVertical: height * 0.15,
-    borderRadius: 20,
-    padding: 20,
-    maxHeight: height * 0.7,
-  },
-  modalHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 15,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "900",
-    color: "#1A1A1A",
-  },
-  rulesContent: {
-    maxHeight: height * 0.5,
-  },
-  rulesText: {
-    fontSize: 14,
-    lineHeight: 22,
-    color: "#1A1A1A",
-  },
-  rulesBold: {
-    fontWeight: "900",
-    color: "#5c1616",
-  },
   labelRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -315,4 +279,172 @@ export const styles = StyleSheet.create({
     color: "#A5A58D",
   },
   animatedIn: { transform: [{ translateY: 0 }] },
+  modalHandle: {
+    width: 40,
+    height: 5,
+    backgroundColor: "#E5E0D5",
+    borderRadius: 10,
+    alignSelf: "center",
+    marginBottom: 20,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  titleWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  headerIconBg: {
+    width: 36,
+    height: 36,
+    backgroundColor: "#5c1616",
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "900",
+    color: "#1A1A1A",
+  },
+  closeCircle: {
+    width: 36,
+    height: 36,
+    backgroundColor: "#F3EEE0",
+    borderRadius: 18,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  introText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#6B705C",
+    lineHeight: 20,
+    marginBottom: 24,
+  },
+  ruleCard: {
+    flexDirection: "row",
+    backgroundColor: "white",
+    padding: 16,
+    borderRadius: 24,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: "#EFE8DA",
+    gap: 16,
+  },
+  ruleIconBg: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  ruleTextContent: {
+    flex: 1,
+  },
+  ruleTitle: {
+    fontSize: 14,
+    fontWeight: "900",
+    color: "#1A1A1A",
+    marginBottom: 4,
+  },
+  ruleDescription: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#A5A58D",
+    lineHeight: 18,
+  },
+  modalFooter: {
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  understandBtn: {
+    backgroundColor: "#1A1A1A",
+    paddingVertical: 18,
+    borderRadius: 20,
+    alignItems: "center",
+    shadowColor: "#1A1A1A",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+  },
+  understandBtnText: {
+    color: "white",
+    fontSize: 12,
+    fontWeight: "900",
+    letterSpacing: 2,
+  },
+  rulesContent: {
+    flex: 1,
+    marginTop: 5,
+    marginBottom: 10,
+  },
+  rulesModal: {
+    backgroundColor: "#FFFDF0",
+    borderTopLeftRadius: 40,
+    borderTopRightRadius: 40,
+    paddingTop: 12,
+    paddingHorizontal: 24,
+    minHeight: 400,
+    width: "100%",
+    zIndex: 1000,
+    elevation: 5,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "flex-end",
+  },
+  navigationWrapper: {
+    width: "100%",
+    alignItems: "center",
+    marginTop: 27,
+  },
+  navigationContainer: {
+    width: "87%",
+    flexDirection: "row",
+    justifyContent: "center",
+    backgroundColor: "white",
+    borderRadius: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E5E0D5",
+    paddingHorizontal: 10,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
+  },
+
+  navigationTab: {
+    flex: 1,
+    paddingVertical: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    borderBottomWidth: 3,
+    borderBottomColor: "transparent",
+  },
+  navigationTabActive: {
+    borderBottomColor: "#5c1616",
+  },
+  navigationTabText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#A5A58D",
+    letterSpacing: 0.5,
+  },
+  navigationTabTextActive: {
+    color: "#5c1616",
+    fontWeight: "900",
+  },
 });
