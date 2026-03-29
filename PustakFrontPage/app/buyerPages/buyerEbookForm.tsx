@@ -11,6 +11,7 @@ import {
   StatusBar,
   KeyboardAvoidingView,
   Alert,
+  useWindowDimensions,
 } from "react-native";
 import {
   ArrowLeft,
@@ -77,10 +78,12 @@ export default function App() {
     "category" | "genre" | null
   >(null);
 
+  const { width: windowWidth } = useWindowDimensions();
+
   const handleSubmitForm = async () => {
     await addBuyerNewEbook(formData);
-    router.replace('/(buyer)/ebook');
-  }
+    router.replace("/(buyer)/ebook");
+  };
 
   const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -123,17 +126,19 @@ export default function App() {
         });
       }
     } catch (err) {
-        Alert.alert("Error", "Failed to select document. Please try again.");
+      Alert.alert("Error", "Failed to select document. Please try again.");
     }
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" />
-      <View style={styles.blobContainer} pointerEvents="none">
-        <View style={styles.blob1} />
-        <View style={styles.blob2} />
-      </View>
+      <View
+        style={[styles.blob, styles.blobTop, { right: -windowWidth * 0.2 }]}
+      />
+      <View
+        style={[styles.blob, styles.blobBottom, { left: -windowWidth * 0.2 }]}
+      />
 
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -162,6 +167,34 @@ export default function App() {
             <View style={[styles.iconButton, { borderColor: "#F3EEE0" }]}>
               <Sparkles size={20} color="#FBBF24" strokeWidth={2} />
             </View>
+          </View>
+
+          <View style={styles.navigationContainer}>
+            <TouchableOpacity
+              style={[styles.navigationTab]}
+              onPress={() => router.replace("/buyerPages/buyerBookForm")}
+            >
+              <Text style={[styles.navigationTabText]}>SELL</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.navigationTab, styles.navigationTabActive]}
+              onPress={() => null}
+            >
+              <Text
+                style={[
+                  styles.navigationTabText,
+                  styles.navigationTabTextActive,
+                ]}
+              >
+                EBOOK
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.navigationTab]}
+              onPress={() => router.replace("/buyerPages/buyerExchangeBookForm")}
+            >
+              <Text style={[styles.navigationTabText]}>EXCHANGE</Text>
+            </TouchableOpacity>
           </View>
 
           <View style={styles.section}>
@@ -397,14 +430,14 @@ export default function App() {
             style={styles.publishBtn}
             activeOpacity={0.8}
             onPress={() => {
-              if (selectedFile) { // Need to alter after so temp for now
+              if (selectedFile) {
+                // Need to alter after so temp for now
                 Alert.alert(
                   "Wait!",
                   "Please select a manuscript file before publishing.",
                 );
                 return;
-              }
-              else{
+              } else {
                 handleSubmitForm();
               }
             }}

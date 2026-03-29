@@ -73,10 +73,10 @@ export default function App() {
 
   const handlePostNewBook = async () => {
     const response = await addBuyerBookToSell(formData);
-    
-    Alert.alert(response[0])
-    return router.back()
-  }
+
+    Alert.alert(response[0]);
+    return router.back();
+  };
 
   const [activeDropdown, setActiveDropdown] = useState<
     "category" | "genre" | null
@@ -92,7 +92,7 @@ export default function App() {
     if (status !== "granted") {
       Alert.alert(
         "Permission Denied",
-        "We need access to your photos to upload a book cover."
+        "We need access to your photos to upload a book cover.",
       );
       return;
     }
@@ -147,7 +147,10 @@ export default function App() {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.header}>
-            <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
+            <TouchableOpacity
+              style={styles.backBtn}
+              onPress={() => router.back()}
+            >
               <ArrowLeft size={22} color="#5c1616" strokeWidth={2.5} />
             </TouchableOpacity>
             <View style={styles.headerTitleContainer}>
@@ -160,6 +163,34 @@ export default function App() {
             <View style={styles.sparkleContainer}>
               <Sparkles size={20} color="#FBBF24" />
             </View>
+          </View>
+
+          <View style={styles.navigationContainer}>
+            <TouchableOpacity
+              style={[styles.navigationTab, styles.navigationTabActive]}
+              onPress={() => null}
+            >
+              <Text
+                style={[
+                  styles.navigationTabText,
+                  styles.navigationTabTextActive,
+                ]}
+              >
+                SELL
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.navigationTab]}
+              onPress={() => router.replace("/buyerPages/buyerEbookForm")}
+            >
+              <Text style={[styles.navigationTabText]}>EBOOK</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.navigationTab]}
+              onPress={() => router.replace("/buyerPages/buyerExchangeBookForm")}
+            >
+              <Text style={[styles.navigationTabText]}>EXCHANGE</Text>
+            </TouchableOpacity>
           </View>
 
           <View style={styles.photoContainer}>
@@ -255,7 +286,7 @@ export default function App() {
                   style={styles.dropdownTrigger}
                   onPress={() =>
                     setActiveDropdown(
-                      activeDropdown === "category" ? null : "category"
+                      activeDropdown === "category" ? null : "category",
                     )
                   }
                 >
@@ -314,7 +345,7 @@ export default function App() {
                   ]}
                   onPress={() =>
                     setActiveDropdown(
-                      activeDropdown === "genre" ? null : "genre"
+                      activeDropdown === "genre" ? null : "genre",
                     )
                   }
                 >
@@ -387,7 +418,11 @@ export default function App() {
             <Text style={styles.tipsText}>Keep it correct and detailed.</Text>
           </View>
 
-          <TouchableOpacity style={styles.publishBtn} activeOpacity={0.8} onPressOut={handlePostNewBook}>
+          <TouchableOpacity
+            style={styles.publishBtn}
+            activeOpacity={0.8}
+            onPressOut={handlePostNewBook}
+          >
             <Text style={styles.publishText}>PUBLISH LISTING</Text>
             <View style={styles.checkIcon}>
               <Check size={20} color="#5c1616" strokeWidth={3} />
