@@ -207,6 +207,37 @@ def fetch_buyer_book(request):
 
     return Response({"message": "Buyer books sent", "data": book_data, "completed": True}, status=status.HTTP_200_OK)
 
+# Fetch all exchange books of buyer
+@api_view(['GET'])
+def fetch_buyer_exchange_book(request):
+    username = request.query_params.get("username")
+    user = CustomUser.objects.filter(username=username).first()
+    buyer = BuyerModel.objects.filter(user=user).first()
+
+    if buyer is None:
+        return Response({"message": "User not found", "data": None, "completed": True}, 
+                        status=status.HTTP_404_NOT_FOUND)
+    
+    all_exchange_books = ExchangeBookModel.objects.filter(buyer=buyer).all()
+
+    exchange_books = []
+    for book in all_exchange_books:
+        created_date = book.date
+        data = {
+            "id": book.book_id,
+            "type": "exchange",
+            "title": book.name.title(),
+            "author": book.author.title(),
+            "condition": book.condition.capitalize(),
+            "preferredExchange": book.category.capitalize(),
+            "postedDate": created_date.strftime("%b %d, %Y"),
+            "genre": book.genre.capitalize(),
+            "location": "Indore, M.P." # Dummy for now
+        }
+        exchange_books.append(data)
+    
+    return Response({"message": "Buyer Exchange books sent", "data": exchange_books, "completed": True}, status=status.HTTP_200_OK)
+
 # Accept request to sell
 @api_view(['POST'])
 def accept_sell_request_from_buyer(request):
