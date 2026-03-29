@@ -1,0 +1,6 @@
+Features:
+    1) Exchange book added then suggest some possible Exchange
+    2) Image Uploading currently disabled (not storing)
+    3) To add your past trades page in setting 
+    4) Notification Feature
+    5) Filter Feature
