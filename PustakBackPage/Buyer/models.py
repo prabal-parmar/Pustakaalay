@@ -38,6 +38,12 @@ BOOK_CONDITION = (
     ("old", "Old")
 )
 
+TRADE_CHOICES = (
+    ("sell", "Sell"),
+    ("exchange", "Exchange"),
+    ("bought", "Bought")
+)
+
 class EbookModel(models.Model):
     ebook_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     buyer = models.ForeignKey(BuyerModel, on_delete=models.CASCADE, related_name="buyer_ebook")
@@ -48,6 +54,10 @@ class EbookModel(models.Model):
     genre = models.CharField(max_length=10, choices=NOVEL_GENRE_TYPE, null=True, blank=True)
     date = models.DateField(auto_now_add=True)
     views = models.IntegerField(default=0)
+    likes = models.IntegerField(default=0)
+    saved = models.IntegerField(default=0)
+    rating = models.FloatField(default=0)
+    score = models.FloatField(default=0)
 
     def __str__(self):
         return f"{self.name} - {self.buyer.user.username}"
@@ -63,6 +73,9 @@ class BookForSellBuyer(models.Model):
     genre = models.CharField(max_length=10, choices=NOVEL_GENRE_TYPE, null=True, blank=True)
     date = models.DateField(auto_now_add=True)
     condition = models.CharField(max_length=10, choices=BOOK_CONDITION, default="fair")
+    likes = models.IntegerField(default=0)
+    saved = models.IntegerField(default=0)
+    views = models.IntegerField(default=0)
 
     def __str__(self):
         return f"{self.name} - {self.buyer.user.username}"
@@ -90,6 +103,26 @@ class ExchangeBookModel(models.Model):
     desired_genre = models.CharField(max_length=10, choices=NOVEL_GENRE_TYPE)
     wanted_condition = models.CharField(max_length=10, choices=BOOK_CONDITION, default="fair")
     description = models.TextField()
-    
+    likes = models.IntegerField(default=0)
+    saved = models.IntegerField(default=0)
+    views = models.IntegerField(default=0)
+
     def __str__(self):
         return f"{self.name} - {self.buyer.user.username}"
+
+class TradeHistoryModel(models.Model):
+    trade_id = models.UUIDField(primary_key=True, default=uuid.uuid4,editable=False)
+    trade_buyer = models.ForeignKey(BuyerModel, on_delete=models.CASCADE, related_name="trade_buyer")
+    trade_seller = models.ForeignKey(BuyerModel, on_delete=models.CASCADE, related_name="trade_seller")
+    trade_exchange_book = models.ForeignKey(ExchangeBookModel, on_delete=models.CASCADE, related_name="trade_exchange_book")
+    trade_sell_book = models.ForeignKey(BookForSellBuyer, on_delete=models.CASCADE, related_name="trade_sell_book")
+    date = models.DateField(auto_now_add=True)
+    trade_type = models.CharField(max_length=10, choices=TRADE_CHOICES)
+
+    def __str__(self):
+        return f"""
+                Type: {self.trade_exchange_book if "exchange" else "sell"} - 
+                Book: {self.trade_exchange_book if self.trade_exchange_book.name else self.trade_sell_book.name} - 
+                Buyer: {self.trade_buyer.user.username} - 
+                Seller: {self.trade_seller.user.username}
+                """
