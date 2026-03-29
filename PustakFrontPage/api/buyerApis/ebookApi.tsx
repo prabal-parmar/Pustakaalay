@@ -97,3 +97,15 @@ export const addExchangeBook = async (bookData: any) => {
         return ["Something went wrong", null, false]
     }
 }
+
+export const fetchExchangeBookData = async () => {
+    try {
+        const username = await getUsername();
+        const response = await api.get('buyer/exchange-books/', {params:{username: username}});
+
+        return [response.data.message, response.data.data, response.data.completed]
+    } catch (error) {
+        console.log(error)
+        return ["Something went wrong", null, false]
+    }
+}
