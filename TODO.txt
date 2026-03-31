@@ -4,3 +4,4 @@ Features:
     3) To add your past trades page in setting 
     4) Notification Feature
     5) Filter Feature
+    6) Add dummy ebooks to show to the user
