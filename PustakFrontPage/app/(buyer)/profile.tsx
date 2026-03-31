@@ -34,6 +34,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { logout } from "@/api/authApis/loginUser";
 
+type HistoryType = {
+  id: string,
+  title: string,
+  to: string,
+  date: string,
+  type: string
+}
+
 export default function ReaderDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isSettingsVisible, setIsSettingsVisible] = useState(false);
@@ -92,22 +100,22 @@ export default function ReaderDashboard() {
     },
   ];
 
-  const history = [
+  const [history, setHistory] = useState<HistoryType[]>([
     {
-      id: 1,
+      id: "1",
       title: "The Seven Husbands of Evelyn Hugo",
       to: "rahul_books",
       date: "2 days ago",
       type: "SENT",
     },
     {
-      id: 2,
+      id: "2",
       title: "Normal People",
       to: "priya_readz",
       date: "1 week ago",
       type: "RECEIVED",
     },
-  ];
+  ]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -201,7 +209,7 @@ export default function ReaderDashboard() {
           <View style={styles.sectionHeader}>
             <View style={styles.titleGroup}>
               <History size={20} color="#1A1A1A" />
-              <Text style={styles.sectionTitle}>Sharing History</Text>
+              <Text style={styles.sectionTitle}>Trade History</Text>
             </View>
             <Text style={styles.historyCount}>
               {filtered.length} activities
@@ -238,7 +246,7 @@ export default function ReaderDashboard() {
                   </Text>
                   <View style={styles.metaRow}>
                     <Text style={styles.metaLabel}>
-                      {item.type === "SENT" ? "Sent to" : "From"}
+                      {item.type === "sell" ? "Sold to" : item.type === "exchange" ? "Exchange with" : "Bought from"}
                     </Text>
                     <Text style={styles.metaUser}>@{item.to}</Text>
                     <View style={styles.miniDot} />
