@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   StatusBar,
   Dimensions,
+  Alert,
 } from "react-native";
 import {
   Search,
@@ -29,15 +30,27 @@ import {
   Sparkles,
 } from "lucide-react-native";
 import { styles } from "@/components/styles/buyerStyles/homeStyles";
+import { router, useFocusEffect } from "expo-router";
+import { fetchHotEbooksData } from "@/api/buyerApis/homeApi";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 const guidelineBaseWidth = 375;
 const scale = (size: number) => (SCREEN_WIDTH / guidelineBaseWidth) * size;
+
+type TrendingEbooks = {
+  id: string,
+  title: string,
+  author: string,
+  rating: number,
+  reads: number
+}
+
 export default function App() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [wishlist, setWishlist] = useState<number[]>([101]);
+  const [wishlist, setWishlist] = useState<string[]>(["101"]);
   const [user, setUser] = useState({ name: "Prabal Parmar" });
+  const [viewAll, setViewAll] = useState<Boolean>(false);
 
   const readingNow = [
     {
@@ -48,24 +61,31 @@ export default function App() {
       color: "#5c1616",
       lastRead: "2h ago",
     },
+    {
+      id: 2,
+      title: "New The Midnight Library",
+      author: "New Matt Haig",
+      progress: 40,
+      color: "#5c1616",
+      lastRead: "2h ago",
+    },
   ];
 
-  const trending = [
-    {
-      id: 101,
-      title: "Project Hail Mary",
-      author: "Andy Weir",
-      rating: 4.9,
-      reads: "12.4k",
-    },
-    {
-      id: 102,
-      title: "Circe",
-      author: "Madeline Miller",
-      rating: 4.8,
-      reads: "8.1k",
-    },
-  ];
+  const [trending, setTrending] = useState<TrendingEbooks[]>([]);
+
+  useEffect(() => {
+    const fetchHotEbooks = async () => {
+      const [message, data, completed] = await fetchHotEbooksData();
+      if(completed){
+        setTrending(data);
+        return null;
+      }
+      else{
+        return Alert.alert(message);
+      }
+    }
+    fetchHotEbooks();
+  }, [])
 
   const recommended = [
     {
@@ -88,7 +108,7 @@ export default function App() {
     },
   ];
 
-  const toggleWishlist = (id: number) => {
+  const toggleWishlist = (id: string) => {
     setWishlist((prev) =>
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
     );
@@ -139,13 +159,13 @@ export default function App() {
               <View style={styles.titleAccent} />
               <Text style={styles.sectionTitle}>CONTINUE READING</Text>
             </View>
-            <TouchableOpacity>
-              <Text style={styles.viewAll}>View All</Text>
+            <TouchableOpacity onPressOut={() => setViewAll(!viewAll)}>
+              <Text style={styles.viewAll}>{viewAll ? "Hide All" : "View All"}</Text>
             </TouchableOpacity>
           </View>
 
-          {readingNow.map((book) => (
-            <TouchableOpacity key={book.id} style={styles.readingCard}>
+          {readingNow.slice(0,(viewAll ? 3 : 1)).map((book) => (
+            <TouchableOpacity key={book.id} style={[styles.readingCard, {marginBottom: 4}]}>
               <View style={styles.bookIconBox}>
                 <BookOpen
                   size={scale(32)}
@@ -315,7 +335,7 @@ export default function App() {
             </TouchableOpacity>
           ))}
 
-          <TouchableOpacity style={styles.ctaBanner}>
+          <TouchableOpacity style={styles.ctaBanner} onPressOut={() => router.push('/buyerPages/buyerBookForm')}>
             <View style={styles.ctaSparkle}>
               <Sparkles size={scale(80)} color="#FBBF24" opacity={0.1} />
             </View>
