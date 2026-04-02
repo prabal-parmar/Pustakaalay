@@ -3,9 +3,15 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
 from Users.models import BuyerModel, CustomUser
-from .models import BuyerProfile, BookForSellBuyer, EbookModel, EbookHistory, ExchangeBookModel
+from .models import (BuyerProfile, 
+                     BookForSellBuyer, 
+                     EbookModel, 
+                     EbookHistory, 
+                     ExchangeBookModel,
+                     TradeHistoryModel)
 from django.utils import timezone
 from  Models.buyerModels import calculate_score
+from datetime import datetime
 
 # Buyer Profile
 @api_view(['GET'])
@@ -313,4 +319,49 @@ def get_hot_ebook_picks(request):
     
     return Response({"message": "Hot Ebooks data sent.", 
                      "data": data_to_send, 
+                     "completed": True}, status=status.HTTP_200_OK)
+
+# Fetch trade history of buyer
+@api_view(['GET'])
+def get_trade_history(request):
+    username = request.query_params.get("username")
+    user = CustomUser.objects.filter(username=username).first()
+    buyer = BuyerModel.objects.filter(user=user).first()
+    if not buyer:
+        return Response({"message": "Unable to find buyer.", 
+                         "data": None, 
+                         "completed": False}, status=status.HTTP_404_NOT_FOUND)
+    
+    bought_books = list(TradeHistoryModel.objects.filter(trade_buyer=buyer).all())
+    sold_books = list(TradeHistoryModel.objects.filter(trade_seller=buyer).all())
+
+    books_data = []
+    # For bought books
+    for book in bought_books:
+        temp = {
+            "id": book.trade_id,
+            "title": book.trade_exchange_book.name if book.trade_exchange_book else book.trade_sell_book.name,
+            "to": book.trade_seller.user.username,
+            "date": book.date.strftime("%b %d, %Y"),
+            "type": book.trade_type
+        }
+        books_data.append(temp)
+
+    # For sold books
+    for book in sold_books:
+        temp = {
+            "id": book.trade_id,
+            "title": book.trade_exchange_book.name if book.trade_exchange_book else book.trade_sell_book.name,
+            "to": book.trade_buyer.user.username,
+            "date": book.date.strftime("%b %d, %Y"),
+            "type": book.trade_type
+        }
+        books_data.append(temp)
+    
+    sorted_data = sorted(
+                        books_data, 
+                        key=lambda x: datetime.strptime(x["date"], "%b %d, %Y")
+                        )
+    return Response({"message": "Trade history data of books sent.", 
+                     "data": sorted_data,
                      "completed": True}, status=status.HTTP_200_OK)
