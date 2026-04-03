@@ -112,8 +112,8 @@ class ExchangeBookModel(models.Model):
 
 class TradeHistoryModel(models.Model):
     trade_id = models.UUIDField(primary_key=True, default=uuid.uuid4,editable=False)
-    trade_buyer = models.ForeignKey(BuyerModel, on_delete=models.CASCADE, related_name="trade_buyer")
-    trade_seller = models.ForeignKey(BuyerModel, on_delete=models.CASCADE, related_name="trade_seller")
+    trade_buyer = models.ForeignKey(BuyerModel, on_delete=models.CASCADE, related_name="trade_buyer", null=True, blank=True)
+    trade_seller = models.ForeignKey(BuyerModel, on_delete=models.CASCADE, related_name="trade_seller",null=True, blank=True)
     trade_exchange_book = models.ForeignKey(ExchangeBookModel, on_delete=models.CASCADE, related_name="trade_exchange_book")
     trade_sell_book = models.ForeignKey(BookForSellBuyer, on_delete=models.CASCADE, related_name="trade_sell_book")
     date = models.DateField(auto_now_add=True)
