@@ -20,3 +20,15 @@ export const fetchHotEbooksData = async () => {
         return ["Something went wrong!", null, false]
     }
 }
+
+export const fetchLocalExchangeData = async () => {
+    try {
+        const username = await getUsername();
+        const response = await api.get('/buyer/rec-exchange/', {params: {username: username}})
+
+        return [response.data.message, response.data.data, response.data.completed]
+    } catch (error) {
+        console.log(error)
+        return ["Something went wrong!", null, false]
+    }
+}
