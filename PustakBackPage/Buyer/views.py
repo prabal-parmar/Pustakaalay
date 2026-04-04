@@ -12,6 +12,7 @@ from .models import (BuyerProfile,
 from django.utils import timezone
 from  Models.buyerModels import calculate_score
 from datetime import datetime
+from django.db.models.functions import Random
 
 # Buyer Profile
 @api_view(['GET'])
@@ -364,4 +365,34 @@ def get_trade_history(request):
                         )
     return Response({"message": "Trade history data of books sent.", 
                      "data": sorted_data,
+                     "completed": True}, status=status.HTTP_200_OK)
+
+# Fetch Local Exchange books (currently not local just random 2 - local need to change)
+@api_view(['GET'])
+def get_local_exchange(request):
+    username = request.query_params.get("username")
+    user = CustomUser.objects.filter(username=username).first()
+    buyer = BuyerModel.objects.filter(user=user)
+    if not buyer:
+        return Response({"message": "Unable to find buyer.", 
+                         "data": None, 
+                         "completed": False}, status=status.HTTP_404_NOT_FOUND)
+    
+    random_exchanges = list(ExchangeBookModel.objects.order_by(Random())[:2])
+    books_data = []
+
+    for book in random_exchanges:
+        temp = {
+            "id": book.book_id,
+            "title": book.name.capitalize(),
+            "author": book.author.capitalize(),
+            "type": "Echange",
+            "price": book.category.capitalize(),
+            "distance": "-",
+            "condition": book.condition.capitalize()
+        }
+        books_data.append(temp)
+    
+    return Response({"message": "Recommended Books sent.", 
+                     "data": books_data, 
                      "completed": True}, status=status.HTTP_200_OK)
