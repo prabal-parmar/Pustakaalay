@@ -5,3 +5,6 @@ Features:
     4) Notification Feature
     5) Filter Feature
     6) Add dummy ebooks to show to the user
+
+Backend:
+    1) Need to add local exchange with location feature
