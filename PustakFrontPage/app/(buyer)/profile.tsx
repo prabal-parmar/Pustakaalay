@@ -29,7 +29,7 @@ import {
   Lock,
 } from "lucide-react-native";
 import { styles } from "@/components/styles/buyerStyles/profileStyles";
-import { fetchBuyerProfileData } from "@/api/buyerApis/profile";
+import { fetchBuyerProfileData, fetchBuyerTradeHistory } from "@/api/buyerApis/profile";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { logout } from "@/api/authApis/loginUser";
@@ -100,32 +100,34 @@ export default function ReaderDashboard() {
     },
   ];
 
-  const [history, setHistory] = useState<HistoryType[]>([
-    {
-      id: "1",
-      title: "The Seven Husbands of Evelyn Hugo",
-      to: "rahul_books",
-      date: "2 days ago",
-      type: "SENT",
-    },
-    {
-      id: "2",
-      title: "Normal People",
-      to: "priya_readz",
-      date: "1 week ago",
-      type: "RECEIVED",
-    },
-  ]);
+  const [history, setHistory] = useState<HistoryType[]>([]);
 
   useEffect(() => {
     const fetchProfile = async () => {
       const username = await AsyncStorage.getItem("username");
       if (username) {
-        const buyerData = await fetchBuyerProfileData(username);
-        setReader(buyerData);
+        const [message, buyerData] = await fetchBuyerProfileData(username);
+        if (buyerData){
+          setReader(buyerData);
+        }
+        else{
+          await logout();
+          return Alert.alert(message);
+        }
       }
     };
+    
+    const fetchTradeHistory = async () => {
+      const [message, data, completed] = await fetchBuyerTradeHistory();
+      if (completed) {
+        setHistory(data);
+      }
+      else {
+        return Alert.alert(message);
+      }
+    }
     fetchProfile();
+    fetchTradeHistory();
   }, []);
 
   const filtered = history.filter(
