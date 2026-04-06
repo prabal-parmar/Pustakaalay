@@ -31,7 +31,7 @@ import {
 } from "lucide-react-native";
 import { styles } from "@/components/styles/buyerStyles/homeStyles";
 import { router, useFocusEffect } from "expo-router";
-import { fetchHotEbooksData } from "@/api/buyerApis/homeApi";
+import { fetchHotEbooksData, fetchLocalExchangeData } from "@/api/buyerApis/homeApi";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
@@ -44,6 +44,16 @@ type TrendingEbooks = {
   author: string,
   rating: number,
   reads: number
+}
+
+type RecommendedBook = {
+  id: string,
+  title: string,
+  author: string,
+  type: string,
+  price: number,
+  distance: string,
+  condition: string
 }
 
 export default function App() {
@@ -72,6 +82,7 @@ export default function App() {
   ];
 
   const [trending, setTrending] = useState<TrendingEbooks[]>([]);
+    const [recommended, setRecommended] = useState<RecommendedBook[]>([]);
 
   useEffect(() => {
     const fetchHotEbooks = async () => {
@@ -84,29 +95,18 @@ export default function App() {
         return Alert.alert(message);
       }
     }
+    const fetchLocalExchange = async () => {
+      const [message, data, completed] = await fetchLocalExchangeData();
+      if(completed){
+        setRecommended(data);
+      }
+      else{
+        return Alert.alert(message)
+      }
+    }
     fetchHotEbooks();
+    fetchLocalExchange();
   }, [])
-
-  const recommended = [
-    {
-      id: 201,
-      title: "Sapiens: A Brief History",
-      author: "Yuval Noah Harari",
-      type: "Exchange",
-      price: "Free",
-      distance: "0.8 km",
-      condition: "Good",
-    },
-    {
-      id: 202,
-      title: "Atomic Habits",
-      author: "James Clear",
-      type: "Buy",
-      price: "₹250",
-      distance: "1.2 km",
-      condition: "Like New",
-    },
-  ];
 
   const toggleWishlist = (id: string) => {
     setWishlist((prev) =>
