@@ -1,7 +1,38 @@
 from django.db import models
-from Users.models import SellerModel
+from Users.models import SellerModel, CustomUser
 import uuid
 # Create your models here.
+
+CATEGORY_TYPE = (
+    ("novel", "Novel"),
+    ("historical", "Historical"),
+    ("biography", "Biography"),
+    ("scientific", "Scientific"),
+    ("miscellaneous", "Miscellaneous"),
+    ("other", "Other")
+)
+
+NOVEL_GENRE_TYPE = (
+    ("fiction", "Fiction"),
+    ("fantasy", "Fantasy"),
+    ("mystery", "Mystery"),
+    ("romance", "Romance"),
+    ("sci-fi", "Sci-fi"),
+    ("thriller", "Thriller")
+)
+
+EDUCATIONAL_TYPE = (
+    ("science", "Science"),
+    ("history", "History"),
+    ("technology", "Technology"),
+    ("mathematics", "Mathematics"),
+    ("medicine", "Medicine")
+)
+
+CONDITION_TYPE = (
+    ("new", "New"),
+    ("old", "Old")
+)
 
 class SellerProfile(models.Model):
     seller = models.OneToOneField(SellerModel, on_delete=models.CASCADE, related_name="seller")
@@ -12,39 +43,8 @@ class SellerProfile(models.Model):
 
     def __str__(self):
         return f"{self.seller.user.username}"
-    
+
 class BookDataModel(models.Model):
-    CATEGORY_TYPE = (
-        ("novel", "Novel"),
-        ("historical", "Historical"),
-        ("biography", "Biography"),
-        ("scientific", "Scientific"),
-        ("miscellaneous", "Miscellaneous"),
-        ("other", "Other")
-    )
-
-    NOVEL_GENRE_TYPE = (
-        ("fiction", "Fiction"),
-        ("fantasy", "Fantasy"),
-        ("mystery", "Mystery"),
-        ("romance", "Romance"),
-        ("sci-fi", "Sci-fi"),
-        ("thriller", "Thriller")
-    )
-
-    EDUCATIONAL_TYPE = (
-        ("science", "Science"),
-        ("history", "History"),
-        ("technology", "Technology"),
-        ("mathematics", "Mathematics"),
-        ("medicine", "Medicine")
-    )
-
-    CONDITION_TYPE = (
-        ("new", "New"),
-        ("old", "Old")
-    )
-
     book_id = models.UUIDField(primary_key=True, default=uuid.uuid4,editable=False)
     seller = models.ForeignKey(SellerModel, on_delete=models.CASCADE, related_name="seller_books_sell")
     name = models.CharField(max_length=100)
@@ -57,6 +57,17 @@ class BookDataModel(models.Model):
     condition = models.CharField(max_length=5, choices=CONDITION_TYPE)
     genre = models.CharField(max_length=10, choices=NOVEL_GENRE_TYPE, null=True, blank=True)
     educational_type = models.CharField(max_length=15, choices=EDUCATIONAL_TYPE, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    likes = models.IntegerField(default=0)
+    saved = models.IntegerField(default=0)
+    views = models.IntegerField(default=0)
 
     def __str__(self):
         return f"{self.seller.user.username} - {self.name} - {self.condition}"
+    
+class BookHistoryModel(models.Model):
+    book=models.ForeignKey(BookDataModel, on_delete=models.CASCADE, related_name="book_name")
+    user=models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="history_user")
+    liked=models.BooleanField(default=False)
+    saved=models.BooleanField(default=False)
+    viewed=models.BooleanField(default=False)
