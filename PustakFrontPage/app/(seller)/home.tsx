@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   Dimensions,
   SafeAreaView,
   StatusBar,
+  Alert,
 } from "react-native";
 import {
   Search,
@@ -33,6 +34,7 @@ import {
 } from "lucide-react-native";
 import { styles } from "@/components/styles/sellerStyles/homeStyles";
 import { router } from "expo-router";
+import { fetchMyRecentInventoryData } from "@/api/sellerApis/homeApis";
 
 const { width } = Dimensions.get("window");
 
@@ -40,6 +42,13 @@ const s = (size: number) => {
   const scale = width / 375;
   return Math.min(size * scale, size * 1.15);
 };
+
+type MyListingType = {
+  id: string,
+  title: string,
+  price: Number,
+  views: Number
+}
 
 export default function App() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -85,10 +94,22 @@ export default function App() {
     },
   ];
 
-  const myListings = [
-    { id: 201, title: "The Great Gatsby", price: "₹350", views: 42 },
-    { id: 202, title: "Brief Answers", price: "₹400", views: 18 },
-  ];
+  const [myListings, setMyListings] = useState<MyListingType[]>([
+    { id: "201", title: "The Great Gatsby", price: 350, views: 42 },
+    { id: "202", title: "Brief Answers", price: 400, views: 18 },
+  ]);
+
+  useEffect(() => {
+    const fetchMyListingData = async () => {
+      const [message, data, completed] = await fetchMyRecentInventoryData();
+      if (completed) {
+        setMyListings(data);
+      } else {
+        return Alert.alert(message)
+      }
+    }
+    fetchMyListingData()
+  }, [])
 
   return (
     <SafeAreaView style={styles.container}>
@@ -229,7 +250,7 @@ export default function App() {
               />
               <Text style={styles.sectionTitle}>YOU CAN BUY</Text>
             </View>
-            <TouchableOpacity style={styles.miniBtn}>
+            <TouchableOpacity style={styles.miniBtn} onPressOut={() => router.navigate('/(seller)/explore')}>
               <Text style={styles.miniBtnText}>FIND</Text>
             </TouchableOpacity>
           </View>
@@ -276,7 +297,7 @@ export default function App() {
               <Text style={styles.sectionTitle}>MY INVENTORY</Text>
             </View>
             <TouchableOpacity style={styles.miniBtnGray}>
-              <Text style={styles.miniBtnTextGray}>MANAGE</Text>
+              <Text style={styles.miniBtnTextGray}>MANAGE ALL</Text>
             </TouchableOpacity>
           </View>
 
@@ -297,10 +318,10 @@ export default function App() {
                   {item.title}
                 </Text>
                 <View style={styles.rowSpaceBetween}>
-                  <Text style={styles.gridPrice}>{item.price}</Text>
+                  <Text style={styles.gridPrice}>{`₹${item.price}`}</Text>
                   <View style={styles.rowAlignCenter}>
                     <Activity size={s(10)} color="#A5A58D" />
-                    <Text style={styles.gridStats}>{item.views}</Text>
+                    <Text style={styles.gridStats}>{`${item.views}`}</Text>
                   </View>
                 </View>
               </View>
