@@ -2,9 +2,9 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from Users.models import SellerModel, CustomUser
-from .models import SellerProfile, BookDataModel, BookHistoryModel
+from .models import SellerProfile, BookDataModel, BookHistoryModel, BookBuyRequest
 from rest_framework import status
-
+from Models.sellerModels import time_ago
 # Seller profile
 @api_view(['GET'])
 def get_profile(request):
@@ -157,3 +157,29 @@ def fetch_recent_inventory(request):
     return Response({"message": "My Inventory data sent.", 
                      "data": book_data, 
                      "completed": True}, status=status.HTTP_200_OK)
+
+# Fetch recent 3 Buy Book Requests
+@api_view(['GET'])
+def fetch_buy_book_recent_requests(request, username):
+    user=CustomUser.objects.filter(username=username).first()
+    if not user:
+        return Response({"message": "User not found", 
+                         "data": None, 
+                         "completed": True}, status=status.HTTP_404_NOT_FOUND)
+    
+    all_book_requests=list(BookBuyRequest.objects.filter(user=user).order_by('-time')[:3])
+
+    books_data = []
+    for book in all_book_requests:
+        temp = {
+            "id": book.buy_request_id,
+            "title": book.book.name,
+            "requester": book.user.username,
+            "offer": book.negotiation_price,
+            "time": time_ago(book.time)
+        }
+        books_data.append(temp)
+
+    return Response({"message": "Books recent buy requests sent.", 
+                         "data": books_data, 
+                         "completed": True}, status=status.HTTP_200_OK)
