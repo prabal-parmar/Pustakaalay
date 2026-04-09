@@ -3,13 +3,12 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
 from Users.models import BuyerModel, CustomUser
+from Seller.models import BookDataModel
 from .models import (BuyerProfile, 
-                     BookForSellBuyer, 
                      EbookModel, 
                      EbookHistory, 
                      ExchangeBookModel,
                      TradeHistoryModel)
-from django.utils import timezone
 from  Models.buyerModels import calculate_score
 from datetime import datetime
 from django.db.models.functions import Random
@@ -63,9 +62,11 @@ def add_new_book_to_sell(request):
     author = request.data.get("author")
     username = request.data.get("username")
     user = CustomUser.objects.filter(username=username).first()
-    buyer = BuyerModel.objects.filter(user=user).first()
+    if not user:
+        return Response({"message": "User not found", "data": None, "completed": True}, 
+                        status=status.HTTP_404_NOT_FOUND)
 
-    find_book = BookForSellBuyer.objects.filter(name=name, author=author, buyer=buyer).first()
+    find_book = BookDataModel.objects.filter(name=name, author=author, user=user).first()
 
     if find_book is not None:
         return Response({"message": "Book already added.", "completed": False}, status=status.HTTP_200_OK)
@@ -74,13 +75,13 @@ def add_new_book_to_sell(request):
     price = float(request.data.get("price"))
     category = str(request.data.get("category")).split(" ")[0]
     genre = request.data.get("genre")
-    BookForSellBuyer.objects.create(name=name, 
+    BookDataModel.objects.create(name=name, 
                                  author=author,
                                  description=description,
                                  price=price,
                                  category=category,
                                  genre=genre,
-                                 buyer=buyer)
+                                 user=user)
     
     return Response({"message": f"{name} added successfully.", "completed": True}, status=status.HTTP_201_CREATED)
 
@@ -194,12 +195,11 @@ def fetch_buyer_book(request):
         return Response({"message": "User not found", "data": None, "completed": True}, 
                         status=status.HTTP_404_NOT_FOUND)
     
-    all_books = BookForSellBuyer.objects.filter(buyer=buyer).all()
+    all_books = BookDataModel.objects.filter(user=user).all()
 
     book_data = []
 
     for book in all_books:
-        created_date = book.date
         data = {
             "id": book.book_id,
             "type": "selling",
@@ -208,7 +208,7 @@ def fetch_buyer_book(request):
             "price": book.price,
             "status": "ACTIVE", # need to consider after
             "reads": "0",      # need to consider after
-            "postedDate": created_date.strftime("%b %d, %Y"),
+            "postedDate": book.created_at.strftime("%b %d, %Y"),
             "genre": book.genre,
         }
         book_data.append(data)

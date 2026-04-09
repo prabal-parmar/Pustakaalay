@@ -49,7 +49,7 @@ def add_book_to_sell(request):
         return Response({"message": "User not found", "data": None, "completed": True}, 
                         status=status.HTTP_404_NOT_FOUND)
     
-    find_book = BookDataModel.objects.filter(name=name, author=author, seller=seller).first()
+    find_book = BookDataModel.objects.filter(name=name, author=author, user=user).first()
 
     if find_book is not None:
         return Response({"message": "Book already added.", "completed": False}, status=status.HTTP_200_OK)
@@ -69,7 +69,7 @@ def add_book_to_sell(request):
                                  educational_content=educational_content,
                                  category=category,
                                  condition=condition,
-                                 seller=seller,
+                                 user=user,
                                  genre=genre)
     
     return Response({"message": f"{name} added successfully.", "completed": True}, status=status.HTTP_201_CREATED)
@@ -85,7 +85,7 @@ def seller_books_data(request):
         return Response({"message": "User not found", "data": None, "completed": True}, 
                         status=status.HTTP_404_NOT_FOUND)
     
-    all_books = BookDataModel.objects.filter(seller=seller).values()
+    all_books = BookDataModel.objects.filter(user=user).values()
 
     books = []
     for book in all_books:
@@ -141,7 +141,7 @@ def fetch_recent_inventory(request):
                          "data": None, 
                          "completed": True}, status=status.HTTP_404_NOT_FOUND)
     
-    recent_books = list(BookDataModel.objects.filter(seller=seller).order_by('-created_at')[:2])
+    recent_books = list(BookDataModel.objects.filter(user=user).order_by('-created_at')[:2])
     
     book_data = []
     for book in recent_books:

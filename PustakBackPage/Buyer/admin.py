@@ -1,6 +1,5 @@
 from django.contrib import admin
 from .models import (BuyerProfile, 
-                     BookForSellBuyer, 
                      EbookModel, 
                      EbookHistory, 
                      ExchangeBookModel,
@@ -10,10 +9,6 @@ from .models import (BuyerProfile,
 @admin.register(BuyerProfile)
 class SellerProfileAdmin(admin.ModelAdmin):
     list_display = [field.name for field in BuyerProfile._meta.fields]
-
-@admin.register(BookForSellBuyer)
-class SellerProfileAdmin(admin.ModelAdmin):
-    list_display = [field.name for field in BookForSellBuyer._meta.fields]
 
 @admin.register(EbookModel)
 class SellerProfileAdmin(admin.ModelAdmin):

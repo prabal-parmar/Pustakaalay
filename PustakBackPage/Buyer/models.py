@@ -1,5 +1,6 @@
 from django.db import models
 from Users.models import BuyerModel
+from Seller.models import BookDataModel
 import uuid
 from django.utils import timezone
 
@@ -62,24 +63,6 @@ class EbookModel(models.Model):
     def __str__(self):
         return f"{self.name} - {self.buyer.user.username}"
     
-class BookForSellBuyer(models.Model):
-    book_id = models.UUIDField(primary_key=True, default=uuid.uuid4,editable=False)
-    buyer = models.ForeignKey(BuyerModel, on_delete=models.CASCADE, related_name="buyer_books_sell")
-    name = models.CharField(max_length=100)
-    author = models.CharField(max_length=100)
-    description = models.TextField(default="No Description")
-    price = models.DecimalField(max_digits=6,decimal_places=2)
-    category = models.CharField(max_length=20, choices=CATEGORY_TYPE)
-    genre = models.CharField(max_length=10, choices=NOVEL_GENRE_TYPE, null=True, blank=True)
-    date = models.DateField(auto_now_add=True)
-    condition = models.CharField(max_length=10, choices=BOOK_CONDITION, default="fair")
-    likes = models.IntegerField(default=0)
-    saved = models.IntegerField(default=0)
-    views = models.IntegerField(default=0)
-
-    def __str__(self):
-        return f"{self.name} - {self.buyer.user.username}"
-    
 class EbookHistory(models.Model):
     ebook_id = models.ForeignKey(EbookModel, on_delete=models.CASCADE, related_name='ebook')
     buyer_seen = models.ForeignKey(BuyerModel, on_delete=models.CASCADE, related_name='buyerebook_buyer')
@@ -115,7 +98,7 @@ class TradeHistoryModel(models.Model):
     trade_buyer = models.ForeignKey(BuyerModel, on_delete=models.CASCADE, related_name="trade_buyer")
     trade_seller = models.ForeignKey(BuyerModel, on_delete=models.CASCADE, related_name="trade_seller")
     trade_exchange_book = models.ForeignKey(ExchangeBookModel, on_delete=models.CASCADE, related_name="trade_exchange_book", null=True, blank=True)
-    trade_sell_book = models.ForeignKey(BookForSellBuyer, on_delete=models.CASCADE, related_name="trade_sell_book", null=True, blank=True)
+    trade_sell_book = models.ForeignKey(BookDataModel, on_delete=models.CASCADE, related_name="trade_sell_book", null=True, blank=True)
     date = models.DateField(auto_now_add=True)
     trade_type = models.CharField(max_length=10, choices=TRADE_CHOICES)
 

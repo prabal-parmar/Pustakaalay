@@ -47,7 +47,7 @@ class SellerProfile(models.Model):
 
 class BookDataModel(models.Model):
     book_id = models.UUIDField(primary_key=True, default=uuid.uuid4,editable=False)
-    seller = models.ForeignKey(SellerModel, on_delete=models.CASCADE, related_name="seller_books_sell")
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="seller_books_sell")
     name = models.CharField(max_length=100)
     author = models.CharField(max_length=100)
     description = models.TextField(default="None")
@@ -64,7 +64,7 @@ class BookDataModel(models.Model):
     views = models.IntegerField(default=0)
 
     def __str__(self):
-        return f"{self.seller.user.username} - {self.name} - {self.condition}"
+        return f"{self.user.role} - {self.user.username} - {self.name}"
     
 class BookHistoryModel(models.Model):
     book=models.ForeignKey(BookDataModel, on_delete=models.CASCADE, related_name="book_name")
