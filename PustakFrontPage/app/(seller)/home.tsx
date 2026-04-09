@@ -34,7 +34,7 @@ import {
 } from "lucide-react-native";
 import { styles } from "@/components/styles/sellerStyles/homeStyles";
 import { router } from "expo-router";
-import { fetchMyRecentInventoryData } from "@/api/sellerApis/homeApis";
+import { fetchMyRecentInventoryData, fetchRecentBuyBookRequestData } from "@/api/sellerApis/homeApis";
 
 const { width } = Dimensions.get("window");
 
@@ -50,32 +50,18 @@ type MyListingType = {
   views: Number
 }
 
+type PendingRequestsBookType = {
+  id: string,
+  title: string,
+  requester: string,
+  offer: Number,
+  time: string
+}
+
 export default function App() {
   const [searchTerm, setSearchTerm] = useState("");
   const [user, setUser] = useState({ name: "Prabal Parmar" });
-  const pendingRequests = [
-    {
-      id: 1,
-      title: "The Alchemist",
-      requester: "rahul_07",
-      offer: "₹150",
-      time: "10m ago",
-    },
-    {
-      id: 2,
-      title: "Atomic Habits",
-      requester: "priya_reads",
-      offer: "₹220",
-      time: "2h ago",
-    },
-    {
-      id: 3,
-      title: "Psychology of Money",
-      requester: "amit_k",
-      offer: "₹200",
-      time: "4h ago",
-    },
-  ];
+  const [pendingRequests, setPendingRequests] = useState<PendingRequestsBookType[]>([]);
 
   const marketplaceBooks = [
     {
@@ -108,6 +94,16 @@ export default function App() {
         return Alert.alert(message)
       }
     }
+    const fetchRecentBuyRequests = async () => {
+      const [message, data, completed] = await fetchRecentBuyBookRequestData()
+      if(completed){
+        setPendingRequests(data)
+      }
+      else{
+        return Alert.alert(message)
+      }
+    }
+    fetchRecentBuyRequests()
     fetchMyListingData()
   }, [])
 
@@ -220,7 +216,7 @@ export default function App() {
                   <Text style={styles.subText}>From @{req.requester}</Text>
                 </View>
                 <View style={{ alignItems: "flex-end" }}>
-                  <Text style={styles.priceHighlight}>{req.offer}</Text>
+                  <Text style={styles.priceHighlight}>{`₹${req.offer}`}</Text>
                   <Text style={styles.timeText}>{req.time}</Text>
                 </View>
               </View>
