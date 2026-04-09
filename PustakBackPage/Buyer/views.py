@@ -71,6 +71,8 @@ def add_new_book_to_sell(request):
     if find_book is not None:
         return Response({"message": "Book already added.", "completed": False}, status=status.HTTP_200_OK)
     
+    educational_content = request.data.get("educational_content")
+    condition = request.data.get("condition")
     description = request.data.get("description")
     price = float(request.data.get("price"))
     category = str(request.data.get("category")).split(" ")[0]
@@ -81,7 +83,9 @@ def add_new_book_to_sell(request):
                                  price=price,
                                  category=category,
                                  genre=genre,
-                                 user=user)
+                                 user=user,
+                                 educational_content=educational_content or False,
+                                 condition=condition or "new")
     
     return Response({"message": f"{name} added successfully.", "completed": True}, status=status.HTTP_201_CREATED)
 

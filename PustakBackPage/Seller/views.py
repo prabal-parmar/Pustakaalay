@@ -183,3 +183,29 @@ def fetch_buy_book_recent_requests(request, username):
     return Response({"message": "Books recent buy requests sent.", 
                          "data": books_data, 
                          "completed": True}, status=status.HTTP_200_OK)
+
+# Fetch 2 books for you can buy (home page)
+@api_view(['GET'])
+def fetch_you_can_buy_books(request, username):
+    user = CustomUser.objects.filter(username=username).first()
+    if not user:
+        return Response({"message": "User not found", 
+                         "data": None, 
+                         "completed": True}, status=status.HTTP_404_NOT_FOUND)
+    
+    books = list(BookDataModel.objects.exclude(user=user).order_by('price', 'book_id')[:2])
+
+    book_data = []
+    for book in books:
+        data = {
+            "id": book.book_id,
+            "title": book.name,
+            "seller": book.user.username,
+            "price": book.price,
+            "condition": book.condition
+        }
+        book_data.append(data)
+    
+    return Response({"message": "Books data sent.", 
+                         "data": book_data, 
+                         "completed": True}, status=status.HTTP_200_OK) 
