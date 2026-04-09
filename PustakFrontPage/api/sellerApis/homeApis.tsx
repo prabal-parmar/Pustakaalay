@@ -20,3 +20,15 @@ export const fetchMyRecentInventoryData = async () => {
         return ["Something went wrong!", null, false]
     }
 }
+
+export const fetchRecentBuyBookRequestData = async () => {
+    try {
+        const username = await getUsername()
+        const response = await api.get(`/seller/books-request/${username}`)
+
+        return [response.data.message, response.data.data, response.data.completed]
+    } catch (error) {
+        console.log(error)
+        return ["Something went wrong!", null, false]
+    }
+}
