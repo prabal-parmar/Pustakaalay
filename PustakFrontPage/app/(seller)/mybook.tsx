@@ -47,20 +47,20 @@ export default function InventoryScreen() {
 
   const [inventory, setInventory] = useState<any>([]);
 
-useFocusEffect(
-  useCallback(() => {
-    const fetchBooksData = async () => {
-      const [bookData, message, completed] = await fetchAllBooksOfSeller();
-      if(completed){
-        setInventory(bookData)
+  useFocusEffect(
+    useCallback(() => {
+      const fetchBooksData = async () => {
+        const [bookData, message, completed] = await fetchAllBooksOfSeller();
+        if(completed){
+          setInventory(bookData)
+        }
+        else{
+          return Alert.alert(message)
+        }
       }
-      else{
-        return Alert.alert(message)
-      }
-    }
-    fetchBooksData()
-  }, [inventory])
-)
+      fetchBooksData()
+    }, [])
+  )
   const filteredBooks = useMemo(() => {
     return inventory.filter((book: any) => {
       const matchesType = book.type === activeType;

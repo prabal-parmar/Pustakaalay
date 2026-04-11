@@ -108,9 +108,13 @@ export default function CollectorProfileScreen() {
       }
     };
     const fetchBookDatafromApi = async () => {
-      const username = await AsyncStorage.getItem("username");
-      const data = await fetchSellerBookData(username || "");
-      setMyBooks(data.reverse());
+      const [data, message, completed] = await fetchSellerBookData();
+      if(completed){
+        setMyBooks(data);
+      }
+      else{
+        return Alert.alert(message)
+      }
     }
     fetchBookDatafromApi();
     fetchProfileContent();
