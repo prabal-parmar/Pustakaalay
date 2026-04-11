@@ -39,7 +39,7 @@ export const registerSeller = async (sellerData: any) => {
         const data = {
             name: sellerData.name,
             email: sellerData.email.toLowerCase(),
-            username: sellerData.username.toLowerCase(),
+            username: sellerData.username.toLowerCase().trim(),
             password: sellerData.password,
             sellertype: sellerData.sellerType.toLowerCase(),
             location: sellerData.location,

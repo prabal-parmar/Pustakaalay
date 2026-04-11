@@ -24,7 +24,19 @@ export const fetchMyRecentInventoryData = async () => {
 export const fetchRecentBuyBookRequestData = async () => {
     try {
         const username = await getUsername()
-        const response = await api.get(`/seller/books-request/${username}`)
+        const response = await api.get(`/seller/books/buy-request/${username}`)
+
+        return [response.data.message, response.data.data, response.data.completed]
+    } catch (error) {
+        console.log(error)
+        return ["Something went wrong!", null, false]
+    }
+}
+
+export const fetchRecommendedBooks = async () => {
+    try {
+        const username = await getUsername()
+        const response = await api.get(`/seller/books/recommend/${username}`)
 
         return [response.data.message, response.data.data, response.data.completed]
     } catch (error) {
