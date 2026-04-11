@@ -30,6 +30,7 @@ export default function LoginScreen() {
   const [toggleWidth, setToggleWidth] = useState(0);
   const [username, setUsername] = useState<string>("")
   const [password, setPassword] = useState<string>("")
+  const [logging, setLogging] = useState<Boolean>(false);
   const fade = useRef(new Animated.Value(0)).current;
   const rise = useRef(new Animated.Value(30)).current;
 
@@ -51,6 +52,7 @@ export default function LoginScreen() {
   const loginUser = async () => {
     if(role == "Collector"){
       const res = await loginSeller({username, password});
+      setLogging(false);
       if(res[0] == true){
         await AsyncStorage.setItem("role", "seller");
         await AsyncStorage.setItem("username", username);
@@ -199,8 +201,8 @@ export default function LoginScreen() {
             <Text style={styles.recoverText}>Forgot Password?</Text>
           </Pressable>
 
-          <Pressable style={styles.cta} onPress={loginUser}>
-            <Text style={styles.ctaText}>Login</Text>
+          <Pressable style={styles.cta} onPress={() => {setLogging(true); loginUser();}}>
+            <Text style={styles.ctaText}>{!logging ? "Login": "Logging..."}</Text>
             <ChevronRight size={20} color="#fff" />
           </Pressable>
 
