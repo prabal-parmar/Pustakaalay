@@ -76,7 +76,7 @@ def add_book_to_sell(request):
 
 # Fetch Seller books data
 @api_view(['GET'])
-def seller_books_data(request):
+def fetch_seller_books_data(request):
     username = request.query_params.get("username")
 
     user = CustomUser.objects.filter(username=username).first()
@@ -85,24 +85,24 @@ def seller_books_data(request):
         return Response({"message": "User not found", "data": None, "completed": True}, 
                         status=status.HTTP_404_NOT_FOUND)
     
-    all_books = BookDataModel.objects.filter(user=user).values()
+    all_books = list(BookDataModel.objects.filter(user=user).order_by('-created_at').all())
 
     books = []
     for book in all_books:
-        bookType = str(book["category"])
-        bookType = bookType[0].upper() + bookType[1:]
-        genre = str(book["genre"])
+        genre = str(book.genre)
         genre = genre[0].upper() + genre[1:]
         data = { 
-            "id": book["book_id"], 
-            "title": book["name"], 
-            "author": book["author"], 
-            "price": book["price"] 
+            "id": str(book.book_id),
+            "title": str(book.name), 
+            "author": str(book.author),
+            "price": float(book.price),
+            "type": "Educational" if book.educational_content else "Novel" if book.category == "novel" else "Other",
+            "genre": str(genre)
         }
         
         books.append(data)
 
-    return Response({"allBooks": books,
+    return Response({"data": books,
                      "message": "All books by seller sent", 
                      "completed": True}, status=status.HTTP_200_OK)
 
