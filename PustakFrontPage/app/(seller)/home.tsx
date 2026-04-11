@@ -34,7 +34,8 @@ import {
 } from "lucide-react-native";
 import { styles } from "@/components/styles/sellerStyles/homeStyles";
 import { router } from "expo-router";
-import { fetchMyRecentInventoryData, fetchRecentBuyBookRequestData } from "@/api/sellerApis/homeApis";
+import { fetchMyRecentInventoryData, fetchRecentBuyBookRequestData, fetchRecommendedBooks } from "@/api/sellerApis/homeApis";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width } = Dimensions.get("window");
 
@@ -58,34 +59,48 @@ type PendingRequestsBookType = {
   time: string
 }
 
+type MarketPlaceBooksType = {
+  id: string,
+  title: string,
+  seller: string,
+  price: Number,
+  condition: string,
+}
+
 export default function App() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [user, setUser] = useState({ name: "Prabal Parmar" });
+  const [user, setUser] = useState<string>("");
   const [pendingRequests, setPendingRequests] = useState<PendingRequestsBookType[]>([]);
 
-  const marketplaceBooks = [
+  const [marketplaceBooks, setMarketPlaceBooks] = useState<MarketPlaceBooksType[]>([
     {
-      id: 301,
+      id: "301",
       title: "The Silent Patient",
       seller: "bookworm_ali",
-      price: "₹180",
+      price: 180,
       condition: "New",
     },
     {
-      id: 302,
+      id: "302",
       title: "Deep Work",
       seller: "productivity_pro",
-      price: "₹210",
+      price: 210,
       condition: "Like New",
     },
-  ];
-
-  const [myListings, setMyListings] = useState<MyListingType[]>([
-    { id: "201", title: "The Great Gatsby", price: 350, views: 42 },
-    { id: "202", title: "Brief Answers", price: 400, views: 18 },
   ]);
 
+  const [myListings, setMyListings] = useState<MyListingType[]>([]);
+
   useEffect(() => {
+    const fetchUsername = async () => {
+      const username = await AsyncStorage.getItem("username")
+      if(username){
+        setUser(username)
+      }
+      else{
+        setUser("")
+      }
+    }
     const fetchMyListingData = async () => {
       const [message, data, completed] = await fetchMyRecentInventoryData();
       if (completed) {
@@ -103,8 +118,19 @@ export default function App() {
         return Alert.alert(message)
       }
     }
-    fetchRecentBuyRequests()
-    fetchMyListingData()
+    const fetchRecommendBooksData = async () => {
+      const [message, data, completed] = await fetchRecommendedBooks();
+      if(completed){
+        setMarketPlaceBooks(data);
+      }
+      else{
+        return Alert.alert(message)
+      }
+    }
+    fetchUsername();
+    fetchRecentBuyRequests();
+    fetchMyListingData();
+    fetchRecommendBooksData();
   }, [])
 
   return (
@@ -132,7 +158,7 @@ export default function App() {
             </View>
             <View style={{ marginLeft: s(10) }}>
               <Text style={styles.userRole}>Collector</Text>
-              <Text style={styles.userName}>{user.name}</Text>
+              <Text style={styles.userName}>@{user.toLowerCase()}</Text>
             </View>
           </View>
           <TouchableOpacity style={styles.iconBtn}>
@@ -267,7 +293,7 @@ export default function App() {
                     </Text>
                     <Text style={styles.subText}>by {book.seller}</Text>
                   </View>
-                  <Text style={styles.priceDark}>{book.price}</Text>
+                  <Text style={styles.priceDark}>{`₹${book.price}`}</Text>
                 </View>
                 <View style={[styles.rowSpaceBetween, { marginTop: s(10) }]}>
                   <View style={styles.rowAlignCenter}>
