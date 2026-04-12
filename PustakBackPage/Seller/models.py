@@ -62,6 +62,7 @@ class BookDataModel(models.Model):
     likes = models.IntegerField(default=0)
     saved = models.IntegerField(default=0)
     views = models.IntegerField(default=0)
+    rating=models.DecimalField(max_digits=1, decimal_places=1, default=0)
 
     def __str__(self):
         return f"{self.user.role} - {self.user.username} - {self.name}"
