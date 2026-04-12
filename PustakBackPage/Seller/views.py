@@ -208,4 +208,39 @@ def fetch_you_can_buy_books(request, username):
     
     return Response({"message": "Books data sent.", 
                          "data": book_data, 
-                         "completed": True}, status=status.HTTP_200_OK) 
+                         "completed": True}, status=status.HTTP_200_OK)
+
+# Fetch a book full data using id
+# Image to be added later
+@api_view(['GET'])
+def fetch_book_data_by_id(request, username, id):
+    user=CustomUser.objects.filter(username=username).first()
+    seller=SellerModel.objects.filter(user=user).first()
+    if not seller:
+        return Response({"message": "User not found", 
+                         "data": None, 
+                         "completed": True}, status=status.HTTP_404_NOT_FOUND)
+    
+    book=BookDataModel.objects.filter(book_id=id).first()
+    if not book:
+        return Response({"message": "Unable to find book.", 
+                         "data": None, 
+                         "completed": False}, status=status.HTTP_404_NOT_FOUND)
+    book_data={
+        "id": book.book_id,
+        "name": book.name.title(),
+        "author": book.author.title(),
+        "image": "https://picsum.photos/200", # Temporarly added
+        "description": book.description,
+        "price": book.price,
+        "category": book.category,
+        "isEducational": book.educational_content,
+        "totalLikes": book.likes,
+        "totalViews": book.views,
+        "savedByCount": book.saved,
+        "rating": book.rating
+    }
+
+    return Response({"message": "Book data sent.", 
+                     "data": book_data, 
+                     "completed": True}, status=status.HTTP_200_OK)
