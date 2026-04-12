@@ -12,6 +12,9 @@ const getUsername = async () => {
 export const fetchHotEbooksData = async () => {
     try {
         const username = await getUsername();
+        if (!username){
+            throw new Error("Unable to fetch username!")
+        }
         const response = await api.get('/buyer/hot-picks/', {params: {username: username}})
         
         return [response.data.message, response.data.data, response.data.completed]
@@ -24,6 +27,9 @@ export const fetchHotEbooksData = async () => {
 export const fetchLocalExchangeData = async () => {
     try {
         const username = await getUsername();
+        if (!username){
+            throw new Error("Unable to fetch username!")
+        }
         const response = await api.get('/buyer/rec-exchange/', {params: {username: username}})
 
         return [response.data.message, response.data.data, response.data.completed]

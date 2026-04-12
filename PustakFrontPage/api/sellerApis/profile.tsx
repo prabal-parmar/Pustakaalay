@@ -23,6 +23,9 @@ export const fetchProfileData = async (username: string) => {
 export const fetchSellerBookData = async () => {
     try {
         const username = await getUsername();
+        if (!username){
+            throw new Error("Unable to fetch username!")
+        }
         const response = await api.get('/seller/my-all-books/', {params: {username: username.toLowerCase()}})
         // console.log(response.data.allBooks)
         return [response.data.data, response.data.message, response.data.completed]

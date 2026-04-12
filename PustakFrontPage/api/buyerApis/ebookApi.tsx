@@ -12,6 +12,9 @@ const getUsername = async () => {
 export const fetchBuyerSellBooksData = async () => {
     try {
         const username = await getUsername();
+        if (!username){
+            throw new Error("Unable to fetch username!")
+        }
         const response = await api.get('/buyer/my-sell-books/', {params: {username: username?.toLowerCase()}})
 
         return [response.data.message, response.data.data, true];
@@ -24,6 +27,9 @@ export const fetchBuyerSellBooksData = async () => {
 export const addBuyerBookToSell = async (data: any) => {
     try {
         const username = await getUsername();
+        if (!username){
+            throw new Error("Unable to fetch username!")
+        }
         const formData = {
             username: username?.toLowerCase(),
             name: data.name,
@@ -45,6 +51,9 @@ export const addBuyerBookToSell = async (data: any) => {
 export const addBuyerNewEbook = async (data: any) => {
     try {
         const username = await getUsername();
+        if (!username){
+            throw new Error("Unable to fetch username!")
+        }
         const formData = {
             username: username?.toLowerCase(),
             name: data.name,
@@ -65,6 +74,9 @@ export const addBuyerNewEbook = async (data: any) => {
 export const fetchBuyerEbook = async () => {
     try {
         const username = await getUsername();
+        if (!username){
+            throw new Error("Unable to fetch username!")
+        }
         const response = await api.get('/buyer/my-ebooks/', {params: {username: username?.toLowerCase()}})
 
         return [response.data.message, response.data.data, true];
@@ -77,6 +89,9 @@ export const fetchBuyerEbook = async () => {
 export const checkBuyerSeenEbook = async (ebook_id: string) => {
     try {
         const username = await getUsername();
+        if (!username){
+            throw new Error("Unable to fetch username!")
+        }
         const response = await api.get(`/buyer/${username}/ebook/${ebook_id}`)
 
         return [response.data.message, response.data.data, true]
@@ -89,6 +104,9 @@ export const checkBuyerSeenEbook = async (ebook_id: string) => {
 export const addExchangeBook = async (bookData: any) => {
     try {
         const username = await getUsername();
+        if (!username){
+            throw new Error("Unable to fetch username!")
+        }
         const response = await api.post('/buyer/exchange-book/', {...bookData, username: username});
 
         return [response.data.message, response.data.data, response.data.completed]
@@ -101,6 +119,9 @@ export const addExchangeBook = async (bookData: any) => {
 export const fetchExchangeBookData = async () => {
     try {
         const username = await getUsername();
+        if (!username){
+            throw new Error("Unable to fetch username!")
+        }
         const response = await api.get('buyer/exchange-books/', {params:{username: username}});
 
         return [response.data.message, response.data.data, response.data.completed]

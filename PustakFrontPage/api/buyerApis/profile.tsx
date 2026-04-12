@@ -22,6 +22,9 @@ export const fetchBuyerProfileData = async (username: string) => {
 export const fetchBuyerTradeHistory = async () => {
     try {
         const username = await getUsername();
+        if (!username){
+            throw new Error("Unable to fetch username!")
+        }
         const response = await api.get('/buyer/trade-history/', {params: {username: username}})
 
         return [response.data.message, response.data.data, response.data.completed]
