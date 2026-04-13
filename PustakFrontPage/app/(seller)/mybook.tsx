@@ -9,6 +9,7 @@ import {
   Pressable,
   StatusBar,
   Alert,
+  TouchableOpacity,
 } from "react-native";
 import {
   Book,
@@ -26,11 +27,14 @@ import {
 } from "lucide-react-native";
 import { styles } from "@/components/styles/sellerStyles/mybookStyles"; 
 import { fetchAllBooksOfSeller } from "@/api/sellerApis/myBooksApi";
+import { SellerBookDetailModal, SellerBookData } from "../modals/sellerMybookModal";
 
 export default function InventoryScreen() {
   const [activeType, setActiveType] = useState("Novel");
   const [activeGenre, setActiveGenre] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedBook, setSelectedBook] = useState<SellerBookData | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter()
 
   const categoryMap: Record<string, string[]> = {
@@ -72,9 +76,67 @@ export default function InventoryScreen() {
     });
   }, [activeType, activeGenre, searchTerm, inventory]);
 
+  const myBooks: SellerBookData[] = [
+      {
+        book_id: "550e8400-e29b-41d4-a716-446655440000",
+        name: "The Alchemist",
+        author: "Paulo Coelho",
+        image: "https://picsum.photos/200",
+        description: "A beautiful story about a shepherd boy named Santiago who travels from his homeland in Spain to the Egyptian desert in search of a treasure buried near the Pyramids.",
+        price: "14.99",
+        quantity: 2,
+        educational_content: false,
+        category: "novel",
+        condition: "good",
+        genre: "fantasy",
+        educational_type: null,
+        likes: 124,
+        saved: 45,
+        views: 850,
+        rating: "4.8"
+      }
+  ];
+
+  const handleOpenDetails = (book: SellerBookData) => {
+    setSelectedBook(book);
+    setIsModalOpen(true);
+  };
+
+  const onEdit = (book: SellerBookData) => {
+    setIsModalOpen(false);
+    console.log("Navigating to edit screen for:", book.name);
+    // router.push(`/edit-book/${book.id}`);
+  };
+
+  const onDelete = (book: SellerBookData) => {
+    Alert.alert(
+      "Delete Listing",
+      `Are you sure you want to remove "${book.name}"?`,
+      [
+        { text: "Cancel", style: "cancel" },
+        { 
+          text: "Delete", 
+          style: "destructive", 
+          onPress: () => {
+            setIsModalOpen(false);
+            console.log("Deleted book ID:", book.book_id);
+          } 
+        }
+      ]
+    );
+  };
+
   return (
     <SafeAreaView style={styles.safe}>
       <StatusBar barStyle="dark-content" />
+      <SellerBookDetailModal
+        isVisible={isModalOpen}
+        book={selectedBook}
+        onClose={() => setIsModalOpen(false)}
+        onEdit={onEdit}
+        onDelete={onDelete}
+      />
+
       <ScrollView showsVerticalScrollIndicator={false} stickyHeaderIndices={[1]}>
 
         <View style={styles.header}>
@@ -156,7 +218,7 @@ export default function InventoryScreen() {
         <View style={styles.list}>
           {filteredBooks.length > 0 ? (
             filteredBooks.map((book: any) => (
-              <Pressable key={book.id} style={styles.card}>
+              <TouchableOpacity key={book.id} style={styles.card} onPressOut={() => handleOpenDetails(myBooks[0])}>
                 <View style={styles.cover}>
                   <Book size={24} color="#D4AF37" opacity={0.3} />
                   {book.condition === "Rare" && (
@@ -188,7 +250,7 @@ export default function InventoryScreen() {
                     </View>
                   </View>
                 </View>
-              </Pressable>
+              </TouchableOpacity>
             ))
           ) : (
             <View style={styles.empty}>
