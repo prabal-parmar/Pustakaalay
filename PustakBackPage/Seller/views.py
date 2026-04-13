@@ -245,10 +245,10 @@ def fetch_book_data_by_id(request, username, id):
                      "data": book_data, 
                      "completed": True}, status=status.HTTP_200_OK)
 
-# Fetch my book of seller by book id
+# Fetch or Delete my book of seller by book id
 # Book image to be added
-@api_view(['GET'])
-def fetch_mybook_by_id(request, username, book_id):
+@api_view(['GET', 'DELETE'])
+def fetch_and_delete_mybook_by_id(request, username, book_id):
     user=CustomUser.objects.filter(username=username).first()
     seller=SellerModel.objects.filter(user=user).first()
 
@@ -262,7 +262,13 @@ def fetch_mybook_by_id(request, username, book_id):
         return Response({"message": "Book not found with this id",
                          "data": None,
                          "completed": False}, status=status.HTTP_404_NOT_FOUND)
-    
+
+    if request.method == "DELETE":
+        book.delete()
+        return Response({"message": f"Book deleted with id: {book_id}",
+                         "data": None,
+                         "completed": True}, status=status.HTTP_200_OK)
+
     book_data = {
         "book_id" : book.book_id,
         "name" : book.name.title(),
