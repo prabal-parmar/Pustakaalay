@@ -36,6 +36,8 @@ import { styles } from "@/components/styles/sellerStyles/homeStyles";
 import { router } from "expo-router";
 import { fetchMyRecentInventoryData, fetchRecentBuyBookRequestData, fetchRecommendedBooks } from "@/api/sellerApis/homeApis";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import BookDetailModal, { BookData } from "../modals/bookModal";
+import { fetchBookDataById } from "@/api/modalApis/sellerModalsApi";
 
 const { width } = Dimensions.get("window");
 
@@ -72,6 +74,8 @@ export default function App() {
   const [user, setUser] = useState<string>("");
   const [pendingRequests, setPendingRequests] = useState<PendingRequestsBookType[]>([]);
 
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedBook, setSelectedBook] = useState<BookData | null>(null);
   const [marketplaceBooks, setMarketPlaceBooks] = useState<MarketPlaceBooksType[]>([
     {
       id: "301",
@@ -90,6 +94,17 @@ export default function App() {
   ]);
 
   const [myListings, setMyListings] = useState<MyListingType[]>([]);
+
+  const openBook = async (id: string) => {
+    const [message, data, completed] = await fetchBookDataById(id)
+    if(completed){
+      setSelectedBook(data);
+    }
+    else{
+      return Alert.alert(message);
+    }
+    setModalVisible(true);
+  };
 
   useEffect(() => {
     const fetchUsername = async () => {
@@ -136,6 +151,15 @@ export default function App() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
+
+      <View style={{ flex: 1, justifyContent: 'center' }}>
+        <BookDetailModal
+          isVisible={modalVisible}
+          book={selectedBook}
+          onClose={() => setModalVisible(false)}
+          onBuy={(book) => console.log('Buying:', book.name)}
+        />
+      </View>
 
       <View style={styles.meshContainer}>
         <View style={styles.blob1} />
@@ -300,9 +324,9 @@ export default function App() {
                     <MapPin size={s(12)} color="#6B705C" />
                     <Text style={styles.locText}>1.2 KM AWAY</Text>
                   </View>
-                  <TouchableOpacity style={styles.buyBtn}>
+                  <TouchableOpacity style={styles.buyBtn} onPress={() => openBook(book.id)}>
                     <ShoppingBag size={s(12)} color="white" />
-                    <Text style={styles.buyBtnText}>BUY</Text>
+                    <Text style={styles.buyBtnText}>VIEW</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -351,7 +375,7 @@ export default function App() {
           </View>
         </View>
 
-        <TouchableOpacity style={styles.growthCard}>
+        <TouchableOpacity style={styles.growthCard} onPressOut={() => router.navigate('/(seller)/explore')}>
           <View style={styles.sparkle}>
             <Sparkles size={s(120)} color="#D4AF37" opacity={0.15} />
           </View>
