@@ -2,6 +2,8 @@ from django.db import models
 from Users.models import SellerModel, CustomUser
 import uuid
 from django.core.validators import MinValueValidator
+from django.db.models import F, FloatField, ExpressionWrapper
+from django.utils import timezone
 # Create your models here.
 
 CATEGORY_TYPE = (
@@ -35,6 +37,26 @@ CONDITION_TYPE = (
     ("old", "Old")
 )
 
+# BookManager for BookDataModel with freshness
+class BookManager(models.Manager):
+    def ranked(self):
+        freshness = ExpressionWrapper(
+            1 / (1 + (timezone.now() - F('created_at')).days),
+            output_field=FloatField()
+        )
+
+        score = ExpressionWrapper(
+            (F('likes') * 3) +
+            (F('saved') * 2) +
+            (F('views') * 1) +
+            (F('rating') * 5),
+            output_field=FloatField()
+        )
+
+        return self.annotate(
+            score=score
+        ).order_by('-score')
+
 class SellerProfile(models.Model):
     seller = models.OneToOneField(SellerModel, on_delete=models.CASCADE, related_name="seller")
     description = models.TextField(default="I am using Pustakaalay 📚")
@@ -63,6 +85,8 @@ class BookDataModel(models.Model):
     saved = models.IntegerField(default=0)
     views = models.IntegerField(default=0)
     rating=models.DecimalField(max_digits=1, decimal_places=1, default=0)
+
+    objects=BookManager()
 
     def __str__(self):
         return f"{self.user.role} - {self.user.username} - {self.name}"
