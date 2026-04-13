@@ -244,3 +244,42 @@ def fetch_book_data_by_id(request, username, id):
     return Response({"message": "Book data sent.", 
                      "data": book_data, 
                      "completed": True}, status=status.HTTP_200_OK)
+
+# Fetch my book of seller by book id
+# Book image to be added
+@api_view(['GET'])
+def fetch_mybook_by_id(request, username, book_id):
+    user=CustomUser.objects.filter(username=username).first()
+    seller=SellerModel.objects.filter(user=user).first()
+
+    if not seller:
+        return Response({"message": "User not found", 
+                         "data": None, 
+                         "completed": True}, status=status.HTTP_404_NOT_FOUND)
+    
+    book=BookDataModel.objects.filter(book_id=book_id).first()
+    if not book:
+        return Response({"message": "Book not found with this id",
+                         "data": None,
+                         "completed": False}, status=status.HTTP_404_NOT_FOUND)
+    
+    book_data = {
+        "book_id" : book.book_id,
+        "name" : book.name,
+        "author" : book.author,
+        "description" : book.description,
+        "price" : book.price,
+        "quantity" : book.quantity,
+        "educational_content" : book.educational_content,
+        "category" : book.category,
+        "condition" : book.condition,
+        "genre" : book.genre,
+        "likes" : book.likes,
+        "saved" : book.saved,
+        "views" : book.views,
+        "rating": book.rating
+    }
+    
+    return Response({"message": "Seller Book sent.",
+                     "data": book_data,
+                     "completed": True}, status=status.HTTP_200_OK)
