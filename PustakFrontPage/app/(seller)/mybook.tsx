@@ -28,6 +28,7 @@ import {
 import { styles } from "@/components/styles/sellerStyles/mybookStyles"; 
 import { fetchAllBooksOfSeller } from "@/api/sellerApis/myBooksApi";
 import { SellerBookDetailModal, SellerBookData } from "../modals/sellerMybookModal";
+import { fetchSellerMyBookData } from "@/api/modalApis/sellerModalsApi";
 
 export default function InventoryScreen() {
   const [activeType, setActiveType] = useState("Novel");
@@ -97,8 +98,14 @@ export default function InventoryScreen() {
       }
   ];
 
-  const handleOpenDetails = (book: SellerBookData) => {
-    setSelectedBook(book);
+  const handleOpenDetails = async (book_id: string) => {
+    const [message, data, completed] = await fetchSellerMyBookData(book_id);
+    if (!completed){
+      return Alert.alert(message);
+    }
+    else{
+      setSelectedBook(data);
+    }
     setIsModalOpen(true);
   };
 
@@ -218,7 +225,7 @@ export default function InventoryScreen() {
         <View style={styles.list}>
           {filteredBooks.length > 0 ? (
             filteredBooks.map((book: any) => (
-              <TouchableOpacity key={book.id} style={styles.card} onPressOut={() => handleOpenDetails(myBooks[0])}>
+              <TouchableOpacity key={book.id} style={styles.card} onPressOut={() => handleOpenDetails(book.id)}>
                 <View style={styles.cover}>
                   <Book size={24} color="#D4AF37" opacity={0.3} />
                   {book.condition === "Rare" && (
