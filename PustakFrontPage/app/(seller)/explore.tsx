@@ -1,4 +1,10 @@
-import React, { useState, useMemo, useRef } from "react";
+import React, {
+  useState,
+  useMemo,
+  useRef,
+  useEffect,
+  useCallback,
+} from "react";
 import {
   View,
   Text,
@@ -7,6 +13,8 @@ import {
   ScrollView,
   SafeAreaView,
   StatusBar,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 
 import {
@@ -34,68 +42,43 @@ interface Book {
   genre: string;
 }
 import { styles } from "@/components/styles/sellerStyles/exploreStyles";
+import { fetchExploreBooksData } from "@/api/sellerApis/exploreApis";
+import { useFocusEffect } from "expo-router";
 
 export default function App() {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [wishlist, setWishlist] = useState<number[]>([301, 305]);
   const scrollViewRef = useRef<ScrollView>(null);
 
-  const marketplaceInventory: Book[] = [
-    {
-      id: 301,
-      title: "The Silent Patient",
-      author: "Alex Michaelides",
-      price: "₹180",
-      seller: "bookworm_ali",
-      condition: "New",
-      genre: "Thriller",
-    },
-    {
-      id: 302,
-      title: "Deep Work",
-      author: "Cal Newport",
-      price: "₹210",
-      seller: "productivity_pro",
-      condition: "Like New",
-      genre: "Self-Help",
-    },
-    {
-      id: 303,
-      title: "Sapiens",
-      author: "Yuval Noah Harari",
-      price: "₹320",
-      seller: "history_buff",
-      condition: "Used",
-      genre: "History",
-    },
-    {
-      id: 304,
-      title: "Atomic Habits",
-      author: "James Clear",
-      price: "₹250",
-      seller: "habit_tracker",
-      condition: "New",
-      genre: "Productivity",
-    },
-    {
-      id: 305,
-      title: "Man's Search for Meaning",
-      author: "Viktor Frankl",
-      price: "₹150",
-      seller: "philosophy_hub",
-      condition: "Good",
-      genre: "Philosophy",
-    },
-    {
-      id: 306,
-      title: "The Alchemist",
-      author: "Paulo Coelho",
-      price: "₹140",
-      seller: "dreamer_reads",
-      condition: "Vintage",
-      genre: "Fiction",
-    },
-  ];
+  const [marketplaceInventory, setMarketplaceInventory] = useState<Book[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchMarketplaceInventory = async () => {
+    try {
+      const [message, data, completed] = await fetchExploreBooksData();
+
+      if (completed && data) {
+        setMarketplaceInventory(data);
+      } else {
+        Alert.alert(message);
+      }
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : "Unknown error occurred";
+      Alert.alert("Error", errorMsg);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMarketplaceInventory();
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchMarketplaceInventory();
+    }, []),
+  );
 
   const filteredBooks = useMemo(
     () =>
@@ -103,20 +86,28 @@ export default function App() {
         (b) =>
           b.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
           b.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          b.genre.toLowerCase().includes(searchTerm.toLowerCase())
+          b.genre.toLowerCase().includes(searchTerm.toLowerCase()),
       ),
-    [searchTerm]
+    [marketplaceInventory, searchTerm],
   );
 
   const toggleWishlist = (id: number) => {
     setWishlist((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
     );
   };
 
   const scrollToTop = () => {
     scrollViewRef.current?.scrollTo({ y: 0, animated: true });
   };
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>

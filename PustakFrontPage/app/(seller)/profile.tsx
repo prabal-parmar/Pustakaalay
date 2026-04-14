@@ -9,6 +9,7 @@ import {
   Modal,
   TouchableWithoutFeedback,
   Alert,
+  TouchableOpacity,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import {
@@ -133,12 +134,12 @@ export default function CollectorProfileScreen() {
               </View>
 
               <View style={styles.headerIcons}>
-                <Pressable>
+                <TouchableOpacity>
                   <Share2 size={18} color="#fff" />
-                </Pressable>
-                <Pressable onPress={toggleSettings}>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={toggleSettings}>
                   <Settings size={18} color="#fff" />
-                </Pressable>
+                </TouchableOpacity>
               </View>
             </View>
 
