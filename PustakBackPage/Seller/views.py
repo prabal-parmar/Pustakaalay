@@ -4,7 +4,9 @@ from rest_framework.decorators import api_view
 from Users.models import SellerModel, CustomUser
 from .models import SellerProfile, BookDataModel, BookHistoryModel, BookBuyRequest
 from rest_framework import status
-from Models.sellerModels import time_ago
+from Models.sellerModels import time_ago, refine_books_with_randomness
+from django.db.models import F, Value, CharField
+from django.db.models.functions import Concat
 # Seller profile
 @api_view(['GET'])
 def get_profile(request):
@@ -288,4 +290,35 @@ def fetch_and_delete_mybook_by_id(request, username, book_id):
     
     return Response({"message": "Seller Book sent.",
                      "data": book_data,
+                     "completed": True}, status=status.HTTP_200_OK)
+
+# Fetch all books for explore page using model
+# Pagination to be added later
+@api_view(['GET'])
+def fetch_books_for_explore(request):
+    username=request.query_params.get("username")
+    user=CustomUser.objects.filter(username=username).first()
+    if not user:
+        return Response({"message": "User not found.", 
+                         "data": None, 
+                         "completed": False}, status=status.HTTP_404_NOT_FOUND)
+    
+    books = BookDataModel.objects.exclude(user=user).ranked()
+    books = list(books)
+    books_with_randomness=refine_books_with_randomness(books)
+
+    final_books = [
+                        {
+                            "id": book.book_id,
+                            "title": book.name,
+                            "author": book.author,
+                            "price": f"₹{book.price}",
+                            "seller": book.user.username,
+                            "condition": book.condition,
+                            "genre": book.genre
+                        }
+                        for book in books_with_randomness
+                  ]
+    return Response({"message": "All Books data sent.", 
+                     "data": final_books, 
                      "completed": True}, status=status.HTTP_200_OK)
