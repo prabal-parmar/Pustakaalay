@@ -3,7 +3,6 @@ from Users.models import SellerModel, CustomUser
 import uuid
 from django.core.validators import MinValueValidator
 from django.db.models import F, FloatField, ExpressionWrapper
-from django.utils import timezone
 # Create your models here.
 
 CATEGORY_TYPE = (
@@ -37,14 +36,9 @@ CONDITION_TYPE = (
     ("old", "Old")
 )
 
-# BookManager for BookDataModel with freshness
-class BookManager(models.Manager):
+# Queryset to make ranked a query
+class BookQuerySet(models.QuerySet):
     def ranked(self):
-        freshness = ExpressionWrapper(
-            1 / (1 + (timezone.now() - F('created_at')).days),
-            output_field=FloatField()
-        )
-
         score = ExpressionWrapper(
             (F('likes') * 3) +
             (F('saved') * 2) +
@@ -53,9 +47,16 @@ class BookManager(models.Manager):
             output_field=FloatField()
         )
 
-        return self.annotate(
-            score=score
-        ).order_by('-score')
+        return self.annotate(score=score).order_by('-score')
+
+# BookManager for BookDataModel with freshness
+class BookManager(models.Manager):
+    def get_queryset(self):
+        return BookQuerySet(self.model, using=self._db)
+
+    def ranked(self):
+        return self.get_queryset().ranked()
+
 
 class SellerProfile(models.Model):
     seller = models.OneToOneField(SellerModel, on_delete=models.CASCADE, related_name="seller")
