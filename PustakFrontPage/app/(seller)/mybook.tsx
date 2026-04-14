@@ -28,7 +28,7 @@ import {
 import { styles } from "@/components/styles/sellerStyles/mybookStyles"; 
 import { fetchAllBooksOfSeller } from "@/api/sellerApis/myBooksApi";
 import { SellerBookDetailModal, SellerBookData } from "../modals/sellerMybookModal";
-import { fetchSellerMyBookData } from "@/api/modalApis/sellerModalsApi";
+import { deleteMyBookById, fetchSellerMyBookData } from "@/api/modalApis/sellerModalsApi";
 
 export default function InventoryScreen() {
   const [activeType, setActiveType] = useState("Novel");
@@ -77,26 +77,6 @@ export default function InventoryScreen() {
     });
   }, [activeType, activeGenre, searchTerm, inventory]);
 
-  const myBooks: SellerBookData[] = [
-      {
-        book_id: "550e8400-e29b-41d4-a716-446655440000",
-        name: "The Alchemist",
-        author: "Paulo Coelho",
-        image: "https://picsum.photos/200",
-        description: "A beautiful story about a shepherd boy named Santiago who travels from his homeland in Spain to the Egyptian desert in search of a treasure buried near the Pyramids.",
-        price: "14.99",
-        quantity: 2,
-        educational_content: false,
-        category: "novel",
-        condition: "good",
-        genre: "fantasy",
-        educational_type: null,
-        likes: 124,
-        saved: 45,
-        views: 850,
-        rating: "4.8"
-      }
-  ];
 
   const handleOpenDetails = async (book_id: string) => {
     const [message, data, completed] = await fetchSellerMyBookData(book_id);
@@ -115,18 +95,27 @@ export default function InventoryScreen() {
     // router.push(`/edit-book/${book.id}`);
   };
 
-  const onDelete = (book: SellerBookData) => {
+  const onDelete = async () => {
     Alert.alert(
       "Delete Listing",
-      `Are you sure you want to remove "${book.name}"?`,
+      `Are you sure you want to remove "${selectedBook?.name}"?`,
       [
         { text: "Cancel", style: "cancel" },
         { 
           text: "Delete", 
           style: "destructive", 
-          onPress: () => {
+          onPress: async () => {
             setIsModalOpen(false);
-            console.log("Deleted book ID:", book.book_id);
+            if (selectedBook && selectedBook.book_id){
+              const [message, data, completed] = await deleteMyBookById(selectedBook.book_id)
+              if(!completed){
+                return Alert.alert(message);
+              }
+              else{
+                setInventory((prev: any) => prev.filter((book: any) => book.id !== selectedBook.book_id))
+                setSelectedBook(null);
+              }
+            }
           } 
         }
       ]
