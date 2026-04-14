@@ -38,3 +38,15 @@ export const fetchSellerMyBookData = async (book_id: string) => {
         return ["Something went wrong!", null, false]
     }
 }
+
+export const deleteMyBookById = async (book_id: string) => {
+    try {
+        const username = await getUsername();
+        const response = await api.delete(`/seller/books/mybooks/${username}/${book_id}`)
+
+        return [response.data.message, response.data.data, response.data.completed]
+    } catch (error) {
+        console.log(error)
+        return ["Something went wrong!", null, false]
+    }
+}
