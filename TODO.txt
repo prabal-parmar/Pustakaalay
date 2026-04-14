@@ -9,5 +9,7 @@ Features:
 Backend:
     1) Need to add local exchange with location feature
     2) Hardcoded educational_content and condition for buyer book
+    3) Pagination to be added
 Frontend:
     1) Need to add name in home page of seller
+    2) Pagination to be added
