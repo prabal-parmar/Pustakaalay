@@ -33,25 +33,30 @@ import {
 } from "lucide-react-native";
 
 interface Book {
-  id: number;
+  id: string;
   title: string;
   author: string;
-  price: string;
+  price: number;
   seller: string;
   condition: string;
   genre: string;
+  liked: boolean;
 }
+
 import { styles } from "@/components/styles/sellerStyles/exploreStyles";
-import { fetchExploreBooksData } from "@/api/sellerApis/exploreApis";
+import { fetchExploreBooksData, toggleBookLiked } from "@/api/sellerApis/exploreApis";
 import { useFocusEffect } from "expo-router";
+import BookDetailModal, { BookData } from "../modals/bookModal";
+import { fetchBookDataById } from "@/api/modalApis/sellerModalsApi";
 
 export default function App() {
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [wishlist, setWishlist] = useState<number[]>([301, 305]);
   const scrollViewRef = useRef<ScrollView>(null);
 
   const [marketplaceInventory, setMarketplaceInventory] = useState<Book[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedBook, setSelectedBook] = useState<BookData | null>(null);
 
   const fetchMarketplaceInventory = async () => {
     try {
@@ -80,6 +85,17 @@ export default function App() {
     }, []),
   );
 
+  const openBook = async (id: string) => {
+      const [message, data, completed] = await fetchBookDataById(id)
+      if(completed){
+        setSelectedBook(data);
+      }
+      else{
+        return Alert.alert(message);
+      }
+      setModalVisible(true);
+    };
+
   const filteredBooks = useMemo(
     () =>
       marketplaceInventory.filter(
@@ -91,10 +107,15 @@ export default function App() {
     [marketplaceInventory, searchTerm],
   );
 
-  const toggleWishlist = (id: number) => {
-    setWishlist((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
-    );
+  const toggleWishlist = async (id: string) => {
+    const [message, data, completed] = await toggleBookLiked(id);
+    
+    if(completed){
+      setMarketplaceInventory((prev: any) => prev.map((b: any)=> b.id === data.id ? { ...b, liked: !b.liked } : b))
+    }
+    else{
+      return Alert.alert(message)
+    }
   };
 
   const scrollToTop = () => {
@@ -112,6 +133,15 @@ export default function App() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#FCF9F1" />
+
+      <View style={{ flex: 1, justifyContent: 'center' }}>
+        <BookDetailModal
+          isVisible={modalVisible}
+          book={selectedBook}
+          onClose={() => setModalVisible(false)}
+          onBuy={(book) => console.log('Buying:', book.name)}
+        />
+      </View>
 
       <View style={styles.header}>
         <View style={styles.headerRow}>
@@ -182,16 +212,16 @@ export default function App() {
                   >
                     <Heart
                       size={16}
-                      color={wishlist.includes(book.id) ? "#721C24" : "#A5A58D"}
+                      color={book.liked ? "#721C24" : "#A5A58D"}
                       fill={
-                        wishlist.includes(book.id) ? "#721C24" : "transparent"
+                        book.liked ? "#721C24" : "transparent"
                       }
                     />
                   </TouchableOpacity>
 
-                  <View style={styles.externalLink}>
+                  <TouchableOpacity style={styles.externalLink} onPressOut={() => openBook(book.id)}>
                     <ArrowUpRight size={14} color="#1A1A1A" strokeWidth={3} />
-                  </View>
+                  </TouchableOpacity>
                 </View>
 
                 <View style={styles.contentPadding}>
@@ -213,8 +243,8 @@ export default function App() {
 
                   <View style={styles.footerRow}>
                     <Text style={styles.priceTag}>{book.price}</Text>
-                    <TouchableOpacity style={styles.buyButton}>
-                      <Text style={styles.buyText}>BUY</Text>
+                    <TouchableOpacity style={styles.buyButton} onPressOut={() => openBook(book.id)}>
+                      <Text style={styles.buyText}>VIEW</Text>
                       <MessageSquare size={10} color="white" />
                     </TouchableOpacity>
                   </View>
