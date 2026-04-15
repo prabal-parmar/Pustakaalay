@@ -41,10 +41,11 @@ interface Book {
   condition: string;
   genre: string;
   liked: boolean;
+  saved: boolean;
 }
 
 import { styles } from "@/components/styles/sellerStyles/exploreStyles";
-import { fetchExploreBooksData, toggleBookLiked } from "@/api/sellerApis/exploreApis";
+import { fetchExploreBooksData, toggleBookLiked, toggleBookSaved } from "@/api/sellerApis/exploreApis";
 import { useFocusEffect } from "expo-router";
 import BookDetailModal, { BookData } from "../modals/bookModal";
 import { fetchBookDataById } from "@/api/modalApis/sellerModalsApi";
@@ -107,11 +108,22 @@ export default function App() {
     [marketplaceInventory, searchTerm],
   );
 
-  const toggleWishlist = async (id: string) => {
+  const toggleWishlistLike = async (id: string) => {
     const [message, data, completed] = await toggleBookLiked(id);
     
     if(completed){
       setMarketplaceInventory((prev: any) => prev.map((b: any)=> b.id === data.id ? { ...b, liked: !b.liked } : b))
+    }
+    else{
+      return Alert.alert(message)
+    }
+  };
+
+  const toggleWishlistSave = async (id: string) => {
+    const [message, data, completed] = await toggleBookSaved(id);
+    
+    if(completed){
+      setMarketplaceInventory((prev: any) => prev.map((b: any)=> b.id === data.id ? { ...b, saved: !b.saved } : b))
     }
     else{
       return Alert.alert(message)
@@ -140,6 +152,8 @@ export default function App() {
           book={selectedBook}
           onClose={() => setModalVisible(false)}
           onBuy={(book) => console.log('Buying:', book.name)}
+          onLikeToggle={() => selectedBook && toggleWishlistLike(selectedBook.id)}
+          onSaveToggle={() => selectedBook && toggleWishlistSave(selectedBook.id)}
         />
       </View>
 
@@ -207,7 +221,7 @@ export default function App() {
                   </View>
 
                   <TouchableOpacity
-                    onPress={() => toggleWishlist(book.id)}
+                    onPress={() => toggleWishlistLike(book.id)}
                     style={styles.heartButton}
                   >
                     <Heart
