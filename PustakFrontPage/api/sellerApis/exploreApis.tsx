@@ -26,3 +26,19 @@ export const fetchExploreBooksData = async () => {
     return ["Something went wrong!", null, false];
   }
 };
+
+export const toggleBookLiked = async (book_id: string) => {
+    try {
+        const username = await getUsername();
+
+        if (!username){
+            throw new Error("Unable to fetch username!");
+        }
+        const response = await api.post(`/seller/books/${username}/${book_id}/like/`)
+
+        return [response.data.message, response.data.data, response.data.completed]
+    } catch (error) {
+        console.log(error)
+        return ["Something went wrong!", null, false];
+    }
+}
