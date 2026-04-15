@@ -228,6 +228,8 @@ def fetch_book_data_by_id(request, username, id):
         return Response({"message": "Unable to find book.", 
                          "data": None, 
                          "completed": False}, status=status.HTTP_404_NOT_FOUND)
+    
+    book_history=BookHistoryModel.objects.filter(user=user, book=book).first()
     book_data={
         "id": book.book_id,
         "name": book.name.title(),
@@ -240,7 +242,9 @@ def fetch_book_data_by_id(request, username, id):
         "totalLikes": book.likes,
         "totalViews": book.views,
         "savedByCount": book.saved,
-        "rating": book.rating
+        "rating": book.rating,
+        "liked": book_history.liked if book_history else False,
+        "saved": book_history.saved if book_history else False
     }
 
     book_history=BookHistoryModel.objects.filter(user=user, book=book).first()
@@ -335,7 +339,7 @@ def fetch_books_for_explore(request):
                      "completed": True}, status=status.HTTP_200_OK)
 
 # Book liked or unliked by seller
-@api_view(['POST'])
+@api_view(['PUT'])
 def like_unlike_book(request, username, book_id):
     user=CustomUser.objects.filter(username=username).first()
     seller=SellerModel.objects.filter(user=user).first()
@@ -368,6 +372,45 @@ def like_unlike_book(request, username, book_id):
     book.likes = book.likes + (1 if not book_history.liked else -1)
     book.save()
     book_history.liked = not book_history.liked
+    book_history.save()
+    return Response({"message": f"Book history created for book with id: {book_id}.",
+                         "data": {"id": book_id},
+                         "completed": True}, status=status.HTTP_200_OK)
+
+# Book save or unsave by seller
+@api_view(['PUT'])
+def save_unsave_book(request, username, book_id):
+    user=CustomUser.objects.filter(username=username).first()
+    seller=SellerModel.objects.filter(user=user).first()
+
+    if not seller:
+        return Response({"message": "User not found.", 
+                         "data": None, 
+                         "completed": False}, status=status.HTTP_404_NOT_FOUND)
+    
+    book=BookDataModel.objects.filter(book_id=book_id).first()
+    if not book:
+        return Response({"message": "Book not found.", 
+                         "data": None, 
+                         "completed": False}, status=status.HTTP_404_NOT_FOUND)
+    
+    book_history=BookHistoryModel.objects.filter(user=user, book=book).first()
+
+    if not book_history:
+        BookHistoryModel.objects.create(user=user,
+                                        book=book,
+                                        saved=True,
+                                        viewed=True).save()
+        book.saved += 1
+        book.views += 1
+        book.save()
+        return Response({"message": f"Book history created for book with id: {book_id}.",
+                         "data": {"id": book_id}, 
+                         "completed": True}, status=status.HTTP_201_CREATED)
+    
+    book.saved = book.saved + (1 if not book_history.saved else -1)
+    book.save()
+    book_history.saved = not book_history.saved
     book_history.save()
     return Response({"message": f"Book history created for book with id: {book_id}.",
                          "data": {"id": book_id},
