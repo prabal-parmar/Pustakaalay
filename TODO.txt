@@ -8,8 +8,11 @@ Features:
 
 Backend:
     1) Need to add local exchange with location feature
-    2) Hardcoded educational_content and condition for buyer book
+    2) Hardcoded educational_content and condition for buyer book - Buyer
     3) Pagination to be added
 Frontend:
     1) Need to add name in home page of seller
     2) Pagination to be added
+    3) Currently Analytics feature is disabled need to use later - Seller
+    4) Notification icon is not working as of now - Seller
+    5) Edit button on profile - Seller
