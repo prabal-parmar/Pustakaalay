@@ -33,7 +33,8 @@ EDUCATIONAL_TYPE = (
 
 CONDITION_TYPE = (
     ("new", "New"),
-    ("old", "Old")
+    ("old", "Old"),
+    ("good", "Good")
 )
 
 # Queryset to make ranked a query
@@ -78,7 +79,7 @@ class BookDataModel(models.Model):
     quantity = models.PositiveIntegerField(default=1)
     educational_content = models.BooleanField(default=False)
     category = models.CharField(max_length=20, choices=CATEGORY_TYPE)
-    condition = models.CharField(max_length=5, choices=CONDITION_TYPE)
+    condition = models.CharField(max_length=5, choices=CONDITION_TYPE, default="Good")
     genre = models.CharField(max_length=10, choices=NOVEL_GENRE_TYPE, null=True, blank=True)
     educational_type = models.CharField(max_length=15, choices=EDUCATIONAL_TYPE, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
