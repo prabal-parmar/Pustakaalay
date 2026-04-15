@@ -34,7 +34,23 @@ export const toggleBookLiked = async (book_id: string) => {
         if (!username){
             throw new Error("Unable to fetch username!");
         }
-        const response = await api.post(`/seller/books/${username}/${book_id}/like/`)
+        const response = await api.put(`/seller/books/${username}/${book_id}/like/`)
+
+        return [response.data.message, response.data.data, response.data.completed]
+    } catch (error) {
+        console.log(error)
+        return ["Something went wrong!", null, false];
+    }
+}
+
+export const toggleBookSaved = async (book_id: string) => {
+    try {
+        const username = await getUsername();
+
+        if (!username){
+            throw new Error("Unable to fetch username!");
+        }
+        const response = await api.put(`/seller/books/${username}/${book_id}/save/`)
 
         return [response.data.message, response.data.data, response.data.completed]
     } catch (error) {
