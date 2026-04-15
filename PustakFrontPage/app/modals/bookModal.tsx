@@ -1,14 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  StyleSheet,
   View,
   Text,
   Modal,
   TouchableOpacity,
   Image,
   ScrollView,
-  Dimensions,
-  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -19,6 +16,7 @@ import {
   BookOpen,
   ShoppingBag,
   Star,
+  Share2,
 } from 'lucide-react-native';
 import { styles } from '@/components/styles/modalStyles/bookDatamodalStyle';
 
@@ -36,6 +34,8 @@ export interface BookData {
   totalViews: number;
   savedByCount: number;
   rating: number;
+  liked?: boolean; 
+  saved?: boolean;
 }
 
 interface ModalProps {
@@ -43,10 +43,42 @@ interface ModalProps {
   onClose: () => void;
   book: BookData | null;
   onBuy?: (book: BookData) => void;
+  onLikeToggle?: (id: string, isNowLiked: boolean) => void;
+  onSaveToggle?: (id: string, isNowSaved: boolean) => void;
 }
 
-export const BookDetailModal = ({ isVisible, onClose, book, onBuy }: ModalProps) => {
+export const BookDetailModal = ({ 
+  isVisible, 
+  onClose, 
+  book, 
+  onBuy,
+  onLikeToggle,
+  onSaveToggle 
+}: ModalProps) => {
+
+  const [isLikedLocal, setIsLikedLocal] = useState(false);
+  const [isSavedLocal, setIsSavedLocal] = useState(false);
+
+  useEffect(() => {
+    if (book) {
+      setIsLikedLocal(!!book.liked);
+      setIsSavedLocal(!!book.saved);
+    }
+  }, [book, isVisible]);
+
   if (!book) return null;
+
+  const handleLike = () => {
+    const newState = !isLikedLocal;
+    setIsLikedLocal(newState);
+    onLikeToggle?.(book.id, newState);
+  };
+
+  const handleSave = () => {
+    const newState = !isSavedLocal;
+    setIsSavedLocal(newState);
+    onSaveToggle?.(book.id, newState);
+  };
 
   const renderBadge = () => {
     if (book.isEducational) {
@@ -57,11 +89,7 @@ export const BookDetailModal = ({ isVisible, onClose, book, onBuy }: ModalProps)
         </View>
       );
     }
-
-    const label = book.category === 'Novel' && book.genre 
-      ? `${book.genre}` 
-      : book.category;
-
+    const label = book.category === 'Novel' && book.genre ? `${book.genre}` : book.category;
     return (
       <View style={styles.badge}>
         <Text style={styles.badgeText}>{label.toUpperCase()}</Text>
@@ -78,11 +106,7 @@ export const BookDetailModal = ({ isVisible, onClose, book, onBuy }: ModalProps)
       statusBarTranslucent
     >
       <View style={styles.overlay}>
-        <TouchableOpacity 
-          style={styles.backdrop} 
-          activeOpacity={1} 
-          onPress={onClose} 
-        />
+        <TouchableOpacity style={styles.backdrop} activeOpacity={1} onPress={onClose} />
         
         <View style={styles.bottomSheet}>
           <View style={styles.header}>
@@ -109,15 +133,48 @@ export const BookDetailModal = ({ isVisible, onClose, book, onBuy }: ModalProps)
           >
             <View style={styles.imageSection}>
                 <View style={styles.imageShadowBox}>
-                    <Image
-                        source={{ uri: book.image }}
-                        style={styles.bookImage}
-                        resizeMode="contain"
-                    />
+                    <Image source={{ uri: book.image }} style={styles.bookImage} resizeMode="contain" />
                 </View>
             </View>
 
             <View style={styles.contentContainer}>
+                <View style={styles.bentoActionContainer}>
+                    <TouchableOpacity 
+                      style={[styles.bentoActionBtn, isLikedLocal && styles.activeLike]} 
+                      onPress={handleLike}
+                      activeOpacity={0.7}
+                    >
+                        <Heart 
+                          size={18} 
+                          color={isLikedLocal ? "#F43F5E" : "#64748B"} 
+                          fill={isLikedLocal ? "#F43F5E" : "transparent"} 
+                        />
+                        <Text style={[styles.bentoActionText, isLikedLocal && { color: "#F43F5E" }]}>
+                          {isLikedLocal ? 'Liked' : 'Like'}
+                        </Text>
+                    </TouchableOpacity>
+                    
+                    <TouchableOpacity 
+                      style={[styles.bentoActionBtn, isSavedLocal && styles.activeSave]} 
+                      onPress={handleSave}
+                      activeOpacity={0.7}
+                    >
+                        <Bookmark 
+                          size={18} 
+                          color={isSavedLocal ? "#D97706" : "#64748B"} 
+                          fill={isSavedLocal ? "#D97706" : "transparent"} 
+                        />
+                        <Text style={[styles.bentoActionText, isSavedLocal && { color: "#D97706" }]}>
+                          {isSavedLocal ? 'Saved' : 'Save'}
+                        </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={styles.bentoActionBtn} activeOpacity={0.7}>
+                        <Share2 size={18} color="#64748B" />
+                        <Text style={styles.bentoActionText}>Share</Text>
+                    </TouchableOpacity>
+                </View>
+
                 <View style={styles.titleRow}>
                     <View style={{ flex: 1 }}>
                         <Text style={styles.bookTitle} numberOfLines={2}>{book.name}</Text>
@@ -136,23 +193,29 @@ export const BookDetailModal = ({ isVisible, onClose, book, onBuy }: ModalProps)
                 <View style={styles.statsContainer}>
                     <View style={styles.statBox}>
                         <View style={[styles.iconCircle, { backgroundColor: '#FFF1F2' }]}>
-                            <Heart size={18} color="#F43F5E" fill="#F43F5E" />
+                            <Heart size={18} color="#F43F5E" fill={isLikedLocal ? "#F43F5E" : "transparent"} />
                         </View>
-                        <Text style={styles.statValue}>{book.totalLikes > 999 ? `${(book.totalLikes/1000).toFixed(1)}k` : book.totalLikes}</Text>
+                        <Text style={styles.statValue}>
+                          {isLikedLocal && !book.liked ? book.totalLikes + 1 : 
+                           !isLikedLocal && book.liked ? book.totalLikes - 1 : book.totalLikes}
+                        </Text>
                         <Text style={styles.statLabel}>LIKES</Text>
                     </View>
                     <View style={styles.statBox}>
                         <View style={[styles.iconCircle, { backgroundColor: '#F0F9FF' }]}>
                             <Eye size={18} color="#0EA5E9" />
                         </View>
-                        <Text style={styles.statValue}>{book.totalViews > 999 ? `${(book.totalViews/1000).toFixed(1)}k` : book.totalViews}</Text>
+                        <Text style={styles.statValue}>{book.totalViews}</Text>
                         <Text style={styles.statLabel}>VIEWS</Text>
                     </View>
                     <View style={styles.statBox}>
                         <View style={[styles.iconCircle, { backgroundColor: '#FFFBEB' }]}>
-                            <Bookmark size={18} color="#D97706" fill="#D97706" />
+                            <Bookmark size={18} color="#D97706" fill={isSavedLocal ? "#D97706" : "transparent"} />
                         </View>
-                        <Text style={styles.statValue}>{book.savedByCount}</Text>
+                        <Text style={styles.statValue}>
+                          {isSavedLocal && !book.saved ? book.savedByCount + 1 : 
+                           !isSavedLocal && book.saved ? book.savedByCount - 1 : book.savedByCount}
+                        </Text>
                         <Text style={styles.statLabel}>SAVED</Text>
                     </View>
                 </View>
