@@ -24,7 +24,7 @@ def time_ago(dt):
         return f"{int(seconds // 31536000)}y ago"
 
 # Function to add randomness and freshness in books set
-def refine_books_with_randomness(books, randomness=0.2):
+def refine_books_with_randomness(books, randomness_range=5):
     now = datetime.datetime.now(datetime.timezone.utc)
 
     for book in books:
@@ -38,7 +38,7 @@ def refine_books_with_randomness(books, randomness=0.2):
             float(book.rating) * 5
         )
 
-        random_boost = random.uniform(0, 5)
+        random_boost = random.uniform(0, randomness_range)
 
         book.final_score = base_score + (freshness * 10) + random_boost
 
