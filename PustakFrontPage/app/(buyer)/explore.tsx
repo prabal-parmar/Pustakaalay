@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from "react";
+import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -9,6 +9,8 @@ import {
   Platform,
   StatusBar,
   KeyboardAvoidingView,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import {
   Search,
@@ -27,13 +29,17 @@ import {
   LucideIcon,
 } from "lucide-react-native";
 import { styles } from "@/components/styles/buyerStyles/exploreStyles";
+import { useFocusEffect } from "expo-router";
+import { fetchBooksEbooksForBuyer } from "@/api/buyerApis/exploreApi";
+import BookDetailModal, { BookData } from "../modals/bookModal";
+import { fetchBookOrEbookDataById } from "@/api/modalApis/buyerModalsApi";
 
 interface Book {
   id: number;
   title: string;
   author: string;
   price: string;
-  poster: string;
+  seller: string;
   condition: string;
   genre: string;
   category: "Buy" | "Ebook" | "Exchange";
@@ -46,75 +52,6 @@ interface Category {
   icon: LucideIcon;
 }
 
-const readerInventory: Book[] = [
-  {
-    id: 301,
-    title: "The Silent Patient",
-    author: "Alex Michaelides",
-    price: "₹180",
-    poster: "bookworm_ali",
-    condition: "New",
-    genre: "Thriller",
-    category: "Buy",
-    distance: "1.2 km",
-  },
-  {
-    id: 302,
-    title: "Deep Work",
-    author: "Cal Newport",
-    price: "Free",
-    poster: "productivity_pro",
-    condition: "Like New",
-    genre: "Self-Help",
-    category: "Exchange",
-    distance: "3.5 km",
-  },
-  {
-    id: 303,
-    title: "Sapiens",
-    author: "Yuval Noah Harari",
-    price: "₹99",
-    poster: "Pustakaalay",
-    condition: "HD Digital",
-    genre: "History",
-    category: "Ebook",
-    distance: "Instant",
-  },
-  {
-    id: 304,
-    title: "Atomic Habits",
-    author: "James Clear",
-    price: "₹250",
-    poster: "habit_tracker",
-    condition: "New",
-    genre: "Productivity",
-    category: "Buy",
-    distance: "4.2 km",
-  },
-  {
-    id: 305,
-    title: "Dune: Part One",
-    author: "Frank Herbert",
-    price: "Free",
-    poster: "scifi_fan",
-    condition: "Good",
-    genre: "Sci-Fi",
-    category: "Exchange",
-    distance: "0.8 km",
-  },
-  {
-    id: 306,
-    title: "The Alchemist",
-    author: "Paulo Coelho",
-    price: "₹75",
-    poster: "Pustakaalay",
-    condition: "Epub",
-    genre: "Fiction",
-    category: "Ebook",
-    distance: "Instant",
-  },
-];
-
 const categories: Category[] = [
   { id: "All", label: "All Items", icon: LayoutGrid },
   { id: "Buy", label: "Buy", icon: ShoppingBag },
@@ -126,10 +63,39 @@ export default function App() {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [activeCategory, setActiveCategory] = useState<string>("All");
   const [wishlist, setWishlist] = useState<number[]>([301, 305]);
+  const [isLoading, setIsLoading] = useState(true);
   const scrollRef = useRef<ScrollView>(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
-  const filteredBooks = useMemo(
-    () =>
+  const [selectedBook, setSelectedBook] = useState<BookData | null>(null);
+
+  const [readerInventory, setReaderInventory] = useState<Book[]>([]);
+
+  const fetchMarketplaceInventory = async () => {
+    setIsLoading(true);
+    try {
+      const [message, data, completed] = await fetchBooksEbooksForBuyer();
+
+      if (completed && data) {
+        setReaderInventory(data);
+      } else {
+        Alert.alert(message);
+      }
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : "Unknown error occurred";
+      Alert.alert("Error", errorMsg);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  useFocusEffect(
+    useCallback(() => {
+      fetchMarketplaceInventory();
+    }, [])
+  );
+
+  const filteredBooks = useMemo(() =>
       readerInventory.filter((b) => {
         const matchesSearch =
           b.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -139,7 +105,7 @@ export default function App() {
           activeCategory === "All" || b.category === activeCategory;
         return matchesSearch && matchesCategory;
       }),
-    [searchTerm, activeCategory]
+    [readerInventory, searchTerm, activeCategory]
   );
 
   const toggleWishlist = (id: number) => {
@@ -148,9 +114,36 @@ export default function App() {
     );
   };
 
+  const openBook = async (id: string, type: string) => {
+    const [message, data, completed] = await fetchBookOrEbookDataById(id, type)
+    if(completed){
+      setSelectedBook(data);
+    }
+    else{
+      return Alert.alert(message);
+    }
+    setModalVisible(true);
+  };
+
+  const toggleWishlistLike = async (id: string) => {
+    // To add
+  }
+
+  const toggleWishlistSave = async (id: string) => {
+    // To add
+  }
+
   const scrollToTop = () => {
     scrollRef.current?.scrollTo({ y: 0, animated: true });
   };
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#ff5500" />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -168,6 +161,16 @@ export default function App() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
+          <View style={{ flex: 1, justifyContent: 'center' }}>
+            <BookDetailModal
+              isVisible={modalVisible}
+              book={selectedBook}
+              onClose={() => setModalVisible(false)}
+              onBuy={(book) => console.log('Buying:', book.name)}
+              onLikeToggle={() => selectedBook && toggleWishlistLike(selectedBook.id)}
+              onSaveToggle={() => selectedBook && toggleWishlistSave(selectedBook.id)}
+            />
+          </View>
           <View style={styles.header}>
             <View style={styles.titleRow}>
               <View>
@@ -290,7 +293,7 @@ export default function App() {
                     </Text>
                     <View style={styles.posterRow}>
                       <UserCircle2 size={12} color="#6B705C" />
-                      <Text style={styles.posterName}>@{book.poster}</Text>
+                      <Text style={styles.posterName}>@{book.seller}</Text>
                     </View>
 
                     <View style={styles.priceRow}>
