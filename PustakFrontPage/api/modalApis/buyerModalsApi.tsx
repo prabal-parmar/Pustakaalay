@@ -18,15 +18,15 @@ export const fetchBookOrEbookDataById = async (id: string, type: string) => {
         var response;
 
         if(type == "Buy"){
-            response = await api.get(`/buyer/books/${username}/${id}`)
+            response = await api.get(`/buyer/books/buy/${username}/${id}/`)
             return [response.data.message, response.data.data, response.data.completed]
         }
         else if(type == "Ebook"){
-            response = await api.get(`/buyer/ebooks/${username}/${id}`)
+            response = await api.get(`/buyer/books/ebook/${username}/${id}/`)
             return [response.data.message, response.data.data, response.data.completed]
         }
         else if(type == "Exchange"){
-            response = await api.get(`/buyer/exchange/${username}/${id}`)
+            response = await api.get(`/buyer/books/exchange/${username}/${id}/`)
             return [response.data.message, response.data.data, response.data.completed]
         }
         else{
