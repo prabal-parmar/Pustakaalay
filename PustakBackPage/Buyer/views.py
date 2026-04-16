@@ -3,13 +3,14 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
 from Users.models import BuyerModel, CustomUser
-from Seller.models import BookDataModel
+from Seller.models import BookDataModel, BookHistoryModel
 from .models import (BuyerProfile, 
                      EbookModel, 
                      EbookHistory, 
                      ExchangeBookModel,
-                     TradeHistoryModel)
-from  Models.buyerModels import calculate_score
+                     TradeHistoryModel,
+                     ExchangeBookHistory)
+from  Models.buyerModels import calculate_score, refine_books_with_randomness
 from datetime import datetime
 from django.db.models.functions import Random
 
@@ -399,4 +400,84 @@ def get_local_exchange(request):
     
     return Response({"message": "Recommended Books sent.", 
                      "data": books_data, 
+                     "completed": True}, status=status.HTTP_200_OK)
+
+# Fetch all books and ebooks for explore page with type
+@api_view(['GET'])
+def fetch_books_ebooks_for_explore(request):
+    username=request.query_params.get("username")
+    user=CustomUser.objects.filter(username=username).first()
+    buyer=BuyerModel.objects.filter(user=user).first()
+    if not user:
+        return Response({"message": "User not found.", 
+                         "data": None, 
+                         "completed": False}, status=status.HTTP_404_NOT_FOUND)
+    
+    books = BookDataModel.objects.exclude(user=user).ranked()
+    books = list(books)
+    books_with_randomness=refine_books_with_randomness(books)
+
+    final_books = [
+                        {
+                            "id": book.book_id,
+                            "title": book.name,
+                            "author": book.author,
+                            "price": f"₹{book.price}",
+                            "seller": book.user.username,
+                            "condition": book.condition,
+                            "genre": book.genre,
+                            "category": "Buy",
+                            "distance": "1 km", # To be added later if needed
+                            "liked": (BookHistoryModel.objects.filter(user=user, book=book).first() 
+                                      and 
+                                      BookHistoryModel.objects.filter(user=user, book=book).first().liked)
+                        }
+                        for book in books_with_randomness
+                  ]
+    ebooks=EbookModel.objects.exclude(buyer=buyer).ranked()
+    ebooks=list(ebooks)
+    ebooks_with_randomness=refine_books_with_randomness(ebooks)
+    final_ebooks = [
+                        {
+                            "id": book.ebook_id,
+                            "title": book.name,
+                            "author": book.author,
+                            "price": "Free",
+                            "seller": book.buyer.user.username,
+                            "condition": book.condition,
+                            "genre": book.genre,
+                            "category": "Ebook",
+                            "distance": "1 km", # To be added later if needed
+                            "liked": (EbookHistory.objects.filter(ebook_id=book, buyer_seen=buyer).first() 
+                                      and 
+                                      EbookHistory.objects.filter(ebook_id=book, buyer_seen=buyer).first().liked)
+                        }
+                        for book in ebooks_with_randomness
+                  ]
+    
+    exchange_books = ExchangeBookModel.objects.exclude(buyer=buyer).ranked()
+    exchange_books = list(exchange_books)
+    exc_books_with_randomness = refine_books_with_randomness(exchange_books)
+
+    final_exc_books = [
+                        {
+                            "id": book.book_id,
+                            "title": book.name,
+                            "author": book.author,
+                            "price": "Exchange",
+                            "seller": book.buyer.user.username,
+                            "condition": book.condition,
+                            "genre": book.genre,
+                            "category": "Exchange",
+                            "distance": "1 km", # To be added later if needed
+                            "liked": (ExchangeBookHistory.objects.filter(buyer=buyer, book=book).first() 
+                                      and 
+                                      ExchangeBookHistory.objects.filter(buyer=buyer, book=book).first().liked)
+                        }
+                        for book in exc_books_with_randomness
+                  ]
+    
+    explore_books=final_books + final_ebooks + final_exc_books
+    return Response({"message": "All Books and Ebooks data sent.", 
+                     "data": explore_books, 
                      "completed": True}, status=status.HTTP_200_OK)
