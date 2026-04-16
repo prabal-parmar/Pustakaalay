@@ -16,3 +16,4 @@ Frontend:
     3) Currently Analytics feature is disabled need to use later - Seller
     4) Notification icon is not working as of now - Seller
     5) Edit button on profile - Seller
+    6) Use FlatList for proper UI data rendering - Seller & Buyer
