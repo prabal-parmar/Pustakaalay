@@ -2,7 +2,42 @@ from django.db import models
 from Users.models import BuyerModel
 from Seller.models import BookDataModel
 import uuid
-from django.utils import timezone
+from django.db.models import F, FloatField, ExpressionWrapper
+
+class EbookQuerySet(models.QuerySet):
+    def ranked(self):
+        score = ExpressionWrapper(
+            (F('likes') * 3) +
+            (F('saved') * 2) +
+            (F('views') * 1) +
+            (F('rating') * 5),
+            output_field=FloatField()
+        )
+
+        return self.annotate(score=score).order_by('-score')
+
+    def by_category(self, category):
+        return self.filter(category=category)
+
+    def by_genre(self, genre):
+        return self.filter(genre=genre)
+
+    def popular(self):
+        return self.filter(likes__gte=10).order_by('-likes')
+
+    def for_user(self, buyer):
+        return self.filter(buyer=buyer)
+
+class EbookManager(models.Manager):
+
+    def get_queryset(self):
+        return EbookQuerySet(self.model, using=self._db)
+
+    def ranked(self):
+        return self.get_queryset().ranked()
+
+    def popular(self):
+        return self.get_queryset().popular()
 
 
 class BuyerProfile(models.Model):
@@ -53,12 +88,12 @@ class EbookModel(models.Model):
     description = models.TextField(default="No Description")
     category = models.CharField(max_length=20, choices=CATEGORY_TYPE)
     genre = models.CharField(max_length=10, choices=NOVEL_GENRE_TYPE, null=True, blank=True)
-    date = models.DateField(auto_now_add=True)
+    created_at=models.DateTimeField(auto_now_add=True)
     views = models.IntegerField(default=0)
     likes = models.IntegerField(default=0)
     saved = models.IntegerField(default=0)
     rating = models.FloatField(default=0)
-    score = models.FloatField(default=0)
+    objects = EbookManager()
 
     def __str__(self):
         return f"{self.name} - {self.buyer.user.username}"
@@ -81,6 +116,7 @@ class ExchangeBookModel(models.Model):
     category = models.CharField(max_length=20, choices=CATEGORY_TYPE)
     genre = models.CharField(max_length=10, choices=NOVEL_GENRE_TYPE, null=True, blank=True)
     date = models.DateField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     condition = models.CharField(max_length=10, choices=BOOK_CONDITION, default="fair")
     desired_category = models.CharField(max_length=20, choices=CATEGORY_TYPE)
     desired_genre = models.CharField(max_length=10, choices=NOVEL_GENRE_TYPE)
@@ -89,9 +125,21 @@ class ExchangeBookModel(models.Model):
     likes = models.IntegerField(default=0)
     saved = models.IntegerField(default=0)
     views = models.IntegerField(default=0)
+    rating = models.FloatField(default=0)
+    objects=EbookManager() # Same Manager and QuerySet can be used for both
 
     def __str__(self):
         return f"{self.name} - {self.buyer.user.username}"
+
+class ExchangeBookHistory(models.Model):
+    book=models.ForeignKey(BookDataModel, on_delete=models.CASCADE, related_name="exchange_book_name")
+    buyer=models.ForeignKey(BuyerModel, on_delete=models.CASCADE, related_name="exchange_history_user")
+    liked=models.BooleanField(default=False)
+    saved=models.BooleanField(default=False)
+    viewed=models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.book} - {self.buyer.user.username}"
 
 class TradeHistoryModel(models.Model):
     trade_id = models.UUIDField(primary_key=True, default=uuid.uuid4,editable=False)
