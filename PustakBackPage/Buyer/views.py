@@ -444,7 +444,6 @@ def fetch_books_ebooks_for_explore(request):
                             "author": book.author,
                             "price": "Free",
                             "seller": book.buyer.user.username,
-                            "condition": book.condition,
                             "genre": book.genre,
                             "category": "Ebook",
                             "distance": "1 km", # To be added later if needed
@@ -480,4 +479,93 @@ def fetch_books_ebooks_for_explore(request):
     explore_books=final_books + final_ebooks + final_exc_books
     return Response({"message": "All Books and Ebooks data sent.", 
                      "data": explore_books, 
+                     "completed": True}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def fetch_book_ebook_by_id(request, type, username, id):
+    user=CustomUser.objects.filter(username=username).first()
+    buyer=BuyerModel.objects.filter(user=user).first()
+    if not user:
+        return Response({"message": "User not found.", 
+                         "data": None, 
+                         "completed": False}, status=status.HTTP_404_NOT_FOUND)
+    
+    if type=="buy":
+        book=BookDataModel.objects.filter(book_id=id).first()
+        if not book:
+            return Response({"message": f"Unable to find book with id: {id}", 
+                         "data": None, 
+                         "completed": False}, status=status.HTTP_404_NOT_FOUND)
+
+        book_history=BookHistoryModel.objects.filter(user=user, book=book).first()
+        book_data = {
+            "id": book.book_id,
+            "name": book.name.title(),
+            "author": book.author.title(),
+            "image": "https://picsum.photos/200", # To be added later
+            "description": book.description,
+            "price": book.price,
+            "category": book.category.title(),
+            "genre": book.genre.title(),
+            "isEducational": book.educational_content,
+            "totalLikes": book.likes,
+            "totalViews": book.views,
+            "savedByCount": book.saved,
+            "rating": book.rating,
+            "liked": book_history.liked if book_history else False,
+            "saved": book_history.saved if book_history else False
+        }
+
+        return Response({"message": f"Book data for id: {id} sent.", 
+                     "data": book_data, 
+                     "completed": True}, status=status.HTTP_200_OK)
+
+    elif type=="ebook":
+        ebook=EbookModel.objects.filter(ebook_id=id).first()
+        ebook_history=EbookHistory.objects.filter(buyer_seen=buyer, ebook_id=ebook).first()
+        ebook_data = {
+            "ebook_id": ebook.ebook_id,
+            "name": ebook.name.title(),
+            "author": ebook.author.title(),
+            "image": "https://picsum.photos/200", # To be added later
+            "description": ebook.description,
+            "category": ebook.category.title(),
+            "genre": ebook.genre.title(),
+            "views": ebook.views,
+            "likes": ebook.likes,
+            "saved": ebook.saved,
+            "rating": ebook.rating,
+            "liked": ebook_history.liked if ebook_history else False,
+            "saved_status": ebook_history.saved if ebook_history else False
+        }
+
+        return Response({"message": f"Ebook data for id: {id} sent.", 
+                     "data": ebook_data, 
+                     "completed": True}, status=status.HTTP_200_OK)
+    
+    elif type=="exchange":
+        exchange_book=ExchangeBookModel.objects.filter(book_id=id).first()
+        exchange_book_history=ExchangeBookHistory.objects.filter(buyer=buyer, book=exchange_book).first()
+        exchange_book_data={
+            "book_id": exchange_book.book_id,
+            "name": exchange_book.name.title(),
+            "author": exchange_book.author.title(),
+            "image": "https://picsum.photos/200",
+            "category": exchange_book.category.title(),
+            "genre": exchange_book.genre.title(),
+            "condition": exchange_book.condition.title(),
+            "description": exchange_book.description,
+            "desired_category": exchange_book.desired_category.title(),
+            "desired_genre": exchange_book.desired_genre.title(),
+            "wanted_condition": exchange_book.wanted_condition.title(),
+            "likes": exchange_book.likes,
+            "saved": exchange_book.saved,
+            "views": exchange_book.views,
+            "rating": exchange_book.rating,
+            "liked": exchange_book_history.liked if exchange_book_history else False,
+            "saved_status": exchange_book_history.saved if exchange_book_history else False
+        }
+
+        return Response({"message": f"Exchange book data for id: {id} sent.", 
+                     "data": exchange_book_data,
                      "completed": True}, status=status.HTTP_200_OK)

@@ -13,5 +13,6 @@ urlpatterns = [
     path('hot-picks/', views.get_hot_ebook_picks, name="Hot Ebook data for Buyer"),
     path('trade-history/', views.get_trade_history, name="Fetch Trade History of books."),
     path('rec-exchange/', views.get_local_exchange, name="Local Exchange for Buyer"),
-    path('explore/', views.fetch_books_ebooks_for_explore, name="Books, Ebooks, Exchange Books for explore page")
+    path('explore/', views.fetch_books_ebooks_for_explore, name="Books, Ebooks, Exchange Books for explore page"),
+    path('books/<str:type>/<str:username>/<str:id>/', views.fetch_book_ebook_by_id, name="Books or Ebooks or ExchangeBooks by Id")
 ]

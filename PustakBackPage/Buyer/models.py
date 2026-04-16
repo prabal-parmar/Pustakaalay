@@ -88,6 +88,7 @@ class EbookModel(models.Model):
     description = models.TextField(default="No Description")
     category = models.CharField(max_length=20, choices=CATEGORY_TYPE)
     genre = models.CharField(max_length=10, choices=NOVEL_GENRE_TYPE, null=True, blank=True)
+    date=models.DateField(auto_now_add=True)
     created_at=models.DateTimeField(auto_now_add=True)
     views = models.IntegerField(default=0)
     likes = models.IntegerField(default=0)
@@ -132,7 +133,7 @@ class ExchangeBookModel(models.Model):
         return f"{self.name} - {self.buyer.user.username}"
 
 class ExchangeBookHistory(models.Model):
-    book=models.ForeignKey(BookDataModel, on_delete=models.CASCADE, related_name="exchange_book_name")
+    book=models.ForeignKey(ExchangeBookModel, on_delete=models.CASCADE, related_name="exchange_book_name")
     buyer=models.ForeignKey(BuyerModel, on_delete=models.CASCADE, related_name="exchange_history_user")
     liked=models.BooleanField(default=False)
     saved=models.BooleanField(default=False)
