@@ -34,6 +34,7 @@ import { fetchBooksEbooksForBuyer } from "@/api/buyerApis/exploreApi";
 import BookDetailModal, { BookData } from "../modals/bookModal";
 import { fetchBookOrEbookDataById } from "@/api/modalApis/buyerModalsApi";
 import { EbookData, EbookDetailModal } from "../modals/ebookModal";
+import { ExchangeBookData, ExchangeBookDetailModal } from "../modals/exchangeBookModal";
 
 interface Book {
   id: string;
@@ -68,8 +69,10 @@ export default function App() {
   const scrollRef = useRef<ScrollView>(null);
   const [bookModalVisible, setBookModalVisible] = useState(false);
   const [ebookModalVisible, setEbookModalVisible] = useState(false);
+  const [exhangeBookModalVisible, setExhangeBookModalVisible] = useState(false);
   const [selectedBook, setSelectedBook] = useState<BookData | null>(null);
   const [selectedEbook, setSelectedEbook] = useState<EbookData | null>(null);
+  const [selectedExchangeBook, setSelectedExchangeBook] = useState<ExchangeBookData | null>(null);
   const [readerInventory, setReaderInventory] = useState<Book[]>([]);
 
   const handleRead = () => {
@@ -128,12 +131,12 @@ export default function App() {
          setBookModalVisible(true);
       }
       else if(type=="Ebook"){
-        console.log(type)
         setSelectedEbook(data);
         setEbookModalVisible(true);
       }
       else if (type=="Exchange"){
-        // To be added
+        setSelectedExchangeBook(data);
+        setExhangeBookModalVisible(true);
       }
       else{
         console.log("Type of book is wrong!")
@@ -152,6 +155,9 @@ export default function App() {
     // To add
   }
 
+  const handleProposeSwap = async (id: string) => {
+    // To add
+  }
   const scrollToTop = () => {
     scrollRef.current?.scrollTo({ y: 0, animated: true });
   };
@@ -196,6 +202,14 @@ export default function App() {
               onRead={handleRead}
               onLikeToggle={() => selectedEbook && toggleWishlistLike(selectedEbook.ebook_id)}
               onSaveToggle={(id, saved) => console.log(id, saved)}
+            />
+            <ExchangeBookDetailModal
+              isVisible={exhangeBookModalVisible}
+              book={selectedExchangeBook}
+              onClose={() => setExhangeBookModalVisible(false)}
+              onExchange={() => selectedExchangeBook && handleProposeSwap(selectedExchangeBook?.book_id)}
+              onLikeToggle={(id, liked) => console.log("Liked swap:", id, liked)}
+              onSaveToggle={(id, saved) => console.log("Saved swap:", id, saved)}
             />
           </View>
           <View style={styles.header}>
