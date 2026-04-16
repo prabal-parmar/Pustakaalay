@@ -33,9 +33,10 @@ import { useFocusEffect } from "expo-router";
 import { fetchBooksEbooksForBuyer } from "@/api/buyerApis/exploreApi";
 import BookDetailModal, { BookData } from "../modals/bookModal";
 import { fetchBookOrEbookDataById } from "@/api/modalApis/buyerModalsApi";
+import { EbookData, EbookDetailModal } from "../modals/ebookModal";
 
 interface Book {
-  id: number;
+  id: string;
   title: string;
   author: string;
   price: string;
@@ -62,14 +63,19 @@ const categories: Category[] = [
 export default function App() {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [activeCategory, setActiveCategory] = useState<string>("All");
-  const [wishlist, setWishlist] = useState<number[]>([301, 305]);
+  const [wishlist, setWishlist] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const scrollRef = useRef<ScrollView>(null);
-  const [modalVisible, setModalVisible] = useState(false);
-
+  const [bookModalVisible, setBookModalVisible] = useState(false);
+  const [ebookModalVisible, setEbookModalVisible] = useState(false);
   const [selectedBook, setSelectedBook] = useState<BookData | null>(null);
-
+  const [selectedEbook, setSelectedEbook] = useState<EbookData | null>(null);
   const [readerInventory, setReaderInventory] = useState<Book[]>([]);
+
+  const handleRead = () => {
+    console.log("Reading...");
+    setEbookModalVisible(false);
+  }
 
   const fetchMarketplaceInventory = async () => {
     setIsLoading(true);
@@ -108,7 +114,7 @@ export default function App() {
     [readerInventory, searchTerm, activeCategory]
   );
 
-  const toggleWishlist = (id: number) => {
+  const toggleWishlist = (id: string) => {
     setWishlist((prev) =>
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
     );
@@ -117,12 +123,25 @@ export default function App() {
   const openBook = async (id: string, type: string) => {
     const [message, data, completed] = await fetchBookOrEbookDataById(id, type)
     if(completed){
-      setSelectedBook(data);
+      if(type=="Buy"){
+         setSelectedBook(data);
+         setBookModalVisible(true);
+      }
+      else if(type=="Ebook"){
+        console.log(type)
+        setSelectedEbook(data);
+        setEbookModalVisible(true);
+      }
+      else if (type=="Exchange"){
+        // To be added
+      }
+      else{
+        console.log("Type of book is wrong!")
+      }
     }
     else{
       return Alert.alert(message);
     }
-    setModalVisible(true);
   };
 
   const toggleWishlistLike = async (id: string) => {
@@ -163,12 +182,20 @@ export default function App() {
         >
           <View style={{ flex: 1, justifyContent: 'center' }}>
             <BookDetailModal
-              isVisible={modalVisible}
+              isVisible={bookModalVisible}
               book={selectedBook}
-              onClose={() => setModalVisible(false)}
+              onClose={() => {setBookModalVisible(false); setSelectedBook(null);}}
               onBuy={(book) => console.log('Buying:', book.name)}
               onLikeToggle={() => selectedBook && toggleWishlistLike(selectedBook.id)}
               onSaveToggle={() => selectedBook && toggleWishlistSave(selectedBook.id)}
+            />
+            <EbookDetailModal
+              isVisible={ebookModalVisible}
+              ebook={selectedEbook}
+              onClose={() => {setEbookModalVisible(false); setSelectedBook(null);}}
+              onRead={handleRead}
+              onLikeToggle={() => selectedEbook && toggleWishlistLike(selectedEbook.ebook_id)}
+              onSaveToggle={(id, saved) => console.log(id, saved)}
             />
           </View>
           <View style={styles.header}>
@@ -304,13 +331,13 @@ export default function App() {
                           <Text style={styles.locText}>{book.distance}</Text>
                         </View>
                       </View>
-                      <TouchableOpacity style={styles.actionBtn}>
+                      <TouchableOpacity style={styles.actionBtn} onPressOut={() => openBook(book.id, book.category)}>
                         <Text style={styles.actionBtnText}>
                           {book.category === "Ebook"
                             ? "READ"
                             : book.category === "Exchange"
                             ? "SWAP"
-                            : "BUY"}
+                            : "VIEW"}
                         </Text>
                       </TouchableOpacity>
                     </View>
