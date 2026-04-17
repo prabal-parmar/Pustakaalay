@@ -20,3 +20,15 @@ export const fetchBooksEbooksForBuyer = async () => {
         return ["Something went wrong!", null, false]
     }
 }
+
+export const toggleBuyerBookLiked = async (id: string, type: string) => {
+    try {
+        const username = await getUsername();
+        const response = await api.put(`/buyer/${type}/${username}/${id}/like/`)
+
+        return [response.data.message, response.data.data, response.data.completed]
+    } catch (error) {
+        console.log(error)
+        return ["Something went wrong!", null, false]
+    }
+}
