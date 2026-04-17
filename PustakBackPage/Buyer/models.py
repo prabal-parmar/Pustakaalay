@@ -137,7 +137,7 @@ class ExchangeBookHistory(models.Model):
     buyer=models.ForeignKey(BuyerModel, on_delete=models.CASCADE, related_name="exchange_history_user")
     liked=models.BooleanField(default=False)
     saved=models.BooleanField(default=False)
-    viewed=models.BooleanField(default=False)
+    viewed=models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.book} - {self.buyer.user.username}"

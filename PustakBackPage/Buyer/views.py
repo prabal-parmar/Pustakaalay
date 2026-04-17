@@ -481,6 +481,7 @@ def fetch_books_ebooks_for_explore(request):
                      "data": explore_books, 
                      "completed": True}, status=status.HTTP_200_OK)
 
+# Fetch book or ebook or exchange book by id
 @api_view(['GET'])
 def fetch_book_ebook_by_id(request, type, username, id):
     user=CustomUser.objects.filter(username=username).first()
@@ -569,3 +570,96 @@ def fetch_book_ebook_by_id(request, type, username, id):
         return Response({"message": f"Exchange book data for id: {id} sent.", 
                      "data": exchange_book_data,
                      "completed": True}, status=status.HTTP_200_OK)
+
+# Like book or ebook or exchange book by id and type
+@api_view(['PUT'])
+def like_book_ebook_by_id(request, type, username, id):
+    user=CustomUser.objects.filter(username=username).first()
+    buyer=BuyerModel.objects.filter(user=user).first()
+    if not user:
+        return Response({"message": "User not found.",
+                         "data": None,
+                         "completed": False}, status=status.HTTP_404_NOT_FOUND)
+    
+    if type == "Buy":
+        book=BookDataModel.objects.filter(book_id=id).first()
+        if not book:
+            return Response({"message": "Book not found.", 
+                         "data": None, 
+                         "completed": False}, status=status.HTTP_404_NOT_FOUND)
+        
+        book_history=BookHistoryModel.objects.filter(book=book, user=user).first()
+        if not book_history:
+            BookHistoryModel.objects.create(book=book,
+                                            user=user,
+                                            liked=True).save()
+            book.views += 1
+            book.likes += 1
+            book.save()
+            return Response({"message": f"Book liked for id: {id}.",
+                            "data": id,
+                            "completed": True}, status=status.HTTP_200_OK)
+        else:
+            book_history.liked = not book_history.liked
+            book_history.save()
+
+            return Response({"message": f"Book like toggled for id: {id}.",
+                            "data": id,
+                            "completed": True}, status=status.HTTP_200_OK)
+
+    elif type == "Ebook":
+        ebook=EbookModel.objects.filter(ebook_id=id).first()
+        if not ebook:
+            return Response({"message": "Ebook not found.", 
+                            "data": None,
+                            "completed": False}, status=status.HTTP_404_NOT_FOUND)
+        
+        ebook_history=EbookHistory.objects.filter(ebook_id=ebook, buyer_seen=buyer).first()
+        if not ebook_history:
+            EbookHistory.objects.create(ebook_id=ebook,
+                                        buyer_seen=buyer,
+                                        liked=True).save()
+            ebook.views += 1
+            ebook.likes += 1
+            ebook.save()
+            return Response({"message": f"Ebook liked for id: {id}.",
+                            "data": id,
+                            "completed": True}, status=status.HTTP_200_OK)
+        else:
+            ebook_history.liked = not ebook_history.liked
+            ebook_history.save()
+
+            return Response({"message": f"Ebook like toggled for id: {id}.",
+                            "data": id,
+                            "completed": True}, status=status.HTTP_200_OK)
+    
+    elif type == "Exchange":
+        exchange_book=ExchangeBookModel.objects.filter(book_id=id).first()
+        if not exchange_book:
+            return Response({"message": "Exchange book not found.", 
+                            "data": None, 
+                            "completed": False}, status=status.HTTP_404_NOT_FOUND)
+        
+        exchange_book_history=ExchangeBookHistory.objects.filter(book=exchange_book, buyer=buyer).first()
+        if not exchange_book_history:
+            ExchangeBookHistory.objects.create(book=exchange_book,
+                                               buyer=buyer).save()
+            
+            exchange_book.views += 1
+            exchange_book.likes += 1
+            exchange_book.save()
+            return Response({"message": f"Exchange book liked for id: {id}.",
+                            "data": id,
+                            "completed": True}, status=status.HTTP_200_OK)
+        else:
+            exchange_book_history.liked = not exchange_book_history.liked
+            exchange_book_history.save()
+
+            return Response({"message": f"Exchange book toggle for id: {id}.",
+                            "data": id,
+                            "completed": True}, status=status.HTTP_200_OK)
+    
+    else:
+        return Response({"message": "Invalid Book type.", 
+                        "data": None,
+                        "completed": False}, status=status.HTTP_404_NOT_FOUND)
