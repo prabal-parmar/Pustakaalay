@@ -30,7 +30,7 @@ import {
 } from "lucide-react-native";
 import { styles } from "@/components/styles/buyerStyles/exploreStyles";
 import { useFocusEffect } from "expo-router";
-import { fetchBooksEbooksForBuyer } from "@/api/buyerApis/exploreApi";
+import { fetchBooksEbooksForBuyer, toggleBuyerBookLiked } from "@/api/buyerApis/exploreApi";
 import BookDetailModal, { BookData } from "../modals/bookModal";
 import { fetchBookOrEbookDataById } from "@/api/modalApis/buyerModalsApi";
 import { EbookData, EbookDetailModal } from "../modals/ebookModal";
@@ -46,6 +46,8 @@ interface Book {
   genre: string;
   category: "Buy" | "Ebook" | "Exchange";
   distance: string;
+  liked: boolean;
+  saved: boolean;
 }
 
 interface Category {
@@ -147,15 +149,22 @@ export default function App() {
     }
   };
 
-  const toggleWishlistLike = async (id: string) => {
+  const toggleWishlistLike = async (id: string, type: string) => {
+    const [message, data, completed] = await toggleBuyerBookLiked(id, type);
+    if (completed){
+      setReaderInventory((prev: any) => prev.map((b: any)=> b.id === id ? { ...b, liked: !b.liked } : b))
+      toggleWishlist(id);
+    }
+    else{
+      return Alert.alert(message);
+    }
+  }
+
+  const toggleWishlistSave = async (id: string, type: string) => {
     // To add
   }
 
-  const toggleWishlistSave = async (id: string) => {
-    // To add
-  }
-
-  const handleProposeSwap = async (id: string) => {
+  const handleProposeSwap = async (id: string, type: string) => {
     // To add
   }
   const scrollToTop = () => {
@@ -192,22 +201,22 @@ export default function App() {
               book={selectedBook}
               onClose={() => {setBookModalVisible(false); setSelectedBook(null);}}
               onBuy={(book) => console.log('Buying:', book.name)}
-              onLikeToggle={() => selectedBook && toggleWishlistLike(selectedBook.id)}
-              onSaveToggle={() => selectedBook && toggleWishlistSave(selectedBook.id)}
+              onLikeToggle={() => selectedBook && toggleWishlistLike(selectedBook.id, selectedBook.category)}
+              onSaveToggle={() => selectedBook && toggleWishlistSave(selectedBook.id, selectedBook.category)}
             />
             <EbookDetailModal
               isVisible={ebookModalVisible}
               ebook={selectedEbook}
               onClose={() => {setEbookModalVisible(false); setSelectedBook(null);}}
               onRead={handleRead}
-              onLikeToggle={() => selectedEbook && toggleWishlistLike(selectedEbook.ebook_id)}
+              onLikeToggle={() => selectedEbook && toggleWishlistLike(selectedEbook.ebook_id, selectedEbook.category)}
               onSaveToggle={(id, saved) => console.log(id, saved)}
             />
             <ExchangeBookDetailModal
               isVisible={exhangeBookModalVisible}
               book={selectedExchangeBook}
               onClose={() => setExhangeBookModalVisible(false)}
-              onExchange={() => selectedExchangeBook && handleProposeSwap(selectedExchangeBook?.book_id)}
+              onExchange={() => selectedExchangeBook && handleProposeSwap(selectedExchangeBook?.book_id, selectedExchangeBook.category)}
               onLikeToggle={(id, liked) => console.log("Liked swap:", id, liked)}
               onSaveToggle={(id, saved) => console.log("Saved swap:", id, saved)}
             />
@@ -308,15 +317,13 @@ export default function App() {
 
                     <TouchableOpacity
                       style={styles.heartBtn}
-                      onPress={() => toggleWishlist(book.id)}
+                      onPress={() => toggleWishlistLike(book.id, book.category)}
                     >
                       <Heart
                         size={16}
-                        color={
-                          wishlist.includes(book.id) ? "#721C24" : "#A5A58D"
-                        }
+                        color={book.liked ? "#721C24" : "#A5A58D"}
                         fill={
-                          wishlist.includes(book.id) ? "#721C24" : "transparent"
+                          book.liked ? "#721C24" : "transparent"
                         }
                       />
                     </TouchableOpacity>
