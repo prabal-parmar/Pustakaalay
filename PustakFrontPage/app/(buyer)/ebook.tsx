@@ -114,7 +114,6 @@ export default function MyBooksScreen() {
   };
 
   const handleOpenModal = async (id: string, type: string) => {
-    console.log(type)
     const [message, data, completed] = await fetchMyBookEbookExchangeBookById(id, type);
     if (completed && type === "selling") {
       setActiveBook(data);

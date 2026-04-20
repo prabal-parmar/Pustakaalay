@@ -193,7 +193,10 @@ export default function ReaderDashboard() {
           </View>
 
           <View style={styles.buttonRow}>
-            <Pressable style={styles.btnPrimary}>
+            <Pressable 
+              style={styles.btnPrimary}
+              onPress={() => router.navigate('/buyerPages/favoriteBooks')}
+            >
               <Heart size={16} color="#fff" fill="#fff" />
               <Text style={styles.btnTextPrimary}>FAVORITES</Text>
             </Pressable>

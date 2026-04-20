@@ -9,6 +9,7 @@ import {
   SafeAreaView,
   ScrollView,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import {
@@ -62,12 +63,12 @@ export default function LoginScreen() {
       }
       else{
         console.log(res[1])
-        return null;
+        return Alert.alert(res[1]);
       }
     }
     else{
       const res = await loginBuyer({username, password});
-      console.log(res[1]);
+      setLogging(false);
       if(res[0] == true){
         await AsyncStorage.setItem("role", "buyer");
         await AsyncStorage.setItem("username", username);
@@ -77,7 +78,7 @@ export default function LoginScreen() {
       }
       else{
         console.log(res[1])
-        return null;
+        return Alert.alert(res[1]);
       }
     }
   }
