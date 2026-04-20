@@ -761,3 +761,60 @@ def fetch_my_book_ebook_by_id(request, type, id):
         return Response({"message": "Invalid Book Type.", 
                          "data": None, 
                          "completed": False}, status=status.HTTP_400_BAD_REQUEST)
+
+# Fetch all favorite books, ebooks and exchange books for buyer
+@api_view(["GET"])
+def fetch_favorite_books(request):
+    username=request.query_params.get("username")
+    user=CustomUser.objects.filter(username=username).first()
+    buyer=BuyerModel.objects.filter(user=user).first()
+    if not buyer:
+        return Response({"message": "User not found.", 
+                         "data": None, 
+                         "completed": False}, status=status.HTTP_404_NOT_FOUND)
+    
+    books_history_liked = list(BookHistoryModel.objects.filter(user=user, liked=True).all())
+    books = []
+    for book in books_history_liked:
+        data={
+            "id": book.book.book_id,
+            "name": book.book.name.title(),
+            "author": book.book.author.title(),
+            "price": book.book.price,
+            "rating": book.book.rating,
+            "image": "https://picsum.photos/200",
+        }
+        books.append(data)
+    
+    ebooks_history_liked = list(EbookHistory.objects.filter(buyer_seen=buyer, liked=True).all())
+    ebooks = []
+    for ebook in ebooks_history_liked:
+        data = {
+            "id": ebook.ebook_id.ebook_id,
+            "name": ebook.ebook_id.name.title(),
+            "author": ebook.ebook_id.author.title(),
+            "rating": ebook.ebook_id.rating,
+            "image": "https://picsum.photos/200",
+        }
+        ebooks.append(data)
+    
+    exchange_history_liked = list(ExchangeBookHistory.objects.filter(buyer=buyer, liked=True).all())
+    exchange_books = []
+    for book in exchange_history_liked:
+        data = {
+            "id": book.book.book_id,
+            "name": book.book.name.title(),
+            "author": book.book.author.title(),
+            "want": book.book.desired_category.title(),
+            "image": "https://picsum.photos/200",
+        }
+        exchange_books.append(data)
+    
+    data = {
+        "books": books,
+        "ebooks": ebooks,
+        "exchangeBooks": exchange_books
+    }
+
+    return Response({"message": "Books, Ebooks and Exchange Books data sent.",
+                     "data": data, "completed": True}, status=status.HTTP_200_OK)
