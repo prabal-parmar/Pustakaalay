@@ -9,12 +9,20 @@ export const loginBuyer = async (loginData: any) => {
         }
         // console.log(data)
         const response = await axios.post('http://127.0.0.1:8000/api/login-buyer/', data)
-        await setTokens(response.data.access, response.data.refresh);
+        if(response.data.completed){
+            await setTokens(response.data.access, response.data.refresh);
+        }
 
         return [response.data.completed, response.data.message]
-    } catch (error) {
-        console.log(error)
-        return [false, "Something went wrong"]
+    } catch (error: any) {
+        if (error.response) {
+            return [
+                false,
+                error.response.data.message || "Invalid credentials!"
+            ];
+        }
+
+        return [false, "Something went wrong!"];
     }
 }
 
@@ -25,12 +33,20 @@ export const loginSeller = async (loginData: any) => {
             password: loginData.password
         }
         const response = await axios.post('http://127.0.0.1:8000/api/login-seller/', data)
-        await setTokens(response.data.access, response.data.refresh);
+        if(response.data.completed){
+            await setTokens(response.data.access, response.data.refresh);
+        }
 
         return [response.data.completed, response.data.message];
-    } catch (error) {
-        console.log(error)
-        return [false, "Something went wrong"]
+    } catch (error: any) {
+        if (error.response) {
+            return [
+                false,
+                error.response.data.message || "Invalid credentials!"
+            ];
+        }
+
+        return [false, "Something went wrong!"];
     }
 }
 
@@ -41,6 +57,6 @@ export const logout = async () => {
         return [response.data.completed, response.data.message]
     } catch (error) {
         console.log(error)
-        return [false, "Something went wrong"]
+        return [false, "Something went wrong!"]
     }
 }
