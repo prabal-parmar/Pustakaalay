@@ -663,3 +663,101 @@ def like_book_ebook_by_id(request, type, username, id):
         return Response({"message": "Invalid Book type.", 
                         "data": None,
                         "completed": False}, status=status.HTTP_404_NOT_FOUND)
+
+# Fetch my book or ebook or exchange book by id
+@api_view(['GET'])
+def fetch_my_book_ebook_by_id(request, type, id):
+    username = request.query_params.get("username")
+    user=CustomUser.objects.filter(username=username).first()
+    buyer=BuyerModel.objects.filter(user=user).first()
+    print(type)
+    if not user:
+        return Response({"message": "User not found.", 
+                         "data": None, 
+                         "completed": False}, status=status.HTTP_404_NOT_FOUND)
+    
+    if type=="buy":
+        book=BookDataModel.objects.filter(book_id=id, user=user).first()
+        if not book:
+            return Response({"message": f"Unable to find book with id: {id}", 
+                         "data": None, 
+                         "completed": False}, status=status.HTTP_404_NOT_FOUND)
+
+        book_data={
+            "book_id": book.book_id,
+            "name": book.name.title(),
+            "author": book.author.title(),
+            "image": "https://picsum.photos/200",
+            "description": book.description,
+            "price": book.price,
+            "quantity": book.quantity,
+            "educational_content": book.educational_content,
+            "category": book.category.title(),
+            "condition": book.condition.title(),
+            "genre": book.genre.title(),
+            "educational_type": book.educational_type.title() if book.educational_type else None,
+            "likes": book.likes,
+            "saved": book.saved,
+            "views": book.views,
+            "rating": book.rating
+        }
+        return Response({"message": f"Book data for id: {id} sent.", 
+                     "data": book_data, 
+                     "completed": True}, status=status.HTTP_200_OK)
+
+    elif type=="ebook":
+        ebook=EbookModel.objects.filter(ebook_id=id, buyer=buyer).first()
+        if not ebook:
+            return Response({"message": f"Unable to find ebook with id: {id}", 
+                         "data": None, 
+                         "completed": False}, status=status.HTTP_404_NOT_FOUND)
+        
+        ebook_data = {
+            "ebook_id": ebook.ebook_id,
+            "name": ebook.name.title(),
+            "author": ebook.author.title(), 
+            "image": "https://picsum.photos/200",
+            "description": ebook.description,
+            "category": ebook.category.title(),
+            "genre": ebook.genre.title(),
+            "views": ebook.views,
+            "likes": ebook.likes,
+            "saved": ebook.saved,
+            "rating": ebook.rating
+        }
+        return Response({"message": f"Ebook data for id: {id} sent.", 
+                     "data": ebook_data, 
+                     "completed": True}, status=status.HTTP_200_OK)
+    
+    elif type=="exchange":
+        exchange_book=ExchangeBookModel.objects.filter(book_id=id, buyer=buyer).first()
+        if not exchange_book:
+            return Response({"message": f"Unable to find exchange book with id: {id}", 
+                         "data": None, 
+                         "completed": False}, status=status.HTTP_404_NOT_FOUND)
+        
+        exchange_book_data = {
+            "book_id": exchange_book.book_id,
+            "name": exchange_book.name.title(),
+            "author": exchange_book.author.title(),
+            "image": "https://picsum.photos/200",
+            "category": exchange_book.category.title(),
+            "genre": exchange_book.genre.title(),
+            "condition": exchange_book.condition.title(),
+            "desired_category": exchange_book.desired_category.title(),
+            "desired_genre": exchange_book.desired_genre.title(),
+            "wanted_condition": exchange_book.wanted_condition.title(),
+            "description": exchange_book.description,
+            "likes": exchange_book.likes,
+            "saved": exchange_book.saved,
+            "views": exchange_book.views,
+            "rating": exchange_book.rating
+        }
+        return Response({"message": f"Exchange book data for id: {id} sent.", 
+                     "data": exchange_book_data,
+                     "completed": True}, status=status.HTTP_200_OK)
+    
+    if not user:
+        return Response({"message": "Invalid Book Type.", 
+                         "data": None, 
+                         "completed": False}, status=status.HTTP_400_BAD_REQUEST)
