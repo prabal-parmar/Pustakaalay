@@ -7,6 +7,7 @@ import {
   TextInput,
   Pressable,
   Alert,
+  TouchableOpacity,
 } from "react-native";
 import {
   FileText,
@@ -30,9 +31,11 @@ import {
   fetchBuyerSellBooksData,
   fetchExchangeBookData,
 } from "@/api/buyerApis/ebookApi";
+import { MyBookData, MyBookDetailModal, MyEbookData, MyEbookDetailModal, MyExchangeData, MyExchangeDetailModal } from "../modals/buyerMybookModal";
+import { fetchMyBookEbookExchangeBookById } from "@/api/modalApis/buyerModalsApi";
 
 interface BaseItem {
-  id: number;
+  id: string;
   title: string;
   author: string;
   postedDate: string;
@@ -75,6 +78,9 @@ export default function MyBooksScreen() {
     "library" | "selling" | "exchange"
   >("library");
 
+  const [activeBook, setActiveBook] = useState<MyBookData | null>(null);
+  const [activeEbook, setActiveEbook] = useState<MyEbookData | null>(null);
+  const [activeExchangeBook, setActiveExchangeBook] = useState<MyExchangeData | null>(null);
   const [myEbooks, setMyEbooks] = useState<LibraryItem[]>([]);
 
   const [myListings, setMyListings] = useState<ListingItem[]>([]);
@@ -94,20 +100,36 @@ export default function MyBooksScreen() {
       b.author.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
+  // To open ebook from here
   const handleClickEbook = async (ebook_id: string) => {
     const [message, data, completed] = await checkBuyerSeenEbook(ebook_id);
 
     if (completed) {
       ebook_id = data.book_id;
       setMyEbooks(prev => (prev.map(e => String(e.id) === ebook_id ? {...e, reads: e.reads += 1} : {...e})))
-      Alert.alert(message);
       return null;
     } else {
-      Alert.alert(message);
       return null;
     }
   };
 
+  const handleOpenModal = async (id: string, type: string) => {
+    console.log(type)
+    const [message, data, completed] = await fetchMyBookEbookExchangeBookById(id, type);
+    if (completed && type === "selling") {
+      setActiveBook(data);
+    }
+    else if (completed && type === "library") {
+      handleClickEbook(String(id))
+      setActiveEbook(data);
+    }
+    else if (completed && type === "exchange") {
+      setActiveExchangeBook(data);
+    }
+    else {
+      return Alert.alert(message)
+    }
+  }
   const handleNavigateToPage = () => {
     if (activeTab == "selling") {
       return router.push("/buyerPages/buyerBookForm");
@@ -116,6 +138,26 @@ export default function MyBooksScreen() {
     } else {
       return router.push("/buyerPages/buyerEbookForm");
     }
+  };
+
+  const handleEdit = (item: any) => {
+    console.log("Navigating to Edit Screen for:", item.name);
+    // navigation.navigate('EditListing', { id: item.book_id || item.ebook_id });
+  };
+
+  const handleDelete = (item: any) => {
+    Alert.alert(
+      "Delete Listing",
+      `Are you sure you want to remove "${item.name}"? This action cannot be undone.`,
+      [
+        { text: "Cancel", style: "cancel" },
+        { 
+          text: "Delete", 
+          style: "destructive", 
+          onPress: () => console.log("Deleting item from Database...") 
+        }
+      ]
+    );
   };
 
   useFocusEffect(
@@ -234,6 +276,30 @@ export default function MyBooksScreen() {
             </Text>
           </Pressable>
         </View>
+
+        <MyBookDetailModal
+          isVisible={!!activeBook}
+          book={activeBook}
+          onClose={() => setActiveBook(null)}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
+
+        <MyEbookDetailModal
+          isVisible={!!activeEbook}
+          ebook={activeEbook}
+          onClose={() => setActiveEbook(null)}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
+
+        <MyExchangeDetailModal
+          isVisible={!!activeExchangeBook}
+          book={activeExchangeBook}
+          onClose={() => setActiveExchangeBook(null)}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
 
         <View style={styles.searchContainer}>
           <View style={styles.searchBox}>
@@ -425,13 +491,13 @@ export default function MyBooksScreen() {
                       </View>
                     </View>
 
-                    <Pressable
+                    <TouchableOpacity
                       style={[
                         styles.readBtn,
                         activeTab === "selling" && styles.editBtn,
                         activeTab === "exchange" && styles.exchangeBtn,
                       ]}
-                      onPressOut={() => activeTab === "library" ? handleClickEbook(String(item.id)): null}
+                      onPressOut={() => handleOpenModal(item.id, activeTab)}
                     >
                       <Text
                         style={[
@@ -452,7 +518,7 @@ export default function MyBooksScreen() {
                           />
                         )}
                       </Text>
-                    </Pressable>
+                    </TouchableOpacity>
                   </View>
                 </View>
               </View>
