@@ -27,6 +27,7 @@ import { styles } from "@/components/styles/buyerStyles/ebookStyles";
 import { router, useFocusEffect } from "expo-router";
 import {
   checkBuyerSeenEbook,
+  deleteMyBookEbook,
   fetchBuyerEbook,
   fetchBuyerSellBooksData,
   fetchExchangeBookData,
@@ -144,16 +145,36 @@ export default function MyBooksScreen() {
     // navigation.navigate('EditListing', { id: item.book_id || item.ebook_id });
   };
 
-  const handleDelete = (item: any) => {
+  const apiForDeleteMyBookEbook = async (id: string, type: string) => {
+    const [message, data, completed] = await deleteMyBookEbook(id, type);
+    if(completed && type==="buy") {
+      setMyListings(prev => prev.filter(b => b.id !== id));
+      setActiveBook(null);
+    }
+    else if(completed && type=="ebook") {
+      setMyEbooks(prev => prev.filter(b => b.id !== id));
+      setActiveEbook(null);
+    }
+    else if(completed && type=="exchange") {
+      setMyExchanges(prev => prev.filter(b => b.id !== id));
+      setActiveExchangeBook(null);
+    }
+    else {
+      return Alert.alert(message);
+    }
+    return null;
+  }
+
+  const handleDelete = (id: string, type: string) => {
     Alert.alert(
-      "Delete Listing",
-      `Are you sure you want to remove "${item.name}"? This action cannot be undone.`,
+      "Are you sure?",
+      `This action cannot be undone.`,
       [
         { text: "Cancel", style: "cancel" },
         { 
           text: "Delete", 
-          style: "destructive", 
-          onPress: () => console.log("Deleting item from Database...") 
+          style: "destructive",
+          onPress: () => apiForDeleteMyBookEbook(id, type)
         }
       ]
     );
@@ -281,7 +302,7 @@ export default function MyBooksScreen() {
           book={activeBook}
           onClose={() => setActiveBook(null)}
           onEdit={handleEdit}
-          onDelete={handleDelete}
+          onDelete={() => activeBook && handleDelete(activeBook?.book_id, "buy")}
         />
 
         <MyEbookDetailModal
@@ -289,7 +310,7 @@ export default function MyBooksScreen() {
           ebook={activeEbook}
           onClose={() => setActiveEbook(null)}
           onEdit={handleEdit}
-          onDelete={handleDelete}
+          onDelete={() => activeEbook && handleDelete(activeEbook.ebook_id, "ebook")}
         />
 
         <MyExchangeDetailModal
@@ -297,7 +318,7 @@ export default function MyBooksScreen() {
           book={activeExchangeBook}
           onClose={() => setActiveExchangeBook(null)}
           onEdit={handleEdit}
-          onDelete={handleDelete}
+          onDelete={() => activeExchangeBook && handleDelete(activeExchangeBook.book_id, "exchange")}
         />
 
         <View style={styles.searchContainer}>
