@@ -670,7 +670,7 @@ def fetch_my_book_ebook_by_id(request, type, id):
     username = request.query_params.get("username")
     user=CustomUser.objects.filter(username=username).first()
     buyer=BuyerModel.objects.filter(user=user).first()
-    print(type)
+    # print(type)
     if not user:
         return Response({"message": "User not found.", 
                          "data": None, 
@@ -818,3 +818,52 @@ def fetch_favorite_books(request):
 
     return Response({"message": "Books, Ebooks and Exchange Books data sent.",
                      "data": data, "completed": True}, status=status.HTTP_200_OK)
+
+# Delete My Book, Ebook or Exchange Book of buyer
+@api_view(['DELETE'])
+def delete_my_book_ebook(request, id, type):
+    username=request.query_params.get("username")
+    user=CustomUser.objects.filter(username=username).first()
+    buyer=BuyerModel.objects.filter(user=user).first()
+    if not buyer:
+        return Response({"message": "User not found.", 
+                         "data": None, 
+                         "completed": False}, status=status.HTTP_404_NOT_FOUND)
+    
+    if type=="buy":
+        book=BookDataModel.objects.filter(user=user, book_id=id).first()
+        if not book:
+            return Response({"message": f"Unable to find book with id: {id}", 
+                         "data": None, 
+                         "completed": False}, status=status.HTTP_404_NOT_FOUND)
+        
+        book.delete()
+        return Response({"message": f"Book deleted for id: {id}", 
+                         "data": None, "completed": True}, status=status.HTTP_200_OK)
+    
+    elif type=="ebook":
+        ebook=EbookModel.objects.filter(ebook_id=id, buyer=buyer).first()
+        if not ebook:
+            return Response({"message": f"Unable to find ebook with id: {id}", 
+                         "data": None, 
+                         "completed": False}, status=status.HTTP_404_NOT_FOUND)
+        
+        ebook.delete()
+        return Response({"message": f"Ebook deleted for id: {id}",
+                         "data": None, "completed": True}, status=status.HTTP_200_OK)
+    
+    elif type=="exchange":
+        exchange_book=ExchangeBookModel.objects.filter(book_id=id, buyer=buyer).first()
+        if not exchange_book:
+            return Response({"message": f"Unable to find exchange book with id: {id}", 
+                         "data": None, 
+                         "completed": False}, status=status.HTTP_404_NOT_FOUND)
+        
+        exchange_book.delete()
+        return Response({"message": f"Exchange book deleted for id: {id}",
+                         "data": None, "completed": True}, status=status.HTTP_200_OK)
+    
+    else:
+        return Response({"message": f"Invalid type of book. Type={type}", 
+                         "data": None, 
+                         "completed": False}, status=status.HTTP_404_NOT_FOUND)

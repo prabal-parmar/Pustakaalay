@@ -17,5 +17,6 @@ urlpatterns = [
     path('books/<str:type>/<str:username>/<str:id>/', views.fetch_book_ebook_by_id, name="Books or Ebooks or ExchangeBooks by Id"),
     path('<str:type>/<str:username>/<str:id>/like/', views.like_book_ebook_by_id, name="Like Book or Ebook by Id"),
     path('mybooks/my/<str:type>/<str:id>/', views.fetch_my_book_ebook_by_id, name="Buyer book, ebook or exchange book"),
-    path('books/all-liked-books/', views.fetch_favorite_books, name="Favorite Books of Buyer")
+    path('books/all-liked-books/', views.fetch_favorite_books, name="Favorite Books of Buyer"),
+    path('mybooks/delete/<str:type>/<str:id>/', views.delete_my_book_ebook, name="Delete my book or ebook")
 ]
