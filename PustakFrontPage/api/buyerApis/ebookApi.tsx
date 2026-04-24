@@ -112,7 +112,7 @@ export const addExchangeBook = async (bookData: any) => {
         return [response.data.message, response.data.data, response.data.completed]
     } catch (error) {
         console.log(error)
-        return ["Something went wrong", null, false]
+        return ["Something went wrong!", null, false]
     }
 }
 
@@ -127,6 +127,21 @@ export const fetchExchangeBookData = async () => {
         return [response.data.message, response.data.data, response.data.completed]
     } catch (error) {
         console.log(error)
-        return ["Something went wrong", null, false]
+        return ["Something went wrong!", null, false]
+    }
+}
+
+export const deleteMyBookEbook = async (id: string, type: string) => {
+    try {
+        const username = await getUsername();
+        if (!username){
+            throw new Error("Unable to fetch username!")
+        }
+        const response = await api.delete(`buyer/mybooks/delete/${type}/${id}/`, {params: {username: username}});
+        
+        return [response.data.message, response.data.data, response.data.completed]
+    } catch (error) {
+        console.log(error)
+        return ["Something went wrong!", null, false]
     }
 }
