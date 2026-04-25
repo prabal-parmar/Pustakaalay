@@ -78,12 +78,14 @@ export default function CollectorProfileScreen() {
       id: 1,
       label: "Account Settings",
       icon: <UserCircle size={20} color="#1A1A1A" />,
+      isAccountSettings: true,
     },
     { id: 2, label: "Notifications", icon: <Bell size={20} color="#1A1A1A" /> },
     {
       id: 3,
       label: "Privacy & Security",
       icon: <Lock size={20} color="#1A1A1A" />,
+      isPrivacy: true,
     },
     {
       id: 4,
@@ -249,7 +251,15 @@ export default function CollectorProfileScreen() {
                       key={option.id}
                       style={styles.settingsItem}
                       onPress={() => {
-                        if (option.isLogout) handleLogout();
+                        if (option.isLogout) {
+                          handleLogout();
+                        }
+                        else if(option.isPrivacy) {
+                          router.push('/common/PrivacySecurityScreen');
+                        }
+                        else if (option.isAccountSettings){
+                          router.push('/common/AccountSettingsScreen')
+                        }
                         toggleSettings();
                       }}
                     >
