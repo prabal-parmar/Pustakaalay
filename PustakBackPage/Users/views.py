@@ -129,3 +129,49 @@ def logout_user(request):
         return Response({"message": "Logout Successfully", "completed": True}, status=status.HTTP_200_OK)
     except:
         return Response({"message": "Something went wrong", "completed": False}, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['GET'])
+def get_user_detail(request):
+    username=request.query_params.get("username")
+    user=CustomUser.objects.filter(username=username).first()
+    if not user:
+        return Response({"message": "User not found.", 
+                         "data": None, 
+                         "completed": False}, status=status.HTTP_404_NOT_FOUND)
+    
+    if user.role == "seller":
+        seller=SellerModel.objects.filter(user=user).first()
+        if not seller:
+            return Response({"message": "Unable to find seller.", 
+                         "data": None,
+                         "completed": False}, status=status.HTTP_404_NOT_FOUND)
+        
+        user_data = {
+            "name": seller.name.title(),
+            "location": seller.location.upper(),
+            "phone": seller.contact_number,
+            "email": seller.email
+        }
+
+        return Response({"message": "Seller data sent.", 
+                         "data": user_data, "completed": True}, status=status.HTTP_200_OK)
+    
+    elif user.role == "buyer":
+        buyer=BuyerModel.objects.filter(user=user).first()
+        if not buyer:
+            return Response({"message": "Unable to find buyer.", 
+                         "data": None,
+                         "completed": False}, status=status.HTTP_404_NOT_FOUND)
+        
+        user_data = {
+            "name": (user.first_name + " " + user.last_name).strip().title(),
+            "location": buyer.city.title(),
+            "phone": buyer.contact_number,
+            "email": buyer.email
+        }
+
+        return Response({"message": "Buyer data sent.", 
+                         "data": user_data, "completed": True}, status=status.HTTP_200_OK)
+    
+    return Response({"message": "Invalid Request!", 
+                     "data": None, "completed": False}, status=status.HTTP_406_NOT_ACCEPTABLE)
