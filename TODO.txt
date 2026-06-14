@@ -10,6 +10,8 @@ Backend:
     1) Need to add local exchange with location feature
     2) Hardcoded educational_content and condition for buyer book - Buyer
     3) Pagination to be added
+    4) Minimize urls by clubbing later for (fetch, delete or edit)
+
 Frontend:
     1) Need to add name in home page of seller
     2) Pagination to be added

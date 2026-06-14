@@ -30,7 +30,7 @@ import {
 } from "lucide-react-native";
 import { styles } from "@/components/styles/buyerStyles/exploreStyles";
 import { useFocusEffect } from "expo-router";
-import { fetchBooksEbooksForBuyer, toggleBuyerBookLiked } from "@/api/buyerApis/exploreApi";
+import { fetchBooksEbooksForBuyer, sendBuyBookRequest, toggleBuyerBookLiked } from "@/api/buyerApis/exploreApi";
 import BookDetailModal, { BookData } from "../modals/bookModal";
 import { fetchBookOrEbookDataById } from "@/api/modalApis/buyerModalsApi";
 import { EbookData, EbookDetailModal } from "../modals/ebookModal";
@@ -171,6 +171,37 @@ export default function App() {
     scrollRef.current?.scrollTo({ y: 0, animated: true });
   };
 
+  const handleBuyNow = (prevAmount: number, book_id: string) => {
+    const previousPrice = prevAmount;
+
+    Alert.prompt(
+      "Confirm Purchase",
+      "Proceed with the current price or negotiate a new amount.",
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        {
+          text: "Confirm",
+          onPress: async (negotiatedAmount: any) => {
+            console.log(`User confirmed at: $${negotiatedAmount}`);
+            const [message, data, completed] = await sendBuyBookRequest(book_id, negotiatedAmount);
+            if (completed){
+              return null;
+            }
+            else{
+              return Alert.alert(message)
+            }
+          }
+        }
+      ],
+      "plain-text",
+      previousPrice.toString(),
+      "numeric"
+    );
+};
+
   if (isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -200,7 +231,7 @@ export default function App() {
               isVisible={bookModalVisible}
               book={selectedBook}
               onClose={() => {setBookModalVisible(false); setSelectedBook(null);}}
-              onBuy={(book) => console.log('Buying:', book.name)}
+              onBuy={(book) => handleBuyNow(Number(book.price), book.id)}
               onLikeToggle={() => selectedBook && toggleWishlistLike(selectedBook.id, selectedBook.category)}
               onSaveToggle={() => selectedBook && toggleWishlistSave(selectedBook.id, selectedBook.category)}
             />

@@ -130,6 +130,7 @@ export default function MyBooksScreen() {
       return Alert.alert(message)
     }
   }
+  
   const handleNavigateToPage = () => {
     if (activeTab == "selling") {
       return router.push("/buyerPages/buyerBookForm");
