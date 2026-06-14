@@ -1,0 +1,7 @@
+pustakenv
+settings.py
+*.env
+db.sqlite3
+*.json
+__pycache__
+.expo
