@@ -9,7 +9,8 @@ from .models import (BuyerProfile,
                      EbookHistory, 
                      ExchangeBookModel,
                      TradeHistoryModel,
-                     ExchangeBookHistory)
+                     ExchangeBookHistory,
+                     BuyBookRequest)
 from  Models.buyerModels import calculate_score, refine_books_with_randomness
 from datetime import datetime
 from django.db.models.functions import Random
@@ -43,7 +44,7 @@ def get_profile(request):
 
 # Send Buy book request
 @api_view(['GET'])
-def send_buy_book_request(request):
+def get_buy_book_requests(request):
     return Response({"data": "Buy Book Request"})
 
 # Exchange book request
@@ -867,3 +868,31 @@ def delete_my_book_ebook(request, id, type):
         return Response({"message": f"Invalid type of book. Type={type}", 
                          "data": None, 
                          "completed": False}, status=status.HTTP_404_NOT_FOUND)
+    
+@api_view(['POST'])
+def send_buy_book_request(request):
+    username=request.data.get("username")
+    book_id=request.data.get("book_id")
+    
+    negotiable_price=int(request.data.get("price"))
+    user=CustomUser.objects.filter(username=username).first()
+    buyer=BuyerModel.objects.filter(user=user).first()
+    if not buyer:
+        return Response({"message": "User not found.", 
+                         "data": None, 
+                         "completed": False}, status=status.HTTP_404_NOT_FOUND)
+    
+    book=BookDataModel.objects.filter(book_id=book_id).first()
+    buy_request=BuyBookRequest.objects.filter(book=book, requester=user).first()
+
+    if buy_request:
+        return Response({"message": "Buy Request Already sent.", 
+                         "data": None, 
+                         "completed": False}, status=status.HTTP_400_BAD_REQUEST)
+    
+    BuyBookRequest.objects.create(book=book, requester=user, requested_amount=negotiable_price).save()
+
+    return Response({"message": "Buy Request Sucess.",
+                     "data": None,
+                     "completed": True}, status=status.HTTP_201_CREATED)
+    

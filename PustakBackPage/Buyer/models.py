@@ -1,5 +1,5 @@
 from django.db import models
-from Users.models import BuyerModel
+from Users.models import BuyerModel, CustomUser
 from Seller.models import BookDataModel
 import uuid
 from django.db.models import F, FloatField, ExpressionWrapper
@@ -158,3 +158,12 @@ class TradeHistoryModel(models.Model):
                 Buyer: {self.trade_buyer.user.username} - 
                 Seller: {self.trade_seller.user.username}
                 """
+    
+class BuyBookRequest(models.Model):
+    request_id=models.UUIDField(primary_key=True, default=uuid.uuid4,editable=False)
+    book=models.ForeignKey(BookDataModel, on_delete=models.CASCADE, related_name="buy_request_book_buyer")
+    requester=models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="buy_book_requester")
+    requested_amount=models.IntegerField()
+
+    def __str__(self):
+        return f"Book:{self.book.name} - Requested by:{self.requester.username}"
