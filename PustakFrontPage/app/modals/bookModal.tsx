@@ -36,6 +36,7 @@ export interface BookData {
   rating: number;
   liked?: boolean; 
   saved?: boolean;
+  buyRequest?:boolean;
 }
 
 interface ModalProps {
@@ -239,8 +240,9 @@ export const BookDetailModal = ({
                 style={styles.buyButton}
                 onPress={() => onBuy?.(book)}
                 activeOpacity={0.8}
+                disabled={!book.buyRequest}
               >
-                <Text style={styles.buyButtonText}>Buy Now</Text>
+                <Text style={styles.buyButtonText}>{book.buyRequest ? "Buy Now": "Requested"}</Text>
                 <View style={styles.buyIconCircle}>
                   <ShoppingBag size={18} color="#0F172A" strokeWidth={2.5} />
                 </View>
