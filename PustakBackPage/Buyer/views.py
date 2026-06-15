@@ -42,17 +42,17 @@ def get_profile(request):
             "message": "Unable to fetch buyer profile data"}, 
             status=status.HTTP_204_NO_CONTENT)
 
-# Send Buy book request
+# Send Buy book request - Todo
 @api_view(['GET'])
 def get_buy_book_requests(request):
     return Response({"data": "Buy Book Request"})
 
-# Exchange book request
+# Exchange book request - Todo
 @api_view(['GET'])
 def send_exchange_book_request(request):
     return Response({"data": "Exchange book request"})
 
-# Accept request to exchange
+# Accept request to exchange - Todo
 @api_view(['POST'])
 def accept_exchange_request_from_buyer(request):
     return Response({"data": "Accept exchange request"})
@@ -252,7 +252,7 @@ def fetch_buyer_exchange_book(request):
     
     return Response({"message": "Buyer Exchange books sent", "data": exchange_books, "completed": True}, status=status.HTTP_200_OK)
 
-# Accept request to sell
+# Accept request to sell - Todo
 @api_view(['POST'])
 def accept_sell_request_from_buyer(request):
     return Response({"data": "Accept sell request"})
@@ -262,7 +262,7 @@ def accept_sell_request_from_buyer(request):
 def all_buy_book_requests(request):
     return Response({"data": "Buy book requests"})
 
-# Exchange request from other buyer
+# Exchange request from other buyer - Todo
 @api_view(['GET'])
 def all_exchange_book_requests(request):
     return Response({"data": "Exchange book requests"})
@@ -429,6 +429,9 @@ def fetch_books_ebooks_for_explore(request):
                             "genre": book.genre,
                             "category": "Buy",
                             "distance": "1 km", # To be added later if needed
+                            "buyRequest": (BookHistoryModel.objects.filter(user=user, book=book).first() 
+                                           and
+                                           BuyBookRequest.objects.filter(requester=user, book=book).exists()),
                             "liked": (BookHistoryModel.objects.filter(user=user, book=book).first() 
                                       and 
                                       BookHistoryModel.objects.filter(user=user, book=book).first().liked)
@@ -869,6 +872,7 @@ def delete_my_book_ebook(request, id, type):
                          "data": None, 
                          "completed": False}, status=status.HTTP_404_NOT_FOUND)
     
+# Send buy request by Buyer
 @api_view(['POST'])
 def send_buy_book_request(request):
     username=request.data.get("username")
@@ -895,4 +899,3 @@ def send_buy_book_request(request):
     return Response({"message": "Buy Request Sucess.",
                      "data": None,
                      "completed": True}, status=status.HTTP_201_CREATED)
-    
