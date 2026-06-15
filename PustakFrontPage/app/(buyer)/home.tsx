@@ -28,91 +28,146 @@ import {
   ScanLine,
   Clock,
   Sparkles,
+  Calendar,
 } from "lucide-react-native";
 import { styles } from "@/components/styles/buyerStyles/homeStyles";
-import { router, useFocusEffect } from "expo-router";
-import { fetchHotEbooksData, fetchLocalExchangeData } from "@/api/buyerApis/homeApi";
+import { router } from "expo-router";
+import {
+  fetchHotEbooksData,
+  fetchLocalExchangeData,
+} from "@/api/buyerApis/homeApi";
+import {
+  ExchangeBookData,
+  ExchangeBookDetailModal,
+} from "../modals/exchangeBookModal";
+import { fetchBookOrEbookDataById } from "@/api/modalApis/buyerModalsApi";
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
-
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const guidelineBaseWidth = 375;
 const scale = (size: number) => (SCREEN_WIDTH / guidelineBaseWidth) * size;
 
 type TrendingEbooks = {
-  id: string,
-  title: string,
-  author: string,
-  rating: number,
-  reads: number
-}
+  id: string;
+  title: string;
+  author: string;
+  rating: number;
+  reads: number;
+};
 
 type RecommendedBook = {
-  id: string,
-  title: string,
-  author: string,
-  type: string,
-  price: number,
-  distance: string,
-  condition: string
-}
+  id: string;
+  title: string;
+  author: string;
+  type: string;
+  price: number;
+  distance: string;
+  condition: string;
+};
 
 export default function App() {
   const [searchTerm, setSearchTerm] = useState("");
   const [wishlist, setWishlist] = useState<string[]>(["101"]);
   const [user, setUser] = useState({ name: "Prabal Parmar" });
   const [viewAll, setViewAll] = useState<Boolean>(false);
-
-  const readingNow = [
-    {
-      id: 1,
-      title: "The Midnight Library",
-      author: "Matt Haig",
-      progress: 65,
-      color: "#5c1616",
-      lastRead: "2h ago",
-    },
-    {
-      id: 2,
-      title: "New The Midnight Library",
-      author: "New Matt Haig",
-      progress: 40,
-      color: "#5c1616",
-      lastRead: "2h ago",
-    },
-  ];
-
+  const [exhangeBookModalVisible, setExhangeBookModalVisible] =
+    useState<boolean>(false);
+  const [selectedExchangeBook, setSelectedExchangeBook] =
+    useState<ExchangeBookData | null>(null);
   const [trending, setTrending] = useState<TrendingEbooks[]>([]);
-    const [recommended, setRecommended] = useState<RecommendedBook[]>([]);
+  const [recommended, setRecommended] = useState<RecommendedBook[]>([]);
+
+  // buy requests sample data
+  const [buyRequests, setBuyRequests] = useState([
+    {
+      id: "1",
+      book_name: "The Midnight Library",
+      author: "Matt Haig",
+      requestor: "Alex Johnson",
+      real_price: 25.0,
+      negotiated_price: 20.0,
+      date: "Oct 12, 2023",
+    },
+    {
+      id: "2",
+      book_name: "Atomic Habits",
+      author: "James Clear",
+      requestor: "Sarah Lee",
+      real_price: 18.5,
+      negotiated_price: 18.5,
+      date: "Oct 14, 2023",
+    },
+  ]);
 
   useEffect(() => {
     const fetchHotEbooks = async () => {
       const [message, data, completed] = await fetchHotEbooksData();
-      if(completed){
+      if (completed) {
         setTrending(data);
         return null;
-      }
-      else{
+      } else {
         return Alert.alert(message);
       }
-    }
+    };
     const fetchLocalExchange = async () => {
       const [message, data, completed] = await fetchLocalExchangeData();
-      if(completed){
+      if (completed) {
         setRecommended(data);
+      } else {
+        return Alert.alert(message);
       }
-      else{
-        return Alert.alert(message)
-      }
-    }
+    };
     fetchHotEbooks();
     fetchLocalExchange();
-  }, [])
+  }, []);
+
+  const handleProposeSwap = async (id: string, type: string) => {
+    // To add API integration for proposing swaps / accepts
+    Alert.alert("Action", `Propose swap/handle action for ${id} (${type})`);
+  };
+
+  const openBook = async (id: string, type: string) => {
+    const [message, data, completed] = await fetchBookOrEbookDataById(id, type);
+    if (completed) {
+      if (type == "Buy") {
+        // Later
+      } else if (type == "Ebook") {
+        // Later
+      } else if (type == "Exchange") {
+        setSelectedExchangeBook(data);
+        setExhangeBookModalVisible(true);
+      } else {
+        console.log("Type of book is wrong!");
+      }
+    } else {
+      return Alert.alert(message);
+    }
+  };
 
   const toggleWishlist = (id: string) => {
     setWishlist((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
     );
   };
+
+  // sample Continue Reading data (used for the Continue Reading section)
+  const [readingNow] = useState([
+    {
+      id: "r1",
+      title: "Deep Work",
+      author: "Cal Newport",
+      progress: 42,
+      lastRead: "2h ago",
+      color: "#FBBF24",
+    },
+    {
+      id: "r2",
+      title: "The Alchemist",
+      author: "Paulo Coelho",
+      progress: 12,
+      lastRead: "Yesterday",
+      color: "#A5A58D",
+    },
+  ]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -123,6 +178,21 @@ export default function App() {
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
+          <ExchangeBookDetailModal
+            isVisible={exhangeBookModalVisible}
+            book={selectedExchangeBook}
+            onClose={() => setExhangeBookModalVisible(false)}
+            onExchange={() =>
+              selectedExchangeBook &&
+              handleProposeSwap(
+                selectedExchangeBook?.book_id,
+                selectedExchangeBook.category,
+              )
+            }
+            onLikeToggle={(id, liked) => console.log("Liked swap:", id, liked)}
+            onSaveToggle={(id, saved) => console.log("Saved swap:", id, saved)}
+          />
+
           <View style={styles.topRow}>
             <View style={styles.profileContainer}>
               <View style={styles.avatar}>
@@ -156,20 +226,110 @@ export default function App() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <View style={styles.titleGroup}>
+              <View style={styles.buyRequestAccent} />
+              <Text style={styles.sectionTitle}>Buy Requests</Text>
+            </View>
+            <TouchableOpacity onPressOut={() => setViewAll(!viewAll)}>
+              <Text style={styles.viewAll}>
+                {viewAll ? "Hide All" : "View All"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {buyRequests
+            .slice(0, viewAll ? buyRequests.length : 1)
+            .map((request) => (
+              <TouchableOpacity
+                key={request.id}
+                style={styles.requestCard}
+                onPress={() =>
+                  Alert.alert(
+                    "Request",
+                    `${request.requestor} wants ${request.book_name}`,
+                  )
+                }
+              >
+                <View style={styles.requestHeaderRow}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.requestBookTitle} numberOfLines={1}>
+                      {request.book_name}
+                    </Text>
+                    {request.author && (
+                      <Text style={styles.requestAuthor}>
+                        by {request.author}
+                      </Text>
+                    )}
+                  </View>
+                  <View style={styles.chevronBox}>
+                    <ChevronRight
+                      size={scale(18)}
+                      color="#5c1616"
+                      strokeWidth={3}
+                    />
+                  </View>
+                </View>
+
+                <View style={styles.requestMetaRow}>
+                  <View style={styles.metaBadge}>
+                    <User size={scale(12)} color="#6B705C" />
+                    <Text style={styles.metaText} numberOfLines={1}>
+                      {request.requestor}
+                    </Text>
+                  </View>
+                  <View style={styles.metaBadge}>
+                    <Calendar size={scale(12)} color="#6B705C" />
+                    <Text style={styles.metaText}>{request.date}</Text>
+                  </View>
+                </View>
+
+                <View style={styles.priceContainer}>
+                  <View style={styles.priceRow}>
+                    <Tag
+                      size={scale(16)}
+                      color="#1c5c16"
+                      style={{ marginRight: scale(6) }}
+                    />
+                    <Text style={styles.offerLabel}>Offering:</Text>
+                    <Text style={styles.negotiatedPrice}>
+                      ${request.negotiated_price.toFixed(2)}
+                    </Text>
+                  </View>
+                  {request.negotiated_price < request.real_price && (
+                    <View style={styles.originalPriceBox}>
+                      <Text style={styles.originalPriceText}>
+                        Listed: ${request.real_price.toFixed(2)}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              </TouchableOpacity>
+            ))}
+        </View>
+
+        {/* Continue Reading + other sections unchanged */}
+
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <View style={styles.titleGroup}>
               <View style={styles.titleAccent} />
               <Text style={styles.sectionTitle}>CONTINUE READING</Text>
             </View>
             <TouchableOpacity onPressOut={() => setViewAll(!viewAll)}>
-              <Text style={styles.viewAll}>{viewAll ? "Hide All" : "View All"}</Text>
+              <Text style={styles.viewAll}>
+                {viewAll ? "Hide All" : "View All"}
+              </Text>
             </TouchableOpacity>
           </View>
 
-          {readingNow.slice(0,(viewAll ? 3 : 1)).map((book) => (
-            <TouchableOpacity key={book.id} style={[styles.readingCard, {marginBottom: 4}]}>
+          {readingNow.slice(0, viewAll ? 3 : 1).map((book) => (
+            <TouchableOpacity
+              key={book.id}
+              style={[styles.readingCard, { marginBottom: 4 }]}
+            >
               <View style={styles.bookIconBox}>
                 <BookOpen
                   size={scale(32)}
-                  color={book.color}
+                  color={book.color ?? "#FBBF24"}
                   strokeWidth={1.5}
                 />
               </View>
@@ -286,7 +446,11 @@ export default function App() {
           </View>
 
           {recommended.map((book) => (
-            <TouchableOpacity key={book.id} style={styles.exchangeCard}>
+            <TouchableOpacity
+              key={book.id}
+              style={styles.exchangeCard}
+              onPressOut={() => openBook(book.id, "Exchange")}
+            >
               <View style={styles.exchangeIconBox}>
                 <BookOpen size={scale(24)} color="#6B705C" />
                 <View
@@ -335,7 +499,10 @@ export default function App() {
             </TouchableOpacity>
           ))}
 
-          <TouchableOpacity style={styles.ctaBanner} onPressOut={() => router.push('/buyerPages/buyerBookForm')}>
+          <TouchableOpacity
+            style={styles.ctaBanner}
+            onPressOut={() => router.push("/buyerPages/buyerBookForm")}
+          >
             <View style={styles.ctaSparkle}>
               <Sparkles size={scale(80)} color="#FBBF24" opacity={0.1} />
             </View>
