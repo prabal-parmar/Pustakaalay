@@ -48,6 +48,7 @@ interface Book {
   distance: string;
   liked: boolean;
   saved: boolean;
+  buyRequest: boolean;
 }
 
 interface Category {
