@@ -33,6 +33,7 @@ import {
 import { styles } from "@/components/styles/buyerStyles/homeStyles";
 import { router } from "expo-router";
 import {
+  fetchBuyBookRequests,
   fetchHotEbooksData,
   fetchLocalExchangeData,
 } from "@/api/buyerApis/homeApi";
@@ -75,28 +76,10 @@ export default function App() {
     useState<ExchangeBookData | null>(null);
   const [trending, setTrending] = useState<TrendingEbooks[]>([]);
   const [recommended, setRecommended] = useState<RecommendedBook[]>([]);
+  const [viewRequests, setViewRequests] = useState<Boolean>(false);
 
   // buy requests sample data
-  const [buyRequests, setBuyRequests] = useState([
-    {
-      id: "1",
-      book_name: "The Midnight Library",
-      author: "Matt Haig",
-      requestor: "Alex Johnson",
-      real_price: 25.0,
-      negotiated_price: 20.0,
-      date: "Oct 12, 2023",
-    },
-    {
-      id: "2",
-      book_name: "Atomic Habits",
-      author: "James Clear",
-      requestor: "Sarah Lee",
-      real_price: 18.5,
-      negotiated_price: 18.5,
-      date: "Oct 14, 2023",
-    },
-  ]);
+  const [buyRequests, setBuyRequests] = useState<any>([]);
 
   useEffect(() => {
     const fetchHotEbooks = async () => {
@@ -116,8 +99,18 @@ export default function App() {
         return Alert.alert(message);
       }
     };
+    const fetchBuyBooks = async () => {
+      const [message, data, completed] = await fetchBuyBookRequests();
+      if(completed) {
+        setBuyRequests(data);
+      } else {
+        return Alert.alert(message);
+      }
+    };
+
     fetchHotEbooks();
     fetchLocalExchange();
+    fetchBuyBooks();
   }, []);
 
   const handleProposeSwap = async (id: string, type: string) => {
@@ -229,16 +222,15 @@ export default function App() {
               <View style={styles.buyRequestAccent} />
               <Text style={styles.sectionTitle}>Buy Requests</Text>
             </View>
-            <TouchableOpacity onPressOut={() => setViewAll(!viewAll)}>
+            <TouchableOpacity onPressOut={() => setViewRequests(!viewRequests)}>
               <Text style={styles.viewAll}>
-                {viewAll ? "Hide All" : "View All"}
+                {viewRequests ? "Hide All" : "View All"}
               </Text>
             </TouchableOpacity>
           </View>
 
           {buyRequests
-            .slice(0, viewAll ? buyRequests.length : 1)
-            .map((request) => (
+            .map((request: any) => (
               <TouchableOpacity
                 key={request.id}
                 style={styles.requestCard}

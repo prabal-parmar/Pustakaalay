@@ -58,3 +58,17 @@ export const toggleBookSaved = async (book_id: string) => {
         return ["Something went wrong!", null, false];
     }
 }
+
+export const sendBuyBookRequestSeller = async (id: string, price: string) => {
+    try {
+        const username = await getUsername();
+        const response = await api.post(`/seller/book/buy-book/`, {username: username, 
+                                                                    book_id: id, 
+                                                                    price: price})
+
+        return [response.data.message, response.data.data, response.data.completed]
+    } catch (error) {
+        console.log(error)
+        return ["Something went wrong!", null, false]
+    }
+}

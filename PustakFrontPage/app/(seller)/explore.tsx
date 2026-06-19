@@ -45,7 +45,7 @@ interface Book {
 }
 
 import { styles } from "@/components/styles/sellerStyles/exploreStyles";
-import { fetchExploreBooksData, toggleBookLiked, toggleBookSaved } from "@/api/sellerApis/exploreApis";
+import { fetchExploreBooksData, sendBuyBookRequestSeller, toggleBookLiked, toggleBookSaved } from "@/api/sellerApis/exploreApis";
 import { useFocusEffect } from "expo-router";
 import BookDetailModal, { BookData } from "../modals/bookModal";
 import { fetchBookDataById } from "@/api/modalApis/sellerModalsApi";
@@ -87,15 +87,15 @@ export default function App() {
   );
 
   const openBook = async (id: string) => {
-      const [message, data, completed] = await fetchBookDataById(id)
-      if(completed){
-        setSelectedBook(data);
-      }
-      else{
-        return Alert.alert(message);
-      }
-      setModalVisible(true);
-    };
+    const [message, data, completed] = await fetchBookDataById(id)
+    if(completed){
+      setSelectedBook(data);
+    }
+    else{
+      return Alert.alert(message);
+    }
+    setModalVisible(true);
+  };
 
   const filteredBooks = useMemo(
     () =>
@@ -117,6 +117,38 @@ export default function App() {
     else{
       return Alert.alert(message)
     }
+  };
+ 
+  const handleBuyNow = (prevAmount: number, book_id: string) => {
+    const previousPrice = prevAmount;
+
+    Alert.prompt(
+      "Confirm Purchase",
+      "Proceed with the current price or negotiate a new amount.",
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        {
+          text: "Confirm",
+          onPress: async (negotiatedAmount: any) => {
+            console.log(`User confirmed at: $${negotiatedAmount}`);
+            const [message, data, completed] = await sendBuyBookRequestSeller(book_id, negotiatedAmount);
+            if (completed){
+              setModalVisible(false);
+              return null;
+            }
+            else{
+              return Alert.alert(message)
+            }
+          }
+        }
+      ],
+      "plain-text",
+      previousPrice.toString(),
+      "numeric"
+    );
   };
 
   const toggleWishlistSave = async (id: string) => {
@@ -151,7 +183,7 @@ export default function App() {
           isVisible={modalVisible}
           book={selectedBook}
           onClose={() => setModalVisible(false)}
-          onBuy={(book) => console.log('Buying:', book.name)}
+          onBuy={(book) => handleBuyNow(Number(book.price), book.id)}
           onLikeToggle={() => selectedBook && toggleWishlistLike(selectedBook.id)}
           onSaveToggle={() => selectedBook && toggleWishlistSave(selectedBook.id)}
         />

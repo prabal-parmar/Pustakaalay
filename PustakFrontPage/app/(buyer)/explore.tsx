@@ -189,6 +189,7 @@ export default function App() {
             console.log(`User confirmed at: $${negotiatedAmount}`);
             const [message, data, completed] = await sendBuyBookRequest(book_id, negotiatedAmount);
             if (completed){
+              setBookModalVisible(false);
               return null;
             }
             else{
@@ -201,7 +202,7 @@ export default function App() {
       previousPrice.toString(),
       "numeric"
     );
-};
+  };
 
   if (isLoading) {
     return (
