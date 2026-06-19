@@ -429,7 +429,7 @@ def fetch_books_ebooks_for_explore(request):
                             "genre": book.genre,
                             "category": "Buy",
                             "distance": "1 km", # To be added later if needed
-                            "buyRequest": (BookHistoryModel.objects.filter(user=user, book=book).first() 
+                            "buyRequest": (BookDataModel.objects.filter(user=user, book_id=book.book_id).exists() 
                                            and
                                            BuyBookRequest.objects.filter(requester=user, book=book).exists()),
                             "liked": (BookHistoryModel.objects.filter(user=user, book=book).first() 
@@ -894,8 +894,42 @@ def send_buy_book_request(request):
                          "data": None, 
                          "completed": False}, status=status.HTTP_400_BAD_REQUEST)
     
-    BuyBookRequest.objects.create(book=book, requester=user, requested_amount=negotiable_price).save()
+    owner=book.user
+
+    BuyBookRequest.objects.create(book=book, requester=user, requested_amount=negotiable_price, owner=owner).save()
 
     return Response({"message": "Buy Request Sucess.",
                      "data": None,
                      "completed": True}, status=status.HTTP_201_CREATED)
+
+# Get All Buy Books Requests For Buyer
+@api_view(['GET'])
+def get_buy_requested_books(request):
+    username=request.query_params.get("username")
+    user=CustomUser.objects.filter(username=username).first()
+    buyer=BuyerModel.objects.filter(user=user).first()
+    if not buyer:
+        return Response({"message": "User not found.", 
+                         "data": None, 
+                         "completed": False}, status=status.HTTP_404_NOT_FOUND)
+    
+    buy_request_books=list(BuyBookRequest.objects.filter(owner=user))
+
+    book_data=[]
+    for book in buy_request_books:
+        b=BookDataModel.objects.filter(book_id=book.book.book_id).first()
+        if b:
+            data={
+                "id": book.request_id,
+                "book_name": book.book.name,
+                "author": book.book.author,
+                "requestor": book.requester.username,
+                "real_price": b.price,
+                "negotiated_price": book.requested_amount,
+                "date": book.date
+            }
+            book_data.append(data)
+
+    return Response({"message": f"Book Requests to buy sent.", 
+                     "data": book_data,
+                     "completed": True}, status=status.HTTP_200_OK)

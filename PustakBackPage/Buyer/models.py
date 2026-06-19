@@ -161,8 +161,10 @@ class TradeHistoryModel(models.Model):
     
 class BuyBookRequest(models.Model):
     request_id=models.UUIDField(primary_key=True, default=uuid.uuid4,editable=False)
+    owner=models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="book_owner")
     book=models.ForeignKey(BookDataModel, on_delete=models.CASCADE, related_name="buy_request_book_buyer")
     requester=models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="buy_book_requester")
+    date=models.DateField(auto_now_add=True)
     requested_amount=models.IntegerField()
 
     def __str__(self):

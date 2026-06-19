@@ -15,6 +15,7 @@ urlpatterns = [
     path('explore/', views.fetch_books_ebooks_for_explore, name="Books, Ebooks, Exchange Books for explore page"),
     path('book/request-buy/', views.send_buy_book_request, name="Buyer request to buy book"),
     path('books/<str:type>/<str:username>/<str:id>/', views.fetch_book_ebook_by_id, name="Books or Ebooks or ExchangeBooks by Id"),
+    path('books/buy-request/', views.get_buy_requested_books, name="Get All Buy Requests book of buyer"),
     path('mybooks/my/<str:type>/<str:id>/', views.fetch_my_book_ebook_by_id, name="Buyer book, ebook or exchange book"),
     path('books/all-liked-books/', views.fetch_favorite_books, name="Favorite Books of Buyer"),
     path('mybooks/delete/<str:type>/<str:id>/', views.delete_my_book_ebook, name="Delete my book or ebook"),
