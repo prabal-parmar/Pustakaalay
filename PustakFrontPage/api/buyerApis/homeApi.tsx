@@ -38,3 +38,18 @@ export const fetchLocalExchangeData = async () => {
         return ["Something went wrong!", null, false]
     }
 }
+
+export const fetchBuyBookRequests = async () => {
+    try {
+        const username = await getUsername();
+        if (!username){
+            throw new Error("Unable to fetch username!")
+        }
+        const response = await api.get('/buyer/books/buy-request/', {params: {username: username}})
+
+        return [response.data.message, response.data.data, response.data.completed]
+    } catch (error) {
+        console.log(error)
+        return ["Something went wrong!", null, false]
+    }
+}
