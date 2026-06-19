@@ -6,11 +6,12 @@ urlpatterns = [
     path('add-book/', views.add_book_to_sell, name="Add New Book"),
     path('my-all-books/', views.fetch_seller_books_data, name="Seller all books data"),
     path('my-inventory/', views.fetch_recent_inventory, name="Seller Books Inventory"),
+    path('explore/', views.fetch_books_for_explore, name="Books data for explore page Seller"),
+    path('book/buy-book/', views.send_buy_book_request, name="Send Buy Request by Seller"),
     path('books/buy-request/<str:username>/', views.fetch_buy_book_recent_requests, name="All Buy book requests"),
     path('books/recommend/<str:username>/', views.fetch_you_can_buy_books, name="Books seller can buy"),
-    path('books/<str:username>/<str:id>/', views.fetch_book_data_by_id, name="Book data using id"),
     path('books/mybooks/<str:username>/<str:book_id>', views.fetch_and_delete_mybook_by_id, name="Fetch My book of seller for book_id"),
-    path('explore/', views.fetch_books_for_explore, name="Books data for explore page Seller"),
+    path('books/<str:username>/<str:id>/', views.fetch_book_data_by_id, name="Book data using id"),
     path('books/<str:username>/<str:book_id>/like/', views.like_unlike_book, name="Like or Unlike book Seller"),
     path('books/<str:username>/<str:book_id>/save/', views.save_unsave_book, name="Save or UnSave book Seller")
 ]

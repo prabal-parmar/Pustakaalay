@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from Users.models import SellerModel, CustomUser
 from .models import SellerProfile, BookDataModel, BookHistoryModel, BookBuyRequest
+from Buyer.models import BuyBookRequest
 from rest_framework import status
 from Models.sellerModels import time_ago, refine_books_with_randomness
 from django.db.models import F, Value, CharField
@@ -169,16 +170,16 @@ def fetch_buy_book_recent_requests(request, username):
                          "data": None, 
                          "completed": True}, status=status.HTTP_404_NOT_FOUND)
     
-    all_book_requests=list(BookBuyRequest.objects.filter(user=user).order_by('-time')[:3])
+    all_book_requests=list(BuyBookRequest.objects.filter(owner=user).order_by('-time')[:3])
 
     books_data = []
     for book in all_book_requests:
         temp = {
-            "id": book.buy_request_id,
+            "id": book.request_id,
             "title": book.book.name,
-            "requester": book.user.username,
-            "offer": book.negotiation_price,
-            "time": time_ago(book.time)
+            "requester": book.requester.username,
+            "offer": book.requested_amount,
+            "date": time_ago(book.date)
         }
         books_data.append(temp)
 
@@ -244,9 +245,13 @@ def fetch_book_data_by_id(request, username, id):
         "savedByCount": book.saved,
         "rating": book.rating,
         "liked": book_history.liked if book_history else False,
-        "saved": book_history.saved if book_history else False
+        "saved": book_history.saved if book_history else False,
+        "buyRequest": (BookDataModel.objects.filter(user=user, book_id=book.book_id).exists() 
+                        and
+                        BuyBookRequest.objects.filter(requester=user, book=book).exists()),
     }
 
+    print(book_data)
     book_history=BookHistoryModel.objects.filter(user=user, book=book).first()
     if not book_history:
         BookHistoryModel.objects.create(user=user,
@@ -415,4 +420,33 @@ def save_unsave_book(request, username, book_id):
     return Response({"message": f"Book history created for book with id: {book_id}.",
                          "data": {"id": book_id},
                          "completed": True}, status=status.HTTP_200_OK)
+
+# Send buy request by Seller for book
+@api_view(['POST'])
+def send_buy_book_request(request):
+    username=request.data.get("username")
+    book_id=request.data.get("book_id")
     
+    negotiable_price=int(float(request.data.get("price")))
+    user=CustomUser.objects.filter(username=username).first()
+    seller=SellerModel.objects.filter(user=user).first()
+    if not seller:
+        return Response({"message": "User not found.", 
+                         "data": None, 
+                         "completed": False}, status=status.HTTP_404_NOT_FOUND)
+    
+    book=BookDataModel.objects.filter(book_id=book_id).first()
+    buy_request=BuyBookRequest.objects.filter(book=book, requester=user).first()
+
+    if buy_request:
+        return Response({"message": "Buy Request Already sent.", 
+                         "data": None, 
+                         "completed": False}, status=status.HTTP_400_BAD_REQUEST)
+    
+    owner=book.user
+
+    BuyBookRequest.objects.create(book=book, requester=user, requested_amount=negotiable_price, owner=owner).save()
+
+    return Response({"message": "Buy Request Sucess.",
+                     "data": None,
+                     "completed": True}, status=status.HTTP_201_CREATED)

@@ -93,6 +93,7 @@ class BookDataModel(models.Model):
     def __str__(self):
         return f"{self.user.role} - {self.user.username} - {self.name}"
     
+# To store the meta data for book (likes, saved)
 class BookHistoryModel(models.Model):
     book=models.ForeignKey(BookDataModel, on_delete=models.CASCADE, related_name="book_name")
     user=models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="history_user")

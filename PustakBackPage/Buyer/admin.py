@@ -3,7 +3,7 @@ from .models import (BuyerProfile,
                      EbookModel, 
                      EbookHistory, 
                      ExchangeBookModel,
-                     TradeHistoryModel)
+                     TradeHistoryModel, BuyBookRequest)
 # Register your models here.
 
 @admin.register(BuyerProfile)
@@ -25,3 +25,7 @@ class SellerProfileAdmin(admin.ModelAdmin):
 @admin.register(TradeHistoryModel)
 class SellerProfileAdmin(admin.ModelAdmin):
     list_display = [field.name for field in TradeHistoryModel._meta.fields]
+
+@admin.register(BuyBookRequest)
+class SellerProfileAdmin(admin.ModelAdmin):
+    list_display = [field.name for field in BuyBookRequest._meta.fields]
