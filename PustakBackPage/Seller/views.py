@@ -170,18 +170,20 @@ def fetch_buy_book_recent_requests(request, username):
                          "data": None, 
                          "completed": True}, status=status.HTTP_404_NOT_FOUND)
     
-    all_book_requests=list(BuyBookRequest.objects.filter(owner=user).order_by('-time')[:3])
+    all_book_requests=list(BuyBookRequest.objects.filter(owner=user).order_by('-date')[:3])
 
     books_data = []
     for book in all_book_requests:
-        temp = {
-            "id": book.request_id,
-            "title": book.book.name,
-            "requester": book.requester.username,
-            "offer": book.requested_amount,
-            "date": time_ago(book.date)
-        }
-        books_data.append(temp)
+        b=BookDataModel.objects.filter(book_id=book.book.book_id).first()
+        if b or not book.closed:
+            temp = {
+                "id": book.request_id,
+                "title": book.book.name,
+                "requester": book.requester.username,
+                "offer": book.requested_amount,
+                "date": time_ago(book.date)
+            }
+            books_data.append(temp)
 
     return Response({"message": "Books recent buy requests sent.", 
                          "data": books_data, 

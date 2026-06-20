@@ -918,7 +918,7 @@ def get_buy_requested_books(request):
     book_data=[]
     for book in buy_request_books:
         b=BookDataModel.objects.filter(book_id=book.book.book_id).first()
-        if b:
+        if b or not book.closed:
             data={
                 "id": book.request_id,
                 "book_name": book.book.name,

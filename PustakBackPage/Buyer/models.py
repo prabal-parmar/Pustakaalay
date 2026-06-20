@@ -166,6 +166,7 @@ class BuyBookRequest(models.Model):
     requester=models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="buy_book_requester")
     date=models.DateField(auto_now_add=True)
     requested_amount=models.IntegerField()
-
+    closed=models.BooleanField(default=False)
+    
     def __str__(self):
         return f"Book:{self.book.name} - Requested by:{self.requester.username}"
