@@ -113,6 +113,39 @@ export default function App() {
     fetchBuyBooks();
   }, []);
 
+  const handleAcceptBuyRequest = async (id: string, buyerName: string, amount: any) => {
+    Alert.alert(
+      "Buy Request",
+      `You have received a purchase request from ${buyerName} for your book.\n\nOffered Amount: ₹${amount}\n\nWould you like to proceed with this sale?`,
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+          onPress: () => {
+            console.log("Cancelled");
+          },
+        },
+        {
+          text: "Reject",
+          style: "destructive",
+          onPress: () => {
+            console.log("Rejected");
+            // Call reject API here
+          },
+        },
+        {
+          text: "Accept with Offer",
+          onPress: () => {
+            console.log("Accepted");
+            // Call accept API here
+          },
+        },
+      ],
+      {
+        cancelable: true,
+      }
+    );
+  } 
   const handleProposeSwap = async (id: string, type: string) => {
     // To add API integration for proposing swaps / accepts
     Alert.alert("Action", `Propose swap/handle action for ${id} (${type})`);
@@ -252,13 +285,14 @@ export default function App() {
                       </Text>
                     )}
                   </View>
-                  <View style={styles.chevronBox}>
+                  <TouchableOpacity style={styles.chevronBox}
+                                    onPressOut={() => handleAcceptBuyRequest(request.id, request.requestor, request.negotiated_price.toFixed(2))}>
                     <ChevronRight
                       size={scale(18)}
                       color="#5c1616"
                       strokeWidth={3}
                     />
-                  </View>
+                  </TouchableOpacity>
                 </View>
 
                 <View style={styles.requestMetaRow}>
