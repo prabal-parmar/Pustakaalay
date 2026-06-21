@@ -1,15 +1,17 @@
 from django.shortcuts import render
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth import authenticate, logout
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
 from .models import BuyerModel, SellerModel, CustomUser
 from Seller.models import SellerProfile
 from Buyer.models import BuyerProfile
+from rest_framework.permissions import AllowAny
 # Create your views here.
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def login_buyer(request):
     username = request.data.get("username")
     password = request.data.get("password")
@@ -32,6 +34,7 @@ def login_buyer(request):
     return Response({"message": "Invalid Credentials", "completed": False}, status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def login_seller(request):
     username = request.data.get("username")
     password = request.data.get("password")
@@ -54,6 +57,7 @@ def login_seller(request):
     return Response({"message": "Invalid Credentials", "completed": False}, status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def register_buyer(request):
     username = request.data.get("username")
     
@@ -93,6 +97,7 @@ def register_buyer(request):
     return Response({"message": "Buyer registered successfully!", "completed": True}, status=status.HTTP_201_CREATED)
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def register_seller(request):
     username = request.data.get("username")
     check_username = CustomUser.objects.filter(username=username).first()
